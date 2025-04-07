@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fresh_planner/ui/pages/main_page.dart';
+import 'package:fresh_planner/ui/pages/calendar_page.dart';
 import 'package:fresh_planner/ui/widgets/flexi_box.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
 
@@ -24,7 +25,7 @@ class _LoginPageState extends State<LoginPage> {
   void checkPassword() async {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const MainPage()),
+      MaterialPageRoute(builder: (context) => const CalendarPage()),
     );
   }
 

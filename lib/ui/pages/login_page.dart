@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fresh_planner/ui/pages/main_page.dart';
 import 'package:fresh_planner/ui/widgets/flexi_box.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
 
@@ -17,17 +18,14 @@ class _LoginPageState extends State<LoginPage> {
   final secondPasswordController = TextEditingController();
 
   bool _isRegister = false;
-  bool get isRegister {
-    return _isRegister;
-  }
-  set isRegister(bool newIsRegister) {
-    setState(() {
-      _isRegister = newIsRegister;
-    });
-  }
+  bool get isRegister => _isRegister;
+  set isRegister(bool value) => setState(() => _isRegister = value);
 
   void checkPassword() async {
-    
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const MainPage()),
+    );
   }
 
   bool suitableEmail(String email) {
@@ -51,16 +49,18 @@ class _LoginPageState extends State<LoginPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "Login",
+          style: AppTextStyles.mainTitle,
+        ),
+      ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 32.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(
-              "Login",
-              style: AppTextStyles.mainTitle,
-            ),
             Text(
               "Welcome to Fresh Planning",
               style: AppTextStyles.subTitle,

@@ -1,28 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:fresh_planner/source/objects/meal.dart';
 import 'package:fresh_planner/ui/widgets/flexi_box.dart';
 
 class CalendarCell extends StatelessWidget {
-  final int day;
+  final DateTime date;
+  final Meal? meal;
   final bool isCurrentDay;
 
   const CalendarCell({
     super.key,
-    this.day = 0,
+    required this.date,
+    this.meal,
     this.isCurrentDay = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 92,
       decoration: BoxDecoration(
         border: Border.all(color: (Colors.green[900])!)
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 2.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -42,7 +43,7 @@ class CalendarCell extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      day.toString(),
+                      date.day.toString(),
                       style: TextStyle(
                         fontSize: 20,
                         color: isCurrentDay ? Colors.white : Colors.green[900], 
@@ -56,16 +57,35 @@ class CalendarCell extends StatelessWidget {
                   height: 15,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.red,
+                    color: meal == null ? Colors.transparent : (meal?.colour)!,
                   ),
                 ),
               ],
             ),
-            FlexiBox(
-              heightFactor: 0.3,
-            ),
-            Text(
-              "Salmon and Pasta"
+            Stack(
+              children: <Widget>[
+                Visibility(
+                  visible: meal != null,
+                  child: Text(
+                    meal == null ? "" : (meal?.name)!,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+                Visibility(
+                  visible: meal == null,
+                  child: Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.green,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:fresh_planner/source/objects/meal.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
@@ -17,6 +20,13 @@ class _CalendarPageState extends State<CalendarPage> {
   
 
   List<CalendarCell> createCalendar() {
+    final List<Meal> meals = [
+      Meal(name: "Chorizo Carbonara", colour: Colors.red),
+      Meal(name: "Lemon Chicken Tacos", colour: Colors.lime),
+      Meal(name: "Salmon Pasta", colour: Colors.pink[200]!),
+      Meal(name: "Creamy Mushroom Pasta", colour: Colors.orange),
+    ];
+
     final List<CalendarCell> cells = [];
 
     final int monthStartDay;
@@ -45,31 +55,35 @@ class _CalendarPageState extends State<CalendarPage> {
     priorMonthLength = getDaysInMonth(priorYear, priorMonth);
 
     int numberAfterAdded = 0;
+    Random rnd = Random();
 
     for (int week = 0; week < 6; week++)
 		{
 			for (int day = 0; day < 7; day++)
 			{
-				int offsetIndex = (week * 7) + day + 1;
+				final int offsetIndex = (week * 7) + day + 1;
 
 				CalendarCell cell;
+
+        int randomSelect = rnd.nextInt(meals.length + 1);
+        Meal? randomMeal = randomSelect > meals.length - 1 ? null : meals[randomSelect];
 
 				// Logic for adding the days before the start of the month
 				if (offsetIndex < monthStartDay + 1)
 				{
-					cell = CalendarCell(day: priorMonthLength - monthStartDay + offsetIndex);
+					cell = CalendarCell(date: DateTime(priorYear, priorMonth, priorMonthLength - monthStartDay + offsetIndex), meal: randomMeal);
 				}
 				// Logic for adding the days after the end of the month
 				else if (offsetIndex > monthLength + monthStartDay)
 				{
-					cell = CalendarCell(day: offsetIndex - (monthLength + monthStartDay));
+					cell = CalendarCell(date: DateTime(nextYear, nextMonth, offsetIndex - (monthLength + monthStartDay)), meal: randomMeal);
           numberAfterAdded++;
 				}
 				// Logic for adding days in the month
 				else
 				{
-          int day = offsetIndex - monthStartDay;
-					cell = CalendarCell(day: day, isCurrentDay: day == currentDay.day,);
+          final DateTime day = DateTime(currentYear, currentMonth, offsetIndex - monthStartDay);
+					cell = CalendarCell(date: day, meal: randomMeal, isCurrentDay: day == DateUtils.dateOnly(currentDay));
 				}
         cells.add(cell);
 			}

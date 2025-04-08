@@ -10,4 +10,5 @@ enum IngredientType {
   herbSpice,
   preserve,
   vegetable,
+  misc,
 }

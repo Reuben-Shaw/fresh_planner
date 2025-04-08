@@ -1,7 +1,7 @@
 import 'package:fresh_planner/source/enums/ingredient_food_type.dart';
 import 'package:fresh_planner/source/enums/ingredient_metric.dart';
 
-class Ingredient {
+class Ingredient implements Comparable<Ingredient> {
   final String name;
   final int amount;
   final double? cost;
@@ -34,6 +34,13 @@ class Ingredient {
       metric: metricFromJson(json['metric']),
       type: ingredientTypeFromJson(json['type']),
     );
+  }
+
+  @override
+  int compareTo(Ingredient other) {
+    int i = type == null ? 0 : other.type == null ? 0 : type!.index.compareTo(other.type!.index);
+    int j = name.compareTo(other.name);
+    return i != 0 ? i : j;
   }
 
   @override

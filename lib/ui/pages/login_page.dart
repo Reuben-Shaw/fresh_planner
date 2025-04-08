@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fresh_planner/source/database/database_ingredients.dart';
 import 'package:fresh_planner/source/database/database_user.dart';
 import 'package:fresh_planner/ui/pages/main_page.dart';
+import 'package:fresh_planner/ui/pages/shared/ingredients_page.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
 
 class LoginPage extends StatefulWidget {
@@ -39,19 +41,26 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    final data = await userDB.loginUser(email, password);
-    if (!data.$1) {
+    final userData = await userDB.loginUser(email, password);
+    if (!userData.$1) {
       errorText = "Email or password is incorrect";
       return;
     }
-    else if (data.$2 == null || !mounted) {
+    else if (userData.$2 == null) {
       errorText = "Internal server error, please try again";
       return;
     }
-
+    final ingredientDB = DatabaseIngredients();
+    final ingredientData = await ingredientDB.getAllIngredients(userData.$2!.uid!);
+    if (ingredientData == null || !mounted) {
+      errorText = "Internal server error, please try again";
+      return;
+    }
+    
+    ingredientData.sort();
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => MainPage(user: data.$2!,)),
+      MaterialPageRoute(builder: (context) => IngredientsPage(user: userData.$2!, ingredients: ingredientData,)),
     );
   }
 

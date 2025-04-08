@@ -20,8 +20,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home: IngredientsPage(user: User(email: "replythisnot@outlook.com", username: "testUser", uid: "wdmdDZ4loXbuJyqPzAoq")),
-      //home: LoginPage(title: "")
+      //home: IngredientsPage(user: User(email: "replythisnot@outlook.com", username: "testUser", uid: "wdmdDZ4loXbuJyqPzAoq")),
+      home: LoginPage(title: "")
     );
   }
 }

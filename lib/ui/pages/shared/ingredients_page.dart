@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/database/database_ingredients.dart';
+import 'package:fresh_planner/source/enums/ingredient_food_type.dart';
 import 'package:fresh_planner/source/enums/ingredient_metric.dart';
 import 'package:fresh_planner/source/objects/ingredient.dart';
 import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
 import 'package:fresh_planner/ui/widgets/ingredient_card.dart';
+import 'package:fresh_planner/ui/widgets/ingredient_list_view.dart';
 
 class IngredientsPage extends StatefulWidget {
-  const IngredientsPage({super.key, required this.user, this.ingredients});
+  const IngredientsPage({super.key, required this.user, required this.ingredients});
 
   final User user;
   final List<Ingredient>? ingredients;
@@ -18,6 +20,38 @@ class IngredientsPage extends StatefulWidget {
 
 class _IngredientsPageState extends State<IngredientsPage> {
   final ingredientDB = DatabaseIngredients();
+
+  List<IngredientListView> ingredientCollapseLists = [];
+  Map<IngredientType, List<IngredientCard>> ingredientMap = {
+    IngredientType.baking : [],
+    IngredientType.dairy : [],
+    IngredientType.driedGood : [],
+    IngredientType.frozen : [],
+    IngredientType.fruitNut : [],
+    IngredientType.herbSpice : [],
+    IngredientType.liquid : [],
+    IngredientType.meat : [],
+    IngredientType.preserve : [],
+    IngredientType.snack : [],
+    IngredientType.vegetable : [],
+    IngredientType.misc : [],
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    setUpIngredientMap();
+  }
+
+  void setUpIngredientMap() {
+    if (widget.ingredients == null) return;
+    for (Ingredient i in widget.ingredients!) {
+      ingredientMap[i.type ?? IngredientType.misc]!.add(IngredientCard(ingredient: i));
+    }
+    for (var i in ingredientMap.entries) {
+      ingredientCollapseLists.add(IngredientListView(ingredientCards: i.value, section: i.key.name));
+    }
+  }
 
   void printIngredients() async {
     List<Ingredient>? ingredients = await ingredientDB.getAllIngredients(widget.user.uid!);
@@ -55,9 +89,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
             ),
             Expanded(
               child: ListView(
-                children: <Widget>[
-                  IngredientCard(ingredient: Ingredient(name: "Bread", metric: IngredientMetric.grams))
-                ],
+                children: ingredientCollapseLists,
               ),
             ),
           ],

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fresh_planner/source/database/database_helper_user.dart';
+import 'package:fresh_planner/source/database/database_user.dart';
 import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/pages/main_page.dart';
 import 'package:fresh_planner/ui/pages/calendar_page.dart';
@@ -20,33 +20,21 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
   final secondPasswordController = TextEditingController();
 
+  final userDB = DatabaseUser();
+
   bool _isRegister = false;
   bool get isRegister => _isRegister;
   set isRegister(bool value) => setState(() => _isRegister = value);
 
-  Future<bool> checkPassword() async {
-    final dbFire = DatabaseHelperUser();
-    debugPrint("Attempting login");
-    final response = await dbFire.loginUser(emailController.text, passwordController.text);
+  Future<void> checkPassword() async {
+    final data = await userDB.loginUser(emailController.text, passwordController.text);
+    if (!data.$1 || data.$2 == null) return;
 
-    bool success = response['success'] ?? false;
-    if (success == true) {
-      debugPrint("Login successful: ${response['message']}");
-
-      final userData = response['user'];
-      final User user = User.fromJson(userData);
-
-      if (!mounted) return false;
-      debugPrint("Context was mounted");
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => CalendarPage(user: user,)),
-      );
-    } else {
-      debugPrint("Login failed: ${response['message'] ?? response['error'] ?? "!!NO ERROR OR MESSAGE!!"}");
-    }
-    return success;
+    if (!mounted) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CalendarPage(user: data.$2!,)),
+    );
   }
 
   bool suitableEmail(String email) {
@@ -54,8 +42,10 @@ class _LoginPageState extends State<LoginPage> {
     return emailReg.hasMatch(email);
   }
 
-  bool emailExists(String email) {
-    return false;
+  Future<bool?> checkEmailExists() async {
+    final data = await userDB.checkEmailExists(emailController.text);
+    if (!data.$1) return null;
+    return data.$2;
   }
 
   void registerAccount() async {

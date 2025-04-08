@@ -44,13 +44,11 @@ class _CalendarPageState extends State<CalendarPage> {
     monthStartDay = (DateTime(currentYear, currentMonth, 1).weekday + 6) % 7;
     monthLength = getDaysInMonth(currentYear, currentMonth);
 
-    if (currentMonth == 1)
-		{
+    if (currentMonth == 1) {
 			priorMonth = 12;
 			priorYear = currentYear - 1;
 		}
-		else if (currentMonth == 12)
-		{
+		else if (currentMonth == 12) {
 			nextMonth = 1;
 			nextYear = currentYear + 1;
 		}
@@ -60,10 +58,8 @@ class _CalendarPageState extends State<CalendarPage> {
     int numberAfterAdded = 0;
     Random rnd = Random();
 
-    for (int week = 0; week < 6; week++)
-		{
-			for (int day = 0; day < 7; day++)
-			{
+    for (int week = 0; week < 6; week++) {
+			for (int day = 0; day < 7; day++) {
 				final int offsetIndex = (week * 7) + day + 1;
 
 				CalendarCell cell;
@@ -72,19 +68,16 @@ class _CalendarPageState extends State<CalendarPage> {
         Meal? randomMeal = randomSelect > meals.length - 1 ? null : meals[randomSelect];
 
 				// Logic for adding the days before the start of the month
-				if (offsetIndex < monthStartDay + 1)
-				{
+				if (offsetIndex < monthStartDay + 1) {
 					cell = CalendarCell(date: DateTime(priorYear, priorMonth, priorMonthLength - monthStartDay + offsetIndex), meal: randomMeal);
 				}
 				// Logic for adding the days after the end of the month
-				else if (offsetIndex > monthLength + monthStartDay)
-				{
+				else if (offsetIndex > monthLength + monthStartDay) {
 					cell = CalendarCell(date: DateTime(nextYear, nextMonth, offsetIndex - (monthLength + monthStartDay)), meal: randomMeal);
           numberAfterAdded++;
 				}
 				// Logic for adding days in the month
-				else
-				{
+				else {
           final DateTime day = DateTime(currentYear, currentMonth, offsetIndex - monthStartDay);
 					cell = CalendarCell(date: day, meal: randomMeal, isCurrentDay: day == DateUtils.dateOnly(currentDay));
 				}
@@ -92,15 +85,14 @@ class _CalendarPageState extends State<CalendarPage> {
 			}
 		}
 
-    if (numberAfterAdded > 6) 
-    {
+    if (numberAfterAdded > 6) {
       cells.length = cells.length - 7;
     }
 
     return cells;
   }
 
-  int getDaysInMonth(int year, int month) {
+int getDaysInMonth(int year, int month) {
   final firstDayOfNextMonth = (month < 12)
       ? DateTime(year, month + 1, 1)
       : DateTime(year + 1, 1, 1);

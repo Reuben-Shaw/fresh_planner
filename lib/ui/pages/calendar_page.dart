@@ -1,13 +1,16 @@
 import 'dart:math';
 
 import 'package:fresh_planner/source/objects/meal.dart';
+import 'package:fresh_planner/source/objects/user.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
 import 'package:fresh_planner/ui/widgets/calendar_cell.dart';
 
 class CalendarPage extends StatefulWidget {
-  const CalendarPage({super.key});
+  const CalendarPage({super.key, required this.user});
+
+  final User user;
 
   @override
   State<CalendarPage> createState() => _CalendarPageState();

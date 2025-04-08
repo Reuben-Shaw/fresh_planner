@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fresh_planner/source/database/database_helper_user.dart';
+import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/pages/main_page.dart';
 import 'package:fresh_planner/ui/pages/calendar_page.dart';
 import 'package:fresh_planner/ui/widgets/flexi_box.dart';
@@ -22,11 +24,29 @@ class _LoginPageState extends State<LoginPage> {
   bool get isRegister => _isRegister;
   set isRegister(bool value) => setState(() => _isRegister = value);
 
-  void checkPassword() async {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const CalendarPage()),
-    );
+  Future<bool> checkPassword() async {
+    final dbFire = DatabaseHelperUser();
+    debugPrint("Attempting login");
+    final response = await dbFire.loginUser(emailController.text, passwordController.text);
+
+    bool success = response['success'] ?? false;
+    if (success == true) {
+      debugPrint("Login successful: ${response['message']}");
+
+      final userData = response['user'];
+      final User user = User.fromJson(userData);
+
+      if (!mounted) return false;
+      debugPrint("Context was mounted");
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => CalendarPage(user: user,)),
+      );
+    } else {
+      debugPrint("Login failed: ${response['message'] ?? response['error'] ?? "!!NO ERROR OR MESSAGE!!"}");
+    }
+    return success;
   }
 
   bool suitableEmail(String email) {
@@ -35,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   bool emailExists(String email) {
-    return true;
+    return false;
   }
 
   void registerAccount() async {

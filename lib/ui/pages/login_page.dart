@@ -17,6 +17,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
+  final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   final secondPasswordController = TextEditingController();
 
@@ -25,6 +26,10 @@ class _LoginPageState extends State<LoginPage> {
   bool _isRegister = false;
   bool get isRegister => _isRegister;
   set isRegister(bool value) => setState(() => _isRegister = value);
+
+  String _errorText = "";
+  String get errorText => _errorText;
+  set errorText(String value) => setState(() => _errorText = value);
 
   Future<void> checkPassword() async {
     final data = await userDB.loginUser(emailController.text, passwordController.text);
@@ -49,9 +54,43 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void registerAccount() async {
-    String email = emailController.text;
-    String firstPassword = passwordController.text;
-    String secondPassword = secondPasswordController.text;
+    final email = emailController.text;
+    final username = usernameController.text;
+    final firstPassword = passwordController.text;
+    final secondPassword = secondPasswordController.text;
+
+    errorText = "";
+
+    if (email.isEmpty || username.isEmpty || firstPassword.isEmpty || secondPassword.isEmpty) {
+      errorText = "Please ensure all data is filled";
+      return;
+    }
+
+    if (!suitableEmail(email)) {
+      errorText = "Please enter a suitable email";
+      return;
+    }
+
+    if (firstPassword != secondPassword) {
+      errorText = "Please ensure passwords match";
+      return;
+    }
+    
+    final emailCheck = await checkEmailExists();
+    if (emailCheck == null) {
+      errorText = "Internal server error, please try again";
+      return;
+    } else if (emailCheck) {
+      errorText = "This email has already been registered";
+      return;
+    }
+
+    final addingNewUser = await userDB.addNewUser(email, username, firstPassword);
+    if (addingNewUser) {
+      isRegister = false;
+    } else {
+      errorText = "Internal server error, please try again";
+    }
   }
 
   @override
@@ -79,6 +118,8 @@ class _LoginPageState extends State<LoginPage> {
             TextField(
               controller: emailController,
               cursorColor: Colors.black,
+              enableSuggestions: false,
+              autocorrect: false,
               decoration: const InputDecoration(
                 filled: true,
                 fillColor: Color(0xFFD7F1E0),
@@ -90,6 +131,28 @@ class _LoginPageState extends State<LoginPage> {
                 border: OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.blue),
+                ),
+              ),
+            ),
+            Visibility(
+              visible: isRegister,
+              child: TextField(
+                controller: usernameController,
+                cursorColor: Colors.black,
+                enableSuggestions: false,
+                autocorrect: false,
+                decoration: const InputDecoration(
+                  filled: true,
+                  fillColor: Color(0xFFD7F1E0),
+                  hintText: 'username',
+                  hintStyle: TextStyle(
+                    color: Color(0x33000000),
+                    fontStyle: FontStyle.italic,
+                  ),
+                  border: OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blue),
+                  ),
                 ),
               ),
             ),
@@ -136,20 +199,8 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-            GestureDetector(
-              onTap: () {
-                isRegister = !isRegister;
-              },
-              child: Text(
-                isRegister ? 'Login' : 'Register',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  decoration: TextDecoration.underline,
-                  decorationColor: Colors.red,
-                  color: Colors.black,
-                ),
-              ),
+            Text(
+              errorText
             ),
             ElevatedButton(
               onPressed:
@@ -179,6 +230,21 @@ class _LoginPageState extends State<LoginPage> {
               ),
               child: Text(
                 isRegister ? 'Register' : 'Login',
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                isRegister = !isRegister;
+              },
+              child: Text(
+                isRegister ? 'Login' : 'Register',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  decoration: TextDecoration.underline,
+                  decorationColor: Colors.red,
+                  color: Colors.black,
+                ),
               ),
             ),
           ],

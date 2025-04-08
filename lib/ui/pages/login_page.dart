@@ -99,7 +99,8 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     final addingNewUser = await userDB.addNewUser(email, username, firstPassword);
-    if (addingNewUser) {
+    if (addingNewUser.$1 && addingNewUser.$2 != null) {
+      await userDB.addDefaultIngredients(addingNewUser.$2!);
       isRegister = false;
     } else {
       errorText = "Internal server error, please try again";

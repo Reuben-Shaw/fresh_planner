@@ -1,8 +1,13 @@
 enum IngredientType {
+  baking,
   dairy,
   driedGood,
-  fruit,
+  frozen,
+  fruitNut,
+  liquid,
   meat,
   snack,
-  veg,
+  herbSpice,
+  preserve,
+  vegetable,
 }

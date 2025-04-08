@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home: CalendarPage(user: User(email: "replythisnot@outlook.com", username: "testUser")),
+      home: LoginPage(title: "test"),
     );
   }
 }

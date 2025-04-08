@@ -1,11 +1,14 @@
+import 'package:fresh_planner/source/objects/ingredient.dart';
+
 class User {
   final String email, username;
-  final String? password;
+  final String? password, uid;
 
   User({
     required this.email,
     required this.username,
     this.password,
+    this.uid,
   });
 
   Map<String, Object?> toMap() {
@@ -13,6 +16,7 @@ class User {
       'email': email,
       'username': username,
       'password': password,
+      'uid': uid,
     };
   }
 
@@ -21,11 +25,12 @@ class User {
       email: json['email'],
       username: json['username'],
       password: json['password'],
+      uid: json['uid'],
     );
   }
 
   @override
   String toString() {
-    return 'User{email: $email, username: $username, password: $password}';
+    return 'User{email: $email, username: $username, password: $password, uid: $uid}';
   }
 }

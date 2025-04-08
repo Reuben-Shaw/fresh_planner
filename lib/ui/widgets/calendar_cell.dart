@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/objects/meal.dart';
-import 'package:fresh_planner/ui/widgets/flexi_box.dart';
 
 class CalendarCell extends StatelessWidget {
   final DateTime date;

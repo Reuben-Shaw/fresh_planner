@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/widgets/flexi_box.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  const MainPage({super.key, required this.user});
 
+  final User user;
+  
   @override
   State<MainPage> createState() => _MainPageState();
 }

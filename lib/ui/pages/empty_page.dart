@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fresh_planner/ui/styles/text_styles.dart';
 
 class EmptyPage extends StatefulWidget {
   const EmptyPage({super.key});

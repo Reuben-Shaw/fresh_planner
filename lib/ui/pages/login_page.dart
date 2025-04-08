@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/database/database_user.dart';
-import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/pages/main_page.dart';
-import 'package:fresh_planner/ui/pages/calendar_page.dart';
-import 'package:fresh_planner/ui/widgets/flexi_box.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
 
 class LoginPage extends StatefulWidget {
@@ -32,13 +29,29 @@ class _LoginPageState extends State<LoginPage> {
   set errorText(String value) => setState(() => _errorText = value);
 
   Future<void> checkPassword() async {
-    final data = await userDB.loginUser(emailController.text, passwordController.text);
-    if (!data.$1 || data.$2 == null) return;
+    final email = emailController.text;
+    final password = passwordController.text;
 
-    if (!mounted) return;
+    errorText = "";
+
+    if (email.isEmpty || password.isEmpty) {
+      errorText = "Please ensure all data is filled";
+      return;
+    }
+
+    final data = await userDB.loginUser(email, password);
+    if (!data.$1) {
+      errorText = "Email or password is incorrect";
+      return;
+    }
+    else if (data.$2 == null || !mounted) {
+      errorText = "Internal server error, please try again";
+      return;
+    }
+
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => CalendarPage(user: data.$2!,)),
+      MaterialPageRoute(builder: (context) => MainPage(user: data.$2!,)),
     );
   }
 
@@ -95,9 +108,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-    
     return Scaffold(
       appBar: AppBar(
         title: Text(

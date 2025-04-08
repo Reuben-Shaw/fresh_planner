@@ -13,7 +13,6 @@ class DatabaseHelperIngredients {
     
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body);
-      debugPrint(body.toString());
 
       if (body is Map<String, dynamic>) {
         return body;

@@ -16,8 +16,15 @@ class Meal {
     };
   }
 
+  factory Meal.fromJson(Map<String, dynamic> json) {
+    return Meal(
+      name: json['name'],
+      colour: json['colour'],
+    );
+  }
+
   @override
   String toString() {
-    return 'User{name: $name, colour: $colour}';
+    return 'Meal{name: $name, colour: $colour}';
   }
 }

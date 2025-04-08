@@ -22,7 +22,7 @@ class CalendarCell extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 2.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: meal == null ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

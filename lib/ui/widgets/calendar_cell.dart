@@ -75,13 +75,17 @@ class CalendarCell extends StatelessWidget {
                 ),
                 Visibility(
                   visible: meal == null,
-                  child: Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.green,
-                    ),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

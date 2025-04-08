@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/pages/calendar/calendar_page.dart';
 import 'package:fresh_planner/ui/pages/login_page.dart';
+import 'package:fresh_planner/ui/pages/shared/ingredients_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +20,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home: LoginPage(title: "test"),
+      home: IngredientsPage(user: User(email: "replythisnot@outlook.com", username: "testUser", uid: "zAtxGLrQVVQH9LY4JY0g")),
+      //home: LoginPage(title: "")
     );
   }
 }

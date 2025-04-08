@@ -1,5 +1,3 @@
-import 'package:fresh_planner/source/objects/ingredient.dart';
-
 class User {
   final String email, username;
   final String? password, uid;

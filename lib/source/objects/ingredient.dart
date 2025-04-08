@@ -21,8 +21,8 @@ class Ingredient {
       'name': name,
       'amount' : amount,
       'cost' : cost,
-      'metric': metric,
-      'type': type,
+      'metric': metricToJson(metric),
+      'type': ingredientTypeToJson(type),
     };
   }
 
@@ -31,8 +31,8 @@ class Ingredient {
       name: json['name'],
       amount: json['amount'],
       cost: json['cost'],
-      metric: json['metric'],
-      type: json['type'],
+      metric: metricFromJson(json['metric']),
+      type: ingredientTypeFromJson(json['type']),
     );
   }
 
@@ -40,4 +40,18 @@ class Ingredient {
   String toString() {
     return 'Ingredient{name: $name, amount: $amount $metric, cost: $cost type: $type}';
   }
+}
+
+String metricToJson(IngredientMetric metric) {
+  return metric.toString().split('.').last;
+}
+IngredientMetric metricFromJson(String json) {
+  return IngredientMetric.values.firstWhere((e) => e.toString().split('.').last == json);
+}
+
+String ingredientTypeToJson(IngredientType? type) {
+  return type.toString().split('.').last;
+}
+IngredientType? ingredientTypeFromJson(String json) {
+  return IngredientType.values.firstWhere((e) => e.toString().split('.').last == json);
 }

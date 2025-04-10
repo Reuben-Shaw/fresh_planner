@@ -6,7 +6,6 @@ import 'package:fresh_planner/source/objects/ingredient.dart';
 import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
 import 'package:fresh_planner/ui/widgets/ingredient_card.dart';
-import 'package:fresh_planner/ui/widgets/ingredient_list_view.dart';
 
 class IngredientsPage extends StatefulWidget {
   const IngredientsPage({super.key, required this.user, required this.ingredients});
@@ -23,20 +22,11 @@ class _IngredientsPageState extends State<IngredientsPage> {
 
   final ingredientDB = DatabaseIngredients();
 
-  List<IngredientListView> ingredientCollapseLists = [];
-  Map<IngredientType, List<IngredientCard>> ingredientMap = {
-    IngredientType.baking : [],
-    IngredientType.dairy : [],
-    IngredientType.driedGood : [],
-    IngredientType.frozen : [],
-    IngredientType.fruitNut : [],
-    IngredientType.herbSpice : [],
-    IngredientType.liquid : [],
-    IngredientType.meat : [],
-    IngredientType.preserve : [],
-    IngredientType.snack : [],
-    IngredientType.vegetable : [],
-    IngredientType.misc : [],
+  final Map<IngredientType, bool> _isOpen = {
+    for (var type in IngredientType.values) type: true,
+  };
+  final Map<IngredientType, List<IngredientCard>> ingredientMap = {
+    for (var type in IngredientType.values) type: [],
   };
 
   @override
@@ -48,10 +38,8 @@ class _IngredientsPageState extends State<IngredientsPage> {
   void setUpIngredientMap() {
     if (widget.ingredients == null) return;
     for (Ingredient i in widget.ingredients!) {
-      ingredientMap[i.type ?? IngredientType.misc]!.add(IngredientCard(ingredient: i));
-    }
-    for (var i in ingredientMap.entries) {
-      ingredientCollapseLists.add(IngredientListView(ingredientCards: i.value, section: i.key.name));
+      IngredientType t = i.type ?? IngredientType.misc;
+      ingredientMap[t]!.add(IngredientCard(ingredient: i));
     }
   }
 
@@ -98,8 +86,34 @@ class _IngredientsPageState extends State<IngredientsPage> {
               trailing: const [Icon(Icons.search)],
             ),
             Expanded(
-              child: ListView(
-                children: ingredientCollapseLists,
+              child: SingleChildScrollView(
+                child: ExpansionPanelList(
+                  expansionCallback: (index, isExpanded) {
+                    final type = ingredientMap.entries.elementAt(index).key;
+                    debugPrint("$type");
+                    setState(() {
+                      _isOpen[type] = isExpanded;
+                      debugPrint("Toggled $type -> ${_isOpen[type]}");
+                    });
+                  },
+                  children: ingredientMap.entries.map((entry) {
+                    final index = entry.key;
+                    final mapEntry = entry.value;
+                    return ExpansionPanel(
+                      headerBuilder: (context, isExpanded) {
+                        return ListTile(
+                          title: Text(index.name),
+                        );
+                      },
+                      body: ListView(
+                        shrinkWrap: true,
+                        physics: ClampingScrollPhysics(),
+                        children: mapEntry,
+                      ),
+                      isExpanded: _isOpen[index]!,
+                    );
+                  }).toList(),
+                ),
               ),
             ),
             Row(

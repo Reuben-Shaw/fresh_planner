@@ -3,6 +3,7 @@ import 'package:fresh_planner/source/database/database_ingredients.dart';
 import 'package:fresh_planner/source/database/database_user.dart';
 import 'package:fresh_planner/ui/pages/main_page.dart';
 import 'package:fresh_planner/ui/pages/shared/ingredients_page.dart';
+import 'package:fresh_planner/ui/pages/shared/recipe_page.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
 
 class LoginPage extends StatefulWidget {
@@ -60,7 +61,8 @@ class _LoginPageState extends State<LoginPage> {
     ingredientData.sort();
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => IngredientsPage(user: userData.$2!, ingredients: ingredientData,)),
+      //MaterialPageRoute(builder: (context) => IngredientsPage(user: userData.$2!, ingredients: ingredientData,)),
+      MaterialPageRoute(builder: (context) => RecipePage(user: userData.$2!, ingredients: ingredientData,)),
     );
   }
 

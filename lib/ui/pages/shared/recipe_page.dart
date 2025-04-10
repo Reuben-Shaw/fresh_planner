@@ -4,6 +4,7 @@ import 'package:fresh_planner/source/objects/recipe.dart';
 import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/pages/shared/ingredients_page.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
+import 'package:fresh_planner/ui/widgets/ingredient_card.dart';
 
 class RecipePage extends StatefulWidget {
   const RecipePage({super.key, required this.user, required this.ingredients});
@@ -16,10 +17,11 @@ class RecipePage extends StatefulWidget {
 }
 
 class _RecipePageState extends State<RecipePage> {
-  final nameController = TextEditingController();
-  final linkController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _linkController = TextEditingController();
 
-  Recipe recipe = Recipe(name: "", ingredients: []);
+  final Recipe _recipe = Recipe(name: "", ingredients: []);
+  final List<IngredientCard> _ingredientCards = [];
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +39,7 @@ class _RecipePageState extends State<RecipePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             TextField(
-              controller: nameController,
+              controller: _nameController,
               decoration: const InputDecoration(
                 filled: true,
                 fillColor: Color(0xFFD7F1E0),
@@ -50,7 +52,7 @@ class _RecipePageState extends State<RecipePage> {
               ),
             ),
             TextField(
-              controller: linkController,
+              controller: _linkController,
               decoration: const InputDecoration(
                 filled: true,
                 fillColor: Color(0xFFD7F1E0),
@@ -76,7 +78,9 @@ class _RecipePageState extends State<RecipePage> {
               ],
             ),
             ListView(
+              shrinkWrap: true,
               children: <Widget>[
+                ..._ingredientCards,
                 GestureDetector(
                   onTap: () async {
                     final result = await Navigator.push(
@@ -84,7 +88,11 @@ class _RecipePageState extends State<RecipePage> {
                       MaterialPageRoute(builder: (context) => IngredientsPage(user: widget.user, ingredients: widget.ingredients,)),
                     );
                     if (result is! Ingredient) return;
-                    recipe.ingredients.add(result);
+                    setState(() {
+                      _recipe.ingredients.add(result);
+                      _ingredientCards.add(IngredientCard(ingredient: result));
+                      _ingredientCards.sort();
+                    });
                   },
                   child: Text(
                     "+ Select Ingredient",

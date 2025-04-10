@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/objects/ingredient.dart';
 
-class IngredientCard extends StatelessWidget {
+class IngredientCard extends StatelessWidget implements Comparable<IngredientCard> {
   final Ingredient ingredient;
   final VoidCallback? onRemove;
 
@@ -10,6 +10,11 @@ class IngredientCard extends StatelessWidget {
     required this.ingredient,
     this.onRemove,
   });
+
+  @override
+  int compareTo(IngredientCard other) {
+    return (ingredient.name.compareTo(other.ingredient.name));
+  }
 
   @override
   Widget build(BuildContext context) {

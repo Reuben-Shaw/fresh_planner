@@ -79,11 +79,12 @@ class _RecipePageState extends State<RecipePage> {
               children: <Widget>[
                 GestureDetector(
                   onTap: () async {
-                    final result = Navigator.push(
+                    final result = await Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => IngredientsPage(user: widget.user, ingredients: widget.ingredients,)),
                     );
-                    if (result == null) return;
+                    if (result is! Ingredient) return;
+                    recipe.ingredients.add(result);
                   },
                   child: Text(
                     "+ Select Ingredient",

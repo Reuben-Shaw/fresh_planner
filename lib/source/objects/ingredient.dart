@@ -2,6 +2,7 @@ import 'package:fresh_planner/source/enums/ingredient_food_type.dart';
 import 'package:fresh_planner/source/enums/ingredient_metric.dart';
 
 class Ingredient implements Comparable<Ingredient> {
+  final String? id;
   final String name;
   final int amount;
   final double? cost;
@@ -9,6 +10,7 @@ class Ingredient implements Comparable<Ingredient> {
   final IngredientType? type;
 
   Ingredient({
+    this.id,
     required this.name,
     this.amount = 0,
     this.cost,
@@ -28,12 +30,21 @@ class Ingredient implements Comparable<Ingredient> {
 
   factory Ingredient.fromJson(Map<String, dynamic> json) {
     return Ingredient(
+      id: json['id'],
       name: json['name'],
       amount: json['amount'],
       cost: json['cost'],
       metric: metricFromJson(json['metric']),
       type: ingredientTypeFromJson(json['type']),
     );
+  }
+
+  bool isEqual(Ingredient? other) {
+    if (other == null) return false;
+    if (name != other.name) return false;
+    if (metric != other.metric) return false;
+    if (type != other.type) return false;
+    return true;
   }
 
   @override
@@ -45,7 +56,7 @@ class Ingredient implements Comparable<Ingredient> {
 
   @override
   String toString() {
-    return 'Ingredient{name: $name, amount: $amount $metric, cost: $cost type: $type}';
+    return 'Ingredient{id: $id, name: $name, amount: $amount $metric, cost: $cost type: $type}';
   }
 }
 

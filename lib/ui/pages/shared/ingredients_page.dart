@@ -18,9 +18,8 @@ class IngredientsPage extends StatefulWidget {
 }
 
 class _IngredientsPageState extends State<IngredientsPage> {
-  final searchController = TextEditingController();
-
-  final ingredientDB = DatabaseIngredients();
+  final _searchController = TextEditingController();
+  final _ingredientDB = DatabaseIngredients();
 
   final Map<IngredientType, bool> _isOpen = {
     for (var type in IngredientType.values) type: true,
@@ -29,24 +28,48 @@ class _IngredientsPageState extends State<IngredientsPage> {
     for (var type in IngredientType.values) type: [],
   };
 
+  Ingredient? _selectedIngredient;
+
   @override
   void initState() {
     super.initState();
-    setUpIngredientMap();
+    _setUpIngredientMap();
   }
 
-  void setUpIngredientMap() {
+  void _setUpIngredientMap() {
     if (widget.ingredients == null) return;
     for (Ingredient i in widget.ingredients!) {
-      IngredientType t = i.type ?? IngredientType.misc;
-      ingredientMap[t]!.add(IngredientCard(ingredient: i));
+      final IngredientType t = i.type ?? IngredientType.misc;
+      ingredientMap[t]!.add(IngredientCard(ingredient: i, onRemove: () async => _removeIngredient(i),));
     }
   }
 
-  void printIngredients() async {
-    List<Ingredient>? ingredients = await ingredientDB.getAllIngredients(widget.user.uid!);
+  void _printIngredients() async {
+    final List<Ingredient>? ingredients = await _ingredientDB.getAllIngredients(widget.user.uid!);
     if (ingredients == null) return;
     debugPrint("Length of ingredients: ${ingredients.length}");
+  }
+
+  void _selectIngredient(Ingredient ingredient) {
+    setState(() {
+      if (_selectedIngredient == ingredient) {
+        _selectedIngredient = null;
+      } else {
+        _selectedIngredient = ingredient;
+      }
+    });
+  }
+
+  void _removeIngredient(Ingredient ingredient) async {
+    bool success = await _ingredientDB.removeIngredient(widget.user.uid!, ingredient.id!);
+    if (!success) return;
+    
+    setState(() {
+      _selectedIngredient = null;
+
+      final type = ingredient.type ?? IngredientType.misc;
+      ingredientMap[type]!.removeWhere((card) => card.ingredient == ingredient);
+    });
   }
 
   @override
@@ -70,7 +93,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                   "Ingredients"
                 ),
                 ElevatedButton(
-                  onPressed: printIngredients, 
+                  onPressed: _printIngredients, 
                   child: Text(
                     "+"
                   ),
@@ -78,7 +101,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
               ],
             ),
             SearchBar(
-              controller: searchController,
+              controller: _searchController,
               padding: const WidgetStatePropertyAll<EdgeInsets>(
                 EdgeInsets.symmetric(horizontal: 16.0),
               ),
@@ -90,7 +113,6 @@ class _IngredientsPageState extends State<IngredientsPage> {
                 child: ExpansionPanelList(
                   expansionCallback: (index, isExpanded) {
                     final type = ingredientMap.entries.elementAt(index).key;
-                    debugPrint("$type");
                     setState(() {
                       _isOpen[type] = isExpanded;
                       debugPrint("Toggled $type -> ${_isOpen[type]}");
@@ -108,7 +130,18 @@ class _IngredientsPageState extends State<IngredientsPage> {
                       body: ListView(
                         shrinkWrap: true,
                         physics: ClampingScrollPhysics(),
-                        children: mapEntry,
+                        children: mapEntry.map((ingredientCard) {
+                          final ingredient = ingredientCard.ingredient;
+                          return (GestureDetector(
+                            onTap: () => _selectIngredient(ingredient),
+                            child: Container(
+                              color: ingredient.isEqual(_selectedIngredient)
+                                  ? Colors.green[100]
+                                  : Colors.transparent,
+                              child: ingredientCard,
+                            ),
+                          ));
+                        }).toList(),
                       ),
                       isExpanded: _isOpen[index]!,
                     );
@@ -121,7 +154,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
               children: <Widget>[
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pop(context,); 
+                    Navigator.pop(context, _selectedIngredient,); 
                   }, 
                   style: ButtonStyle(
                     backgroundColor: WidgetStateProperty.all<Color>(Colors.white),

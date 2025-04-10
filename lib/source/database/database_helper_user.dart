@@ -48,9 +48,9 @@ class DatabaseHelperUser {
     }
   }
 
-  Future<Map<String, (bool, String, String?)>> addUserAPI(String email, String username, String password) async {
+  Future<Map<String, dynamic>> addUserAPI(String email, String username, String password) async {
     try {
-      final Uri url = Uri.parse("https://$_addUserUrl$_standardUrl?email=$email&username=$username&password=$password");
+      final Uri url = Uri.parse("https://$_addUserUrl$_standardUrl");
       final response = await http.post(
         url,
         headers: {
@@ -64,18 +64,22 @@ class DatabaseHelperUser {
       );
 
       if (response.statusCode == 201) {
-          final data = jsonDecode(response.body);
-          final uid = data['uid'] as String?;
-          return {"success": (true, "User added successfully", uid)};
+        final data = jsonDecode(response.body);
+        final uid = data['uid'] as String?;
+        if (uid != null) {
+          return {"success": true, "message": "User added successfully", "uid": uid};
+        } else {
+          return {"error": "UID not found in the response"};
+        }
       } else {
-        return {"error": (false, "Failed with status code ${response.statusCode}", null)};
+        return {"error": "Failed with status code ${response.statusCode}"};
       }
-  } catch (e) {
-    return {"error": (false, "An error occurred: $e", null)};
-  }
+    } catch (e) {
+      return {"error": "An error occurred: $e"};
+    }
   }
 
-  Future<Map<String, (bool, String)>> addIngredientJSONAPI(String json) async {
+  Future<Map<String, dynamic>> addIngredientJSONAPI(String json) async {
     try {
       final Uri url = Uri.parse("https://$_addIngredientListUrl$_standardUrl");
       final response = await http.post(
@@ -87,12 +91,12 @@ class DatabaseHelperUser {
       );
 
       if (response.statusCode == 201) {
-        return {"success": (true, "Successfully added ingredients")};
+        return {"success": true, "message": "Successfully added ingredients"};
       } else {
-        return {"error": (false, "Failed with status code ${response.statusCode}")};
+        return {"error": "Failed with status code ${response.statusCode}"};
       }
     } catch (e) {
-      return {"error": (false, "An error occurred: $e")};
+      return {"error": "An error occurred: $e"};
     }
   }
 }

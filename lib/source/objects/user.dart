@@ -14,7 +14,6 @@ class User {
       'email': email,
       'username': username,
       'password': password,
-      'uid': uid,
     };
   }
 

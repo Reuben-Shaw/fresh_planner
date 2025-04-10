@@ -11,7 +11,8 @@ class DatabaseIngredients {
       debugPrint("Getting ingredients");
       final response = await _database.getAllIngredientsAPI(uid);
 
-      if (response['success'] == true) {
+      bool success = response['success'] as bool? ?? false;
+      if (success) {
         debugPrint("Got ingredients");
         final List<dynamic> ingredientsData = response['ingredients'];
 
@@ -20,11 +21,30 @@ class DatabaseIngredients {
         }).toList();
       } else {
         debugPrint("Failed to get ingredients: ${response['message'] ?? response['error'] ?? "!!NO ERROR OR MESSAGE!!"}");
-        return [];
       }
+      return [];
     } catch (e) {
       debugPrint("Error fetching ingredients: $e");
       return [];
+    }
+  }
+
+  Future<bool> removeIngredient(String uid, String ingredientID) async {
+    try {
+      debugPrint("Attempting to remove ingredient ID: $ingredientID from uid: $uid");
+      final response = await _database.removeIngredientAPI(uid, ingredientID);
+
+      bool success = response['success'] as bool? ?? false;
+      if (success) {
+        debugPrint("Ingredient removed successfully");
+        return true;
+      } else {
+        debugPrint("Ingredient removal failed: ${response['message'] ?? response['error'] ?? "!!NO ERROR OR MESSAGE!!"}");
+      }
+      return false;
+    } catch (e) {
+      debugPrint("Error removing ingredient: $e");
+      return false;
     }
   }
 } 

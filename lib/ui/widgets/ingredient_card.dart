@@ -3,10 +3,12 @@ import 'package:fresh_planner/source/objects/ingredient.dart';
 
 class IngredientCard extends StatelessWidget {
   final Ingredient ingredient;
+  final VoidCallback? onRemove;
 
   const IngredientCard({
     super.key,
     required this.ingredient,
+    this.onRemove,
   });
 
   @override
@@ -37,7 +39,7 @@ class IngredientCard extends StatelessWidget {
           ),
         ),
         IconButton(
-          onPressed: null, 
+          onPressed: onRemove, 
           icon: Image.asset('assets/images/bin.png'),
         ),
       ],

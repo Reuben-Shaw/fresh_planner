@@ -137,7 +137,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
             TextField(
               controller: emailController,
-              cursorColor: Colors.black,
               enableSuggestions: false,
               autocorrect: false,
               decoration: const InputDecoration(
@@ -149,16 +148,12 @@ class _LoginPageState extends State<LoginPage> {
                   fontStyle: FontStyle.italic,
                 ),
                 border: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue),
-                ),
               ),
             ),
             Visibility(
               visible: isRegister,
               child: TextField(
                 controller: usernameController,
-                cursorColor: Colors.black,
                 enableSuggestions: false,
                 autocorrect: false,
                 decoration: const InputDecoration(
@@ -170,15 +165,11 @@ class _LoginPageState extends State<LoginPage> {
                     fontStyle: FontStyle.italic,
                   ),
                   border: OutlineInputBorder(),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.blue),
-                  ),
                 ),
               ),
             ),
             TextField(
               controller: passwordController,
-              cursorColor: Colors.black,
               obscureText: true,
               enableSuggestions: false,
               autocorrect: false,
@@ -191,16 +182,12 @@ class _LoginPageState extends State<LoginPage> {
                   fontStyle: FontStyle.italic,
                 ),
                 border: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue),
-                ),
               ),
             ),
             Visibility(
               visible: isRegister,
               child: TextField(
                 controller: secondPasswordController,
-                cursorColor: Colors.black,
                 obscureText: true,
                 enableSuggestions: false,
                 autocorrect: false,
@@ -213,9 +200,6 @@ class _LoginPageState extends State<LoginPage> {
                     fontStyle: FontStyle.italic,
                   ),
                   border: OutlineInputBorder(),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.blue),
-                  ),
                 ),
               ),
             ),
@@ -224,29 +208,10 @@ class _LoginPageState extends State<LoginPage> {
             ),
             ElevatedButton(
               onPressed:
-                  isRegister ? registerAccount : checkPassword,
+                isRegister ? registerAccount : checkPassword,
               style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(
-                    Colors.white),
-                foregroundColor:
-                    WidgetStateProperty.resolveWith<Color?>(
-                  (Set<WidgetState> states) {
-                    if (states.contains(WidgetState.hovered)) {
-                      return Colors.white;
-                    }
-                    return const Color.fromARGB(
-                        255, 30, 30, 30);
-                  },
-                ),
-                overlayColor:
-                    WidgetStateProperty.resolveWith<Color?>(
-                  (Set<WidgetState> states) {
-                    if (states.contains(WidgetState.hovered)) {
-                      return Colors.blue;
-                    }
-                    return null;
-                  },
-                ),
+                backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
+                foregroundColor: WidgetStateProperty.all<Color>(Colors.black),
               ),
               child: Text(
                 isRegister ? 'Register' : 'Login',

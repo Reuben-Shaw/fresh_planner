@@ -102,6 +102,23 @@ class _IngredientsPageState extends State<IngredientsPage> {
                 children: ingredientCollapseLists,
               ),
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context,); 
+                  }, 
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
+                    foregroundColor: WidgetStateProperty.all<Color>(Colors.black),
+                  ),
+                  child: Text(
+                    "Select",
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),

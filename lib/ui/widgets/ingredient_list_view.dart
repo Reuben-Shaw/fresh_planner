@@ -24,20 +24,20 @@ class IngredientListViewState extends State<IngredientListView> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
-        Row(
-          children: <Widget>[ 
-            Text(
-              widget.section,
-            ),
-            IconButton(
-              onPressed: () {
-                setState(() {
-                  isCollapsed = !isCollapsed; 
-                });
-              },
-              icon: Image.asset('assets/images/${isCollapsed ? "up" : "down"}Arrow.png'),
-            ),
-          ],
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              isCollapsed = !isCollapsed;
+            });
+          },
+          child: Row(
+            children: <Widget>[ 
+              Text(
+                widget.section,
+              ),
+              Image.asset('assets/images/${isCollapsed ? "up" : "down"}Arrow.png'),
+            ],
+          ),
         ),
         Visibility(
           visible: !isCollapsed,

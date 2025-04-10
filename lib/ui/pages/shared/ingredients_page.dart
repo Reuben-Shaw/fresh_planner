@@ -19,6 +19,8 @@ class IngredientsPage extends StatefulWidget {
 }
 
 class _IngredientsPageState extends State<IngredientsPage> {
+  final searchController = TextEditingController();
+
   final ingredientDB = DatabaseIngredients();
 
   List<IngredientListView> ingredientCollapseLists = [];
@@ -86,6 +88,14 @@ class _IngredientsPageState extends State<IngredientsPage> {
                   ),
                 ),
               ],
+            ),
+            SearchBar(
+              controller: searchController,
+              padding: const WidgetStatePropertyAll<EdgeInsets>(
+                EdgeInsets.symmetric(horizontal: 16.0),
+              ),
+              onChanged: (_) => setState(() {}),
+              trailing: const [Icon(Icons.search)],
             ),
             Expanded(
               child: ListView(

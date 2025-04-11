@@ -56,6 +56,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
         _selectedIngredient = null;
       } else {
         _selectedIngredient = ingredient;
+        if (_selectedIngredient != null) _selectedIngredient!.amount = 1;
       }
     });
   }
@@ -150,8 +151,52 @@ class _IngredientsPageState extends State<IngredientsPage> {
               ),
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
+                GestureDetector(
+                  onTap: () async {
+                    if (_selectedIngredient == null) return;
+                    final result = await showDialog<String>(
+                      context: context,
+                      builder: (context) {
+                        String value = '';
+                        return AlertDialog(
+                          title: Text('Enter the amount'),
+                          content: TextField(
+                            keyboardType: TextInputType.number,
+                            onChanged: (val) => value = val,
+                            autofocus: true,
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, value),
+                              child: Text('Set'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                    if (result == null) return;
+                    final parsedValue = int.tryParse(result);
+                    if (parsedValue == null) return;
+
+                    setState(() {
+                      _selectedIngredient!.amount = parsedValue;
+                      _selectedIngredient = _selectedIngredient;
+                    });
+                  },
+                  child: Row(
+                    children: <Widget>[
+                      Text("Amount: "),
+                      Text(_selectedIngredient == null ? "0" : _selectedIngredient!.amount.toString()),
+                      Text(_selectedIngredient == null ? "" : _selectedIngredient!.metric.name),
+                    ],
+                  ),
+                ),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context, _selectedIngredient,); 

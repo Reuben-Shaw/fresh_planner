@@ -3,16 +3,16 @@ import 'package:fresh_planner/source/enums/ingredient_metric.dart';
 
 class Ingredient implements Comparable<Ingredient> {
   final String? id;
-  final String name;
-  final int amount;
-  final double? cost;
-  final IngredientMetric metric;
-  final IngredientType? type;
+  String name;
+  int amount;
+  double? cost;
+  IngredientMetric metric;
+  IngredientType? type;
 
   Ingredient({
     this.id,
     required this.name,
-    this.amount = 0,
+    this.amount = 1,
     this.cost,
     required this.metric,
     this.type,
@@ -21,7 +21,6 @@ class Ingredient implements Comparable<Ingredient> {
   Map<String, Object?> toMap() {
     return {
       'name': name,
-      'amount' : amount,
       'cost' : cost,
       'metric': metricToJson(metric),
       'type': ingredientTypeToJson(type),
@@ -32,7 +31,7 @@ class Ingredient implements Comparable<Ingredient> {
     return Ingredient(
       id: json['id'],
       name: json['name'],
-      amount: json['amount'],
+      amount: 1,
       cost: json['cost'],
       metric: metricFromJson(json['metric']),
       type: ingredientTypeFromJson(json['type']),

@@ -76,12 +76,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Ingredients",
-          style: AppTextStyles.mainTitle,
-        ),
-      ),
+      appBar: AppBar(),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 32.0),
         child: Column(

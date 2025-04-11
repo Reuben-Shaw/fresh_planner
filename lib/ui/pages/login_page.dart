@@ -4,6 +4,7 @@ import 'package:fresh_planner/source/database/database_user.dart';
 import 'package:fresh_planner/ui/pages/main_page.dart';
 import 'package:fresh_planner/ui/pages/shared/ingredients_page.dart';
 import 'package:fresh_planner/ui/pages/shared/recipe_page.dart';
+import 'package:fresh_planner/ui/styles/text_field_styles.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
 
 class LoginPage extends StatefulWidget {
@@ -121,120 +122,194 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Login",
-          style: AppTextStyles.mainTitle,
-        ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              "Welcome to Fresh Planning",
-              style: AppTextStyles.subTitle,
-            ),
-            TextField(
-              controller: emailController,
-              enableSuggestions: false,
-              autocorrect: false,
-              decoration: const InputDecoration(
-                filled: true,
-                fillColor: Color(0xFFD7F1E0),
-                hintText: 'email',
-                hintStyle: TextStyle(
-                  color: Color(0x33000000),
-                  fontStyle: FontStyle.italic,
-                ),
-                border: OutlineInputBorder(),
-              ),
-            ),
-            Visibility(
-              visible: isRegister,
-              child: TextField(
-                controller: usernameController,
-                enableSuggestions: false,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  filled: true,
-                  fillColor: Color(0xFFD7F1E0),
-                  hintText: 'username',
-                  hintStyle: TextStyle(
-                    color: Color(0x33000000),
-                    fontStyle: FontStyle.italic,
+      body: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 32.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Stack(
+                        children: <Widget>[
+                          Container(
+                            transform: Matrix4.translationValues(
+                              MediaQuery.of(context).size.width * .3, -35.0, 0.0
+                            ),
+                            child: RotationTransition(
+                              turns: AlwaysStoppedAnimation(30 / 360),
+                              child: Image(
+                                image: AssetImage("assets/images/LogoHeart1.png"),
+                                fit: BoxFit.scaleDown,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 5,
+                            left: 0,
+                            right: 0,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Login",
+                                  style: AppTextStyles.mainTitle,
+                                ),
+                                SizedBox(height: 5,),
+                                Text(
+                                  "Welcome to Fresh Planning",
+                                  style: AppTextStyles.subTitle,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 40,),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Column(
+                            children: <Widget>[
+                              Container(
+                                decoration: AppTextFieldStyles.dropShadow,
+                                child: TextField(
+                                  controller: emailController,
+                                  enableSuggestions: false,
+                                  autocorrect: false,
+                                  decoration: AppTextFieldStyles.primaryStyle("email")
+                                ),
+                              ),
+                              Visibility(
+                                visible: isRegister,
+                                child: Column(
+                                  children: [
+                                    SizedBox(height: 20,),
+                                    Container(
+                                      decoration: AppTextFieldStyles.dropShadow,
+                                      child: TextField(
+                                        controller: usernameController,
+                                        enableSuggestions: false,
+                                        autocorrect: false,
+                                        decoration: AppTextFieldStyles.primaryStyle("username")
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 20,),
+                              Container(
+                                decoration: AppTextFieldStyles.dropShadow,
+                                child: TextField(
+                                  controller: passwordController,
+                                  obscureText: true,
+                                  enableSuggestions: false,
+                                  autocorrect: false,
+                                  decoration: AppTextFieldStyles.primaryStyle("password")
+                                ),
+                              ),
+                              Visibility(
+                                visible: isRegister,
+                                child: Column(
+                                  children: [
+                                    SizedBox(height: 20,),
+                                    Container(
+                                      decoration: AppTextFieldStyles.dropShadow,
+                                      child: TextField(
+                                        controller: secondPasswordController,
+                                        obscureText: true,
+                                        enableSuggestions: false,
+                                        autocorrect: false,
+                                        decoration: AppTextFieldStyles.primaryStyle("re-enter password")
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 10,),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                errorText,
+                                style: TextStyle(
+                                  fontSize: 14, 
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20,),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              ElevatedButton(
+                                onPressed:
+                                  isRegister ? registerAccount : checkPassword,
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all<Color>(Color(0xFF399E5A)),
+                                ),
+                                child: Text(
+                                  isRegister ? '    Register    ' : '      Login      ',
+                                  style: TextStyle(
+                                    fontSize: 20, 
+                                    fontWeight: FontWeight.bold, 
+                                    color: Colors.white,
+                                    height: 2.5,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 20,),
+                    ],
                   ),
-                  border: OutlineInputBorder(),
                 ),
               ),
-            ),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              enableSuggestions: false,
-              autocorrect: false,
-              decoration: const InputDecoration(
-                filled: true,
-                fillColor: Color(0xFFD7F1E0),
-                hintText: 'password',
-                hintStyle: TextStyle(
-                  color: Color(0x33000000),
-                  fontStyle: FontStyle.italic,
-                ),
-                border: OutlineInputBorder(),
-              ),
-            ),
-            Visibility(
-              visible: isRegister,
-              child: TextField(
-                controller: secondPasswordController,
-                obscureText: true,
-                enableSuggestions: false,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  filled: true,
-                  fillColor: Color(0xFFD7F1E0),
-                  hintText: 'confirm password',
-                  hintStyle: TextStyle(
-                    color: Color(0x33000000),
-                    fontStyle: FontStyle.italic,
+              Column(
+                children: <Widget>[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        isRegister ? "Already a user? " : "New user? ",
+                        style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF979797),
+                          ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          isRegister = !isRegister;
+                        },
+                        child: Text(
+                          isRegister ? "Login here" : "Register here",
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF399E5A),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  border: OutlineInputBorder(),
-                ),
+                  SizedBox(height: 10,)
+                ],
               ),
-            ),
-            Text(
-              errorText
-            ),
-            ElevatedButton(
-              onPressed:
-                isRegister ? registerAccount : checkPassword,
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
-                foregroundColor: WidgetStateProperty.all<Color>(Colors.black),
-              ),
-              child: Text(
-                isRegister ? 'Register' : 'Login',
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                isRegister = !isRegister;
-              },
-              child: Text(
-                isRegister ? 'Login' : 'Register',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  decoration: TextDecoration.underline,
-                  decorationColor: Colors.red,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -91,10 +91,10 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    // if (!suitableEmail(email)) {
-    //   errorText = "Please enter a suitable email";
-    //   return;
-    // }
+    if (!suitableEmail(email)) {
+      errorText = "Please enter a suitable email";
+      return;
+    }
 
     if (firstPassword != secondPassword) {
       errorText = "Please ensure passwords match";
@@ -124,13 +124,13 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: SafeArea(
         top: false,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 32.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Expanded(
-                child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 32.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -276,7 +276,10 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              Column(
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 32.0),
+              child: Column(
                 children: <Widget>[
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -308,8 +311,8 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(height: 10,)
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

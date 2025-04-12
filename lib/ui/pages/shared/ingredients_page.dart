@@ -63,6 +63,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
 
       final type = ingredient.type ?? IngredientType.misc;
       _ingredientMap[type]!.removeWhere((card) => card.ingredient == ingredient);
+      widget.ingredients.remove(ingredient);
     });
   }
 
@@ -93,7 +94,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                     setState(() {
                       widget.ingredients.add(result);
                       widget.ingredients.sort();
-                      _ingredientMap[result.type ?? IngredientType.misc]!.add(IngredientCard(ingredient: result));
+                      _ingredientMap[result.type ?? IngredientType.misc]!.add(IngredientCard(ingredient: result, onRemove: () async => _removeIngredient(result)));
                       _ingredientMap[result.type ?? IngredientType.misc]!.sort();
                     });
                   },

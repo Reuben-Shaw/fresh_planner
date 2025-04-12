@@ -23,9 +23,13 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
   final costController = TextEditingController();
   final costAmountController = TextEditingController();
 
+  InputDecoration costAmountHint = AppTextFieldStyles.primaryStyle("/amount");
+
   String _errorText = "";
   String get errorText => _errorText;
   set errorText(String value) => setState(() => _errorText = value);
+
+
 
   IngredientMetric? _metricDropdownValue;
   void metricDropdownCallback(Object? selectedVaue) {
@@ -45,6 +49,30 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
     }
   }
 
+  
+  @override
+  void initState() {
+    super.initState();
+    costController.addListener(_updateCostAmount);
+  }
+  @override
+  void dispose() {
+    costController.dispose();
+    super.dispose();
+  }
+
+  void _updateCostAmount() {
+    if (costController.text.isNotEmpty) {
+      setState(() {
+        costAmountHint = AppTextFieldStyles.primaryStyle("/amount*");
+      });
+    } else {
+      setState(() {
+        costAmountHint = AppTextFieldStyles.primaryStyle("/amount");
+      });
+    }
+  }
+
   void addIngredient() async {
     if (nameController.text == "" || _metricDropdownValue == null) {
       errorText = "Ensure all required values are filled";
@@ -54,17 +82,22 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
       errorText = "Please ensure an amount per cost is provided";
       return;
     }
-    final costParsed = double.tryParse(costController.text);
-    if (costParsed == null) {
-      errorText = "Cost is not numeric";
-      return;
+
+    double? costParsed;
+    int? costAmountParsed;
+    if (costController.text.isNotEmpty || costAmountController.text.isNotEmpty) {
+      costParsed = double.tryParse(costController.text);
+      if (costParsed == null) {
+        errorText = "Cost is not numeric";
+        return;
+      }
+      costAmountParsed = int.tryParse(costAmountController.text);
+      if (costAmountParsed == null) {
+        errorText = "Amount per cost is not numeric";
+        return;
+      }
     }
-    final costAmountParsed = int.tryParse(costAmountController.text);
-    if (costAmountParsed == null) {
-      errorText = "Amount per cost is not numeric";
-      return;
-    }
-    if (widget.ingredients.any((i) => i.name.toLowerCase() == "")) {
+    if (widget.ingredients.any((i) => i.name == nameController.text.toLowerCase())) {
       errorText = "Ingredient with the same name already exists";
       return;
     }
@@ -101,6 +134,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
               "New\nIngredient",
               style: AppTextStyles.mainTitle,
             ),
+            SizedBox(height: 5,),
             Text(
               "*must be included",
               style: AppTextStyles.subTitle,
@@ -162,7 +196,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                     child: TextField(
                       controller: costAmountController,
                       keyboardType: TextInputType.number,
-                      decoration: AppTextFieldStyles.primaryStyle("/amount"),
+                      decoration: costAmountHint,
                     ),
                   ),
                 ),

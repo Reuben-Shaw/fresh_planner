@@ -91,10 +91,10 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    if (!suitableEmail(email)) {
-      errorText = "Please enter a suitable email";
-      return;
-    }
+    // if (!suitableEmail(email)) {
+    //   errorText = "Please enter a suitable email";
+    //   return;
+    // }
 
     if (firstPassword != secondPassword) {
       errorText = "Please ensure passwords match";

@@ -28,14 +28,14 @@ class Ingredient implements Comparable<Ingredient> {
       'metric': metricToJson(metric),
       'type': ingredientTypeToJson(type),
     };
-  }
+  }//TTe7goiJHi432daeiX7P
 
   factory Ingredient.fromJson(Map<String, dynamic> json) {
     return Ingredient(
       id: json['id'],
       name: json['name'],
       amount: 0,
-      cost: json['cost'],
+      cost: (json['cost'])?.toDouble(),
       costAmount: json['costAmount'],
       metric: metricFromJson(json['metric']),
       type: ingredientTypeFromJson(json['type']),
@@ -70,9 +70,11 @@ IngredientMetric metricFromJson(String json) {
   return IngredientMetric.values.firstWhere((e) => e.toString().split('.').last == json);
 }
 
-String ingredientTypeToJson(IngredientType? type) {
+String? ingredientTypeToJson(IngredientType? type) {
+  if (type == null || type == IngredientType.misc) return null;
   return type.toString().split('.').last;
 }
-IngredientType? ingredientTypeFromJson(String json) {
+IngredientType? ingredientTypeFromJson(String? json) {
+  if (json == null) return null;
   return IngredientType.values.firstWhere((e) => e.toString().split('.').last == json);
 }

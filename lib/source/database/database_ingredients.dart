@@ -47,14 +47,14 @@ class DatabaseIngredients {
     }
   }
 
-  Future<(bool, String?)> addIngredient(String uid, Ingredient i) async {
+  Future<(bool, String?)> addIngredient(String uid, Ingredient ingredient) async {
     try {
       debugPrint("Adding default ingredients");
-      final response = await _database.addIngredientAPI(uid, i.name, i.cost, i.metric, i.type);
+      final response = await _database.addIngredientAPI(uid, ingredient);
 
       bool success = response['success'] as bool? ?? false;
       if (success) {
-        debugPrint("New ingredient added successfully");
+        debugPrint("New ingredient added successfully with id ${response['id'] as String}");
         return (true, response['id'] as String);
       } else {
         debugPrint("Adding new ingredient failed: ${response['message'] ?? response['error'] ?? "!!NO ERROR OR MESSAGE!!"}");

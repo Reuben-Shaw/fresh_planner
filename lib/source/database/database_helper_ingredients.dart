@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/enums/ingredient_food_type.dart';
 import 'package:fresh_planner/source/enums/ingredient_metric.dart';
+import 'package:fresh_planner/source/objects/ingredient.dart';
 import 'package:http/http.dart' as http;
 
 class DatabaseHelperIngredients {
@@ -52,7 +53,7 @@ class DatabaseHelperIngredients {
     }
   }
 
-  Future<Map<String, dynamic>> addIngredientAPI(String uid, String name, double? cost, IngredientMetric metric, IngredientType? type) async {
+  Future<Map<String, dynamic>> addIngredientAPI(String uid, Ingredient i) async {
   try {
     final Uri url = Uri.parse("https://$_addIngredientUrl$_standardUrl");
     final response = await http.post(
@@ -62,10 +63,7 @@ class DatabaseHelperIngredients {
       },
       body: jsonEncode({
         'uid': uid,
-        'name': name.toLowerCase(),
-        'cost': cost,
-        'metric': metric.name,
-        'type': type?.name,
+        'ingredient': i.toMap(),
       }),
     );
 

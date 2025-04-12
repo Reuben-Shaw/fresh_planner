@@ -4,11 +4,11 @@ enum IngredientType {
   driedGood("Dried Goods"),
   frozen("Frozens"),
   fruitNut("Fruits & Nuts"),
+  herbSpice("Herbs & Spices"),
   liquid("Liquids"),
   meat("Meats"),
-  snack("Snacks"),
-  herbSpice("Herbs & Spices"),
   preserve("Preserves"),
+  snack("Snacks"),
   vegetable("Vegetables"),
   misc("Miscellaneous");
 

@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:fresh_planner/source/enums/ingredient_food_type.dart';
-import 'package:fresh_planner/source/enums/ingredient_metric.dart';
 import 'package:fresh_planner/source/objects/ingredient.dart';
 import 'package:http/http.dart' as http;
 
@@ -54,32 +52,32 @@ class DatabaseHelperIngredients {
   }
 
   Future<Map<String, dynamic>> addIngredientAPI(String uid, Ingredient i) async {
-  try {
-    final Uri url = Uri.parse("https://$_addIngredientUrl$_standardUrl");
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'uid': uid,
-        'ingredient': i.toMap(),
-      }),
-    );
+    try {
+      final Uri url = Uri.parse("https://$_addIngredientUrl$_standardUrl");
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'uid': uid,
+          'ingredient': i.toMap(),
+        }),
+      );
 
-    if (response.statusCode == 201) {
-      final data = jsonDecode(response.body);
-      final id = data['id'] as String?;
-      if (id != null) {
-        return {"success": true, "message": "New ingredient added successfully", "id": id};
+      if (response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        final id = data['id'] as String?;
+        if (id != null) {
+          return {"success": true, "message": "New ingredient added successfully", "id": id};
+        } else {
+          return {"error": "ID not found in the response"};
+        }
       } else {
-        return {"error": "ID not found in the response"};
+        return {"error": "Failed with status code ${response.statusCode}"};
       }
-    } else {
-      return {"error": "Failed with status code ${response.statusCode}"};
+    } catch (e) {
+      return {"error": "An error occurred: $e"};
     }
-  } catch (e) {
-    return {"error": "An error occurred: $e"};
-  }
   }
 }

@@ -61,7 +61,7 @@ class IngredientCard extends StatelessWidget implements Comparable<IngredientCar
         IconButton(
           onPressed: onRemove, 
           icon: Icon(
-            Icons.delete_forever_rounded, 
+            showAmount ? Icons.cancel : Icons.delete_forever_rounded, 
             color: Color(0xFF26693C),
           ),
         ),

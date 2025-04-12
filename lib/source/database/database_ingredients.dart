@@ -49,7 +49,7 @@ class DatabaseIngredients {
 
   Future<(bool, String?)> addIngredient(String uid, Ingredient ingredient) async {
     try {
-      debugPrint("Adding default ingredients");
+      debugPrint("Adding new ingredient");
       final response = await _database.addIngredientAPI(uid, ingredient);
 
       bool success = response['success'] as bool? ?? false;

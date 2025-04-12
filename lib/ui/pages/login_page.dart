@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fresh_planner/source/database/database_calendar.dart';
 import 'package:fresh_planner/source/database/database_ingredients.dart';
 import 'package:fresh_planner/source/database/database_user.dart';
 import 'package:fresh_planner/ui/pages/main_page.dart';
@@ -64,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.push(
       context,
       //MaterialPageRoute(builder: (context) => IngredientsPage(user: userData.$2!, ingredients: ingredientData,)),
-      MaterialPageRoute(builder: (context) => RecipePage(user: userData.$2!, ingredients: ingredientData,)),
+      MaterialPageRoute(builder: (context) => RecipePage(user: userData.$2!, ingredients: ingredientData, recipes: [], calendarDB: DatabaseCalendar(),)),
     );
   }
 

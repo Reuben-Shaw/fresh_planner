@@ -56,7 +56,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
         _selectedIngredient = null;
       } else {
         _selectedIngredient = ingredient;
-        if (_selectedIngredient != null) _selectedIngredient!.amount = 1;
+        if (_selectedIngredient != null) _selectedIngredient!.amount = 0;
       }
     });
   }
@@ -84,14 +84,20 @@ class _IngredientsPageState extends State<IngredientsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text(
-                  "Ingredients"
+                  "Ingredients",
+                  style: AppTextStyles.mainTitle,
                 ),
-                ElevatedButton(
-                  onPressed: _printIngredients, 
-                  child: Text(
-                    "+"
+                IconButton(
+                  onPressed: _printIngredients,
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all<Color>(Color(0xFF399E5A)),
+                  ), 
+                  icon: Icon(
+                    Icons.add,
+                    color: Colors.white,
                   ),
                 ),
               ],

@@ -1,14 +1,17 @@
+import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/objects/ingredient.dart';
 
 class Recipe {
-  String name;
+  final String name;
   final String? link;
   final List<Ingredient> ingredients;
+  final Color colour;
 
   Recipe({
     required this.name,
     this.link,
     required this.ingredients,
+    required this.colour,
   });
 
   Map<String, Object?> toMap() {
@@ -16,6 +19,7 @@ class Recipe {
       'name': name,
       'link': link,
       'ingredients': ingredients,
+      'colour': colour,
     };
   }
 
@@ -24,6 +28,7 @@ class Recipe {
       name: json['name'],
       link: json['link'],
       ingredients: json['ingredients'],
+      colour: json['colour'],
     );
   }
 

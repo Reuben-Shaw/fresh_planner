@@ -12,7 +12,7 @@ class Ingredient implements Comparable<Ingredient> {
   Ingredient({
     this.id,
     required this.name,
-    this.amount = 1,
+    this.amount = 0,
     this.cost,
     required this.metric,
     this.type,
@@ -31,7 +31,7 @@ class Ingredient implements Comparable<Ingredient> {
     return Ingredient(
       id: json['id'],
       name: json['name'],
-      amount: 1,
+      amount: 0,
       cost: json['cost'],
       metric: metricFromJson(json['metric']),
       type: ingredientTypeFromJson(json['type']),

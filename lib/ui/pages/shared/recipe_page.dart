@@ -20,7 +20,6 @@ class _RecipePageState extends State<RecipePage> {
   final _nameController = TextEditingController();
   final _linkController = TextEditingController();
 
-  final Recipe _recipe = Recipe(name: "", ingredients: []);
   final List<IngredientCard> _ingredientCards = [];
 
   @override
@@ -89,7 +88,6 @@ class _RecipePageState extends State<RecipePage> {
                     );
                     if (result is! Ingredient) return;
                     setState(() {
-                      _recipe.ingredients.add(result);
                       _ingredientCards.add(IngredientCard(ingredient: result));
                       _ingredientCards.sort();
                     });

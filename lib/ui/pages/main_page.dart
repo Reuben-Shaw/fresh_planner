@@ -27,14 +27,28 @@ class _MainPageState extends State<MainPage> {
           style: AppTextStyles.mainTitle,
         ),
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            
-          ],
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 32.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                "Adding a\nMeal",
+                style: AppTextStyles.mainTitle,
+              ),
+              SizedBox(height: 5,),
+              Row(
+                children: [
+                ],
+              ),
+              Text(
+                "Welcome to Fresh Planning",
+                style: AppTextStyles.subTitle,
+              ),
+            ],
+          ),
         ),
       ),
     );

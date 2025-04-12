@@ -139,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
                         children: <Widget>[
                           Container(
                             transform: Matrix4.translationValues(
-                              MediaQuery.of(context).size.width * .3, -35.0, 0.0
+                              MediaQuery.of(context).size.width * .3, -35.0, 0.0,
                             ),
                             child: RotationTransition(
                               turns: AlwaysStoppedAnimation(30 / 360),

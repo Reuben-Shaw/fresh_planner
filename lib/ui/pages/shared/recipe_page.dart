@@ -10,7 +10,7 @@ class RecipePage extends StatefulWidget {
   const RecipePage({super.key, required this.user, required this.ingredients});
 
   final User user;
-  final List<Ingredient>? ingredients;
+  final List<Ingredient> ingredients;
 
   @override
   State<RecipePage> createState() => _RecipePageState();

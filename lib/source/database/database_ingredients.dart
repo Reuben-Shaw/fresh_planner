@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/database/database_helper_ingredients.dart';
 import 'package:fresh_planner/source/objects/ingredient.dart';
-import 'package:fresh_planner/source/objects/user.dart';
 
 class DatabaseIngredients {
   final _database = DatabaseHelperIngredients();
@@ -45,6 +44,25 @@ class DatabaseIngredients {
     } catch (e) {
       debugPrint("Error removing ingredient: $e");
       return false;
+    }
+  }
+
+  Future<(bool, String?)> addIngredient(String uid, Ingredient i) async {
+    try {
+      debugPrint("Adding default ingredients");
+      final response = await _database.addIngredientAPI(uid, i.name, i.cost, i.metric, i.type);
+
+      bool success = response['success'] as bool? ?? false;
+      if (success) {
+        debugPrint("New ingredient added successfully");
+        return (true, response['id'] as String);
+      } else {
+        debugPrint("Adding new ingredient failed: ${response['message'] ?? response['error'] ?? "!!NO ERROR OR MESSAGE!!"}");
+        return (false, null);
+      }
+    } catch (e) {
+      debugPrint("Adding new ingredient caused a crash: $e");
+      return (false, null);
     }
   }
 } 

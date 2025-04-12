@@ -2,7 +2,7 @@ import 'package:fresh_planner/source/enums/ingredient_food_type.dart';
 import 'package:fresh_planner/source/enums/ingredient_metric.dart';
 
 class Ingredient implements Comparable<Ingredient> {
-  final String? id;
+  String? id;
   String name;
   int amount;
   double? cost;

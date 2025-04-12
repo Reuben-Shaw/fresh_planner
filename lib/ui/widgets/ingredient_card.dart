@@ -36,7 +36,7 @@ class IngredientCard extends StatelessWidget implements Comparable<IngredientCar
                     ingredient.name,
                   ),
                   Text(
-                    ingredient.metric.name,
+                    ingredient.metric.standardName,
                   ),
                 ],
               ),

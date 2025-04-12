@@ -19,13 +19,22 @@ class _AddMealPageState extends State<AddMealPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Icon(
-              Icons.sunny,
-              color: Color(0xFF979797),
-            ),
             Text(
-              " - Lunchtime: 17/10/24",
-              style: AppTextStyles.subTitle,
+              "Adding a\nMeal",
+              style: AppTextStyles.mainTitle,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Icon(
+                  Icons.sunny,
+                  color: Color(0xFF979797),
+                ),
+                Text(
+                  " - Lunchtime: 17/10/24",
+                  style: AppTextStyles.subTitle,
+                ),
+              ],
             ),
           ],
         ),

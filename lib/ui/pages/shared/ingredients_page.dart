@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/database/database_ingredients.dart';
 import 'package:fresh_planner/source/enums/ingredient_food_type.dart';
-import 'package:fresh_planner/source/enums/ingredient_metric.dart';
 import 'package:fresh_planner/source/objects/ingredient.dart';
 import 'package:fresh_planner/source/objects/user.dart';
+import 'package:fresh_planner/ui/pages/shared/add_ingredient_page.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
 import 'package:fresh_planner/ui/widgets/ingredient_card.dart';
 
@@ -11,7 +11,7 @@ class IngredientsPage extends StatefulWidget {
   const IngredientsPage({super.key, required this.user, required this.ingredients});
 
   final User user;
-  final List<Ingredient>? ingredients;
+  final List<Ingredient> ingredients;
 
   @override
   State<IngredientsPage> createState() => _IngredientsPageState();
@@ -24,7 +24,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
   final Map<IngredientType, bool> _isOpen = {
     for (var type in IngredientType.values) type: true,
   };
-  final Map<IngredientType, List<IngredientCard>> ingredientMap = {
+  final Map<IngredientType, List<IngredientCard>> _ingredientMap = {
     for (var type in IngredientType.values) type: [],
   };
 
@@ -37,17 +37,10 @@ class _IngredientsPageState extends State<IngredientsPage> {
   }
 
   void _setUpIngredientMap() {
-    if (widget.ingredients == null) return;
-    for (Ingredient i in widget.ingredients!) {
+    for (Ingredient i in widget.ingredients) {
       final IngredientType t = i.type ?? IngredientType.misc;
-      ingredientMap[t]!.add(IngredientCard(ingredient: i, onRemove: () async => _removeIngredient(i),));
+      _ingredientMap[t]!.add(IngredientCard(ingredient: i, onRemove: () async => _removeIngredient(i),));
     }
-  }
-
-  void _printIngredients() async {
-    final List<Ingredient>? ingredients = await _ingredientDB.getAllIngredients(widget.user.uid!);
-    if (ingredients == null) return;
-    debugPrint("Length of ingredients: ${ingredients.length}");
   }
 
   void _selectIngredient(Ingredient ingredient) {
@@ -69,7 +62,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
       _selectedIngredient = null;
 
       final type = ingredient.type ?? IngredientType.misc;
-      ingredientMap[type]!.removeWhere((card) => card.ingredient == ingredient);
+      _ingredientMap[type]!.removeWhere((card) => card.ingredient == ingredient);
     });
   }
 
@@ -91,7 +84,19 @@ class _IngredientsPageState extends State<IngredientsPage> {
                   style: AppTextStyles.mainTitle,
                 ),
                 IconButton(
-                  onPressed: _printIngredients,
+                  onPressed: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AddIngredientPage(user: widget.user, ingredients: widget.ingredients, ingredientDB: _ingredientDB,)),
+                    );
+                    if (result is! Ingredient) return;
+                    setState(() {
+                      widget.ingredients.add(result);
+                      widget.ingredients.sort();
+                      _ingredientMap[result.type ?? IngredientType.misc]!.add(IngredientCard(ingredient: result));
+                      _ingredientMap[result.type ?? IngredientType.misc]!.sort();
+                    });
+                  },
                   style: ButtonStyle(
                     backgroundColor: WidgetStateProperty.all<Color>(Color(0xFF399E5A)),
                   ), 
@@ -114,13 +119,13 @@ class _IngredientsPageState extends State<IngredientsPage> {
               child: SingleChildScrollView(
                 child: ExpansionPanelList(
                   expansionCallback: (index, isExpanded) {
-                    final type = ingredientMap.entries.elementAt(index).key;
+                    final type = _ingredientMap.entries.elementAt(index).key;
                     setState(() {
                       _isOpen[type] = isExpanded;
                       debugPrint("Toggled $type -> ${_isOpen[type]}");
                     });
                   },
-                  children: ingredientMap.entries.map((entry) {
+                  children: _ingredientMap.entries.map((entry) {
                     final index = entry.key;
                     final mapEntry = entry.value;
                     return ExpansionPanel(
@@ -194,7 +199,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                     children: <Widget>[
                       Text("Amount: "),
                       Text(_selectedIngredient == null ? "0" : _selectedIngredient!.amount.toString()),
-                      Text(_selectedIngredient == null ? "" : _selectedIngredient!.metric.name),
+                      Text(_selectedIngredient == null ? "" : _selectedIngredient!.metric.metricSymbol),
                     ],
                   ),
                 ),

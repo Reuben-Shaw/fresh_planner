@@ -182,7 +182,7 @@ class _LoginPageState extends State<LoginPage> {
                                   controller: emailController,
                                   enableSuggestions: false,
                                   autocorrect: false,
-                                  decoration: AppTextFieldStyles.primaryStyle("email")
+                                  decoration: AppTextFieldStyles.primaryStyle("email"),
                                 ),
                               ),
                               Visibility(
@@ -196,7 +196,7 @@ class _LoginPageState extends State<LoginPage> {
                                         controller: usernameController,
                                         enableSuggestions: false,
                                         autocorrect: false,
-                                        decoration: AppTextFieldStyles.primaryStyle("username")
+                                        decoration: AppTextFieldStyles.primaryStyle("username"),
                                       ),
                                     ),
                                   ],
@@ -210,7 +210,7 @@ class _LoginPageState extends State<LoginPage> {
                                   obscureText: true,
                                   enableSuggestions: false,
                                   autocorrect: false,
-                                  decoration: AppTextFieldStyles.primaryStyle("password")
+                                  decoration: AppTextFieldStyles.primaryStyle("password"),
                                 ),
                               ),
                               Visibility(
@@ -225,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
                                         obscureText: true,
                                         enableSuggestions: false,
                                         autocorrect: false,
-                                        decoration: AppTextFieldStyles.primaryStyle("re-enter password")
+                                        decoration: AppTextFieldStyles.primaryStyle("re-enter password"),
                                       ),
                                     ),
                                   ],

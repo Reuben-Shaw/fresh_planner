@@ -128,152 +128,164 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  "New\nIngredient",
-                  style: AppTextStyles.mainTitle,
-                ),
-                SizedBox(height: 5,),
-                Text(
-                  "*must be included",
-                  style: AppTextStyles.subTitle,
-                ),
-                SizedBox(height: 20,),
-                Container(
-                  decoration: AppTextFieldStyles.dropShadow,
-                  child: TextField(
-                    controller: nameController,
-                    decoration: AppTextFieldStyles.primaryStyle("name*"),
-                  ),
-                ),
-                SizedBox(height: 20,),
-                Container(
-                  decoration: AppTextFieldStyles.dropShadowWithColour,
-                  child: DropdownButton(
-                    items: IngredientMetric.values.map((type) {
-                      return DropdownMenuItem<IngredientMetric>(
-                        value: type,
-                        child: Text("   ${type.standardName}"),
-                      );
-                    }).toList(),
-                    value: _metricDropdownValue,
-                    onChanged: metricDropdownCallback,
-                    isExpanded: true,
-                    underline: Text(""),
-                    hint: Text(
-                      "   ingredient metric*",
-                      style: AppTextStyles.hint,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      "£",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF898989),
-                        fontSize: 46,
-                      ),
-                    ),
-                    SizedBox(width: 10,),
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        decoration: AppTextFieldStyles.dropShadow,
-                        child: TextField(
-                          controller: costController,
-                          keyboardType: TextInputType.numberWithOptions(decimal: true),
-                          decoration: AppTextFieldStyles.primaryStyle("cost"),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 20,),
-                    Expanded(
-                      flex: 2,
-                      child: Container(
-                        decoration: AppTextFieldStyles.dropShadow,
-                        child: TextField(
-                          controller: costAmountController,
-                          keyboardType: TextInputType.number,
-                          decoration: costAmountHint,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 10,),
-                    Text(
-                      metricText,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF898989),
-                        fontSize: 46,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20,),
-                Container(
-                  decoration: AppTextFieldStyles.dropShadowWithColour,
-                  child: DropdownButton(
-                    items: IngredientType.values.map((type) {
-                      return DropdownMenuItem<IngredientType>(
-                        value: type,
-                        child: Text("   ${type.standardName}"),
-                      );
-                    }).toList(),
-                    value: _typeDropdownValue,
-                    onChanged: typeDropdownCallback,
-                    isExpanded: true,
-                    underline: Text(""),
-                    hint: Text(
-                      "   type of ingredient",
-                      style: AppTextStyles.hint,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10,),
-                Text(
-                  errorText,
-                  style: TextStyle(
-                    fontSize: 14, 
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 10,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    ElevatedButton(
-                      onPressed: addIngredient,
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all<Color>(Color(0xFF399E5A)),
-                      ),
-                      child: Text(
-                        "    Add    ",
-                        style: TextStyle(
-                          fontSize: 20, 
-                          fontWeight: FontWeight.bold, 
-                          color: Colors.white,
-                          height: 2.5,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: Icon(Icons.arrow_back,),
             ),
-          ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        "New\nIngredient",
+                        style: AppTextStyles.mainTitle,
+                      ),
+                      SizedBox(height: 5,),
+                      Text(
+                        "*must be included",
+                        style: AppTextStyles.subTitle,
+                      ),
+                      SizedBox(height: 20,),
+                      Container(
+                        decoration: AppTextFieldStyles.dropShadow,
+                        child: TextField(
+                          controller: nameController,
+                          decoration: AppTextFieldStyles.primaryStyle("name*"),
+                        ),
+                      ),
+                      SizedBox(height: 20,),
+                      Container(
+                        decoration: AppTextFieldStyles.dropShadowWithColour,
+                        child: DropdownButton(
+                          items: IngredientMetric.values.map((type) {
+                            return DropdownMenuItem<IngredientMetric>(
+                              value: type,
+                              child: Text("   ${type.standardName}"),
+                            );
+                          }).toList(),
+                          value: _metricDropdownValue,
+                          onChanged: metricDropdownCallback,
+                          isExpanded: true,
+                          underline: Text(""),
+                          hint: Text(
+                            "   ingredient metric*",
+                            style: AppTextStyles.hint,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            "£",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF898989),
+                              fontSize: 46,
+                            ),
+                          ),
+                          SizedBox(width: 10,),
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              decoration: AppTextFieldStyles.dropShadow,
+                              child: TextField(
+                                controller: costController,
+                                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                decoration: AppTextFieldStyles.primaryStyle("cost"),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 20,),
+                          Expanded(
+                            flex: 2,
+                            child: Container(
+                              decoration: AppTextFieldStyles.dropShadow,
+                              child: TextField(
+                                controller: costAmountController,
+                                keyboardType: TextInputType.number,
+                                decoration: costAmountHint,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 10,),
+                          Text(
+                            metricText,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF898989),
+                              fontSize: 46,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 20,),
+                      Container(
+                        decoration: AppTextFieldStyles.dropShadowWithColour,
+                        child: DropdownButton(
+                          items: IngredientType.values.map((type) {
+                            return DropdownMenuItem<IngredientType>(
+                              value: type,
+                              child: Text("   ${type.standardName}"),
+                            );
+                          }).toList(),
+                          value: _typeDropdownValue,
+                          onChanged: typeDropdownCallback,
+                          isExpanded: true,
+                          underline: Text(""),
+                          hint: Text(
+                            "   type of ingredient",
+                            style: AppTextStyles.hint,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10,),
+                      Text(
+                        errorText,
+                        style: TextStyle(
+                          fontSize: 14, 
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 10,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          ElevatedButton(
+                            onPressed: addIngredient,
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all<Color>(Color(0xFF399E5A)),
+                            ),
+                            child: Text(
+                              "    Add    ",
+                              style: TextStyle(
+                                fontSize: 20, 
+                                fontWeight: FontWeight.bold, 
+                                color: Colors.white,
+                                height: 2.5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

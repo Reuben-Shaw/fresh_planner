@@ -62,10 +62,10 @@ class DatabaseHelperIngredients {
       },
       body: jsonEncode({
         'uid': uid,
-        'name': name,
+        'name': name.toLowerCase(),
         'cost': cost,
-        'metric': metric,
-        'type': type,
+        'metric': metric.name,
+        'type': type?.name,
       }),
     );
 

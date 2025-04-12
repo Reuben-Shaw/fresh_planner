@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:fresh_planner/ui/styles/text_styles.dart';
 class AppTextFieldStyles {
   static InputDecoration primaryStyle(String hint) { 
     return InputDecoration(filled: true,
       fillColor: Color(0xFFd7f1e0),
       hintText: hint,
-      hintStyle: TextStyle(
-        color: Color(0x33000000),
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-      ),
+      hintStyle: AppTextStyles.hint,
       border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(
@@ -20,6 +17,19 @@ class AppTextFieldStyles {
   }
 
   static BoxDecoration dropShadow = BoxDecoration(
+    borderRadius: BorderRadius.all(Radius.circular(10)),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withValues(alpha: 0.25),
+        spreadRadius: 0,
+        blurRadius: 4,
+        offset: Offset(0, 4),
+      ),
+    ],
+  );
+
+  static BoxDecoration dropShadowWithColour = BoxDecoration(
+    color: Color(0xFFd7f1e0),
     borderRadius: BorderRadius.all(Radius.circular(10)),
     boxShadow: [
       BoxShadow(

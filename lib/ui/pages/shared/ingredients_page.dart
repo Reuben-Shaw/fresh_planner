@@ -131,7 +131,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                     return ExpansionPanel(
                       headerBuilder: (context, isExpanded) {
                         return ListTile(
-                          title: Text(index.name),
+                          title: Text(index.standardName),
                         );
                       },
                       body: ListView(

@@ -6,6 +6,7 @@ class Ingredient implements Comparable<Ingredient> {
   String name;
   int amount;
   double? cost;
+  int? costAmount;
   IngredientMetric metric;
   IngredientType? type;
 
@@ -14,6 +15,7 @@ class Ingredient implements Comparable<Ingredient> {
     required this.name,
     this.amount = 0,
     this.cost,
+    this.costAmount,
     required this.metric,
     this.type,
   });
@@ -22,6 +24,7 @@ class Ingredient implements Comparable<Ingredient> {
     return {
       'name': name,
       'cost' : cost,
+      'costAmount' : costAmount,
       'metric': metricToJson(metric),
       'type': ingredientTypeToJson(type),
     };
@@ -33,6 +36,7 @@ class Ingredient implements Comparable<Ingredient> {
       name: json['name'],
       amount: 0,
       cost: json['cost'],
+      costAmount: json['costAmount'],
       metric: metricFromJson(json['metric']),
       type: ingredientTypeFromJson(json['type']),
     );
@@ -55,7 +59,7 @@ class Ingredient implements Comparable<Ingredient> {
 
   @override
   String toString() {
-    return 'Ingredient{id: $id, name: $name, amount: $amount $metric, cost: $cost type: $type}';
+    return 'Ingredient{id: $id, name: $name, amount: $amount $metric, cost: $cost, costAmount: $costAmount, type: $type}';
   }
 }
 

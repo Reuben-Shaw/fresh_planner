@@ -21,6 +21,7 @@ class AddIngredientPage extends StatefulWidget {
 class _AddIngredientPageState extends State<AddIngredientPage> {
   final nameController = TextEditingController();
   final costController = TextEditingController();
+  final costAmountController = TextEditingController();
 
   String _errorText = "";
   String get errorText => _errorText;
@@ -49,21 +50,31 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
       errorText = "Ensure all required values are filled";
       return;
     }
+    if (costController.text.isNotEmpty && costAmountController.text.isEmpty) {
+      errorText = "Please ensure an amount per cost is provided";
+      return;
+    }
     final costParsed = double.tryParse(costController.text);
     if (costParsed == null) {
       errorText = "Cost is not numeric";
       return;
     }
-    if (widget.ingredients.any((i) => i.name == "")) {
+    final costAmountParsed = int.tryParse(costAmountController.text);
+    if (costAmountParsed == null) {
+      errorText = "Amount per cost is not numeric";
+      return;
+    }
+    if (widget.ingredients.any((i) => i.name.toLowerCase() == "")) {
       errorText = "Ingredient with the same name already exists";
       return;
     }
 
     final ingredient = Ingredient(
-      name: nameController.text, 
+      name: nameController.text.toLowerCase(), 
       cost: costParsed,
+      costAmount: costAmountParsed,
       metric: _metricDropdownValue!,
-      type: _typeDropdownValue,
+      type: _typeDropdownValue != IngredientType.misc ? _typeDropdownValue : null,
     );
 
     (bool, String?) response = await widget.ingredientDB.addIngredient(widget.user.uid!, ingredient);
@@ -102,17 +113,22 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
               ),
             ),
             Container(
-              decoration: AppTextFieldStyles.dropShadow,
+              decoration: AppTextFieldStyles.dropShadowWithColour,
               child: DropdownButton(
                 items: IngredientMetric.values.map((type) {
                   return DropdownMenuItem<IngredientMetric>(
                     value: type,
-                    child: Text(type.standardName),
+                    child: Text("   ${type.standardName}"),
                   );
                 }).toList(),
-                style: TextStyle(color:Colors.red),
                 value: _metricDropdownValue,
                 onChanged: metricDropdownCallback,
+                isExpanded: true,
+                underline: Text(""),
+                hint: Text(
+                  "   ingredient metric*",
+                  style: AppTextStyles.hint,
+                ),
               ),
             ),
             Row(
@@ -123,10 +139,12 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF898989),
-                    fontSize: 40,
+                    fontSize: 46,
                   ),
                 ),
+                SizedBox(width: 10,),
                 Expanded(
+                  flex: 1,
                   child: Container(
                     decoration: AppTextFieldStyles.dropShadow,
                     child: TextField(
@@ -136,20 +154,37 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                     ),
                   ),
                 ),
+                SizedBox(width: 20,),
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    decoration: AppTextFieldStyles.dropShadow,
+                    child: TextField(
+                      controller: costAmountController,
+                      keyboardType: TextInputType.number,
+                      decoration: AppTextFieldStyles.primaryStyle("/amount"),
+                    ),
+                  ),
+                ),
               ],
             ),
             Container(
-              decoration: AppTextFieldStyles.dropShadow,
+              decoration: AppTextFieldStyles.dropShadowWithColour,
               child: DropdownButton(
                 items: IngredientType.values.map((type) {
                   return DropdownMenuItem<IngredientType>(
                     value: type,
-                    child: Text(type.standardName),
+                    child: Text("   ${type.standardName}"),
                   );
                 }).toList(),
                 value: _typeDropdownValue,
                 onChanged: typeDropdownCallback,
-                style: TextStyle(color:Colors.red),
+                isExpanded: true,
+                underline: Text(""),
+                hint: Text(
+                  "   type of ingredient",
+                  style: AppTextStyles.hint,
+                ),
               ),
             ),
             Text(
@@ -160,20 +195,25 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            ElevatedButton(
-              onPressed: addIngredient,
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(Color(0xFF399E5A)),
-              ),
-              child: Text(
-                "Add",
-                style: TextStyle(
-                  fontSize: 20, 
-                  fontWeight: FontWeight.bold, 
-                  color: Colors.white,
-                  height: 2.5,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: addIngredient,
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all<Color>(Color(0xFF399E5A)),
+                  ),
+                  child: Text(
+                    "    Add    ",
+                    style: TextStyle(
+                      fontSize: 20, 
+                      fontWeight: FontWeight.bold, 
+                      color: Colors.white,
+                      height: 2.5,
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ],
         ),

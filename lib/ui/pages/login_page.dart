@@ -4,6 +4,7 @@ import 'package:fresh_planner/source/database/database_user.dart';
 import 'package:fresh_planner/ui/pages/main_page.dart';
 import 'package:fresh_planner/ui/pages/shared/ingredients_page.dart';
 import 'package:fresh_planner/ui/pages/shared/recipe_page.dart';
+import 'package:fresh_planner/ui/styles/button_styles.dart';
 import 'package:fresh_planner/ui/styles/text_field_styles.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
 
@@ -251,19 +252,15 @@ class _LoginPageState extends State<LoginPage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: <Widget>[
-                              ElevatedButton(
-                                onPressed:
-                                  isRegister ? registerAccount : checkPassword,
-                                style: ButtonStyle(
-                                  backgroundColor: WidgetStateProperty.all<Color>(Color(0xFF399E5A)),
-                                ),
-                                child: Text(
-                                  isRegister ? '    Register    ' : '      Login      ',
-                                  style: TextStyle(
-                                    fontSize: 20, 
-                                    fontWeight: FontWeight.bold, 
-                                    color: Colors.white,
-                                    height: 2.5,
+                              Container(
+                                decoration: AppButtonStyles.curvedShadow,
+                                child: ElevatedButton(
+                                  onPressed:
+                                    isRegister ? registerAccount : checkPassword,
+                                  style: AppButtonStyles.mainBackStyle,
+                                  child: Text(
+                                    isRegister ? '    Register    ' : '      Login      ',
+                                    style: AppButtonStyles.mainTextStyle,
                                   ),
                                 ),
                               ),

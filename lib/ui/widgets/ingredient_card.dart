@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:fresh_planner/source/enums/ingredient_metric.dart';
 import 'package:fresh_planner/source/objects/ingredient.dart';
 
 class IngredientCard extends StatelessWidget implements Comparable<IngredientCard> {
   final Ingredient ingredient;
   final VoidCallback? onRemove;
+  final bool showAmount;
 
   const IngredientCard({
     super.key,
     required this.ingredient,
     this.onRemove,
+    required this.showAmount,
   });
 
   @override
@@ -35,8 +38,20 @@ class IngredientCard extends StatelessWidget implements Comparable<IngredientCar
                   Text(
                     ingredient.name,
                   ),
-                  Text(
-                    ingredient.metric.standardName,
+                  Row(
+                    children: <Widget>[
+                      Visibility(
+                        visible: showAmount,
+                        child: Text(
+                          ingredient.amount == 0 ? "" : ingredient.amount.toString(),
+                        ),
+                      ),
+                      SizedBox(width: 5,),
+                      Text(
+                        (showAmount && (ingredient.metric == IngredientMetric.item || ingredient.amount == 0)) ? "" : 
+                        showAmount ? ingredient.metric.metricSymbol : ingredient.metric.standardName, 
+                      ),
+                    ],
                   ),
                 ],
               ),

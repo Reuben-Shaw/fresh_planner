@@ -4,6 +4,7 @@ import 'package:fresh_planner/source/enums/ingredient_food_type.dart';
 import 'package:fresh_planner/source/objects/ingredient.dart';
 import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/pages/shared/add_ingredient_page.dart';
+import 'package:fresh_planner/ui/styles/button_styles.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
 import 'package:fresh_planner/ui/widgets/ingredient_card.dart';
 
@@ -39,7 +40,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
   void _setUpIngredientMap() {
     for (Ingredient i in widget.ingredients) {
       final IngredientType t = i.type ?? IngredientType.misc;
-      _ingredientMap[t]!.add(IngredientCard(ingredient: i, onRemove: () async => _removeIngredient(i),));
+      _ingredientMap[t]!.add(IngredientCard(ingredient: i, onRemove: () async => _removeIngredient(i), showAmount: false,));
     }
   }
 
@@ -84,26 +85,29 @@ class _IngredientsPageState extends State<IngredientsPage> {
                   "Ingredients",
                   style: AppTextStyles.mainTitle,
                 ),
-                IconButton(
-                  onPressed: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => AddIngredientPage(user: widget.user, ingredients: widget.ingredients, ingredientDB: _ingredientDB,)),
-                    );
-                    if (result is! Ingredient) return;
-                    setState(() {
-                      widget.ingredients.add(result);
-                      widget.ingredients.sort();
-                      _ingredientMap[result.type ?? IngredientType.misc]!.add(IngredientCard(ingredient: result, onRemove: () async => _removeIngredient(result)));
-                      _ingredientMap[result.type ?? IngredientType.misc]!.sort();
-                    });
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all<Color>(Color(0xFF399E5A)),
-                  ), 
-                  icon: Icon(
-                    Icons.add,
-                    color: Colors.white,
+                Container(
+                  decoration: AppButtonStyles.circularShadow,
+                  child: IconButton(
+                    onPressed: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AddIngredientPage(user: widget.user, ingredients: widget.ingredients, ingredientDB: _ingredientDB,)),
+                      );
+                      if (result is! Ingredient) return;
+                      setState(() {
+                        widget.ingredients.add(result);
+                        widget.ingredients.sort();
+                        _ingredientMap[result.type ?? IngredientType.misc]!.add(IngredientCard(ingredient: result, onRemove: () async => _removeIngredient(result), showAmount: false,));
+                        _ingredientMap[result.type ?? IngredientType.misc]!.sort();
+                      });
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStateProperty.all<Color>(Color(0xFF399E5A)),
+                    ), 
+                    icon: Icon(
+                      Icons.add,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ],

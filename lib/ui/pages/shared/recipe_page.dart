@@ -88,7 +88,7 @@ class _RecipePageState extends State<RecipePage> {
                     );
                     if (result is! Ingredient) return;
                     setState(() {
-                      _ingredientCards.add(IngredientCard(ingredient: result));
+                      _ingredientCards.add(IngredientCard(ingredient: result, showAmount: true,));
                       _ingredientCards.sort();
                     });
                   },

@@ -4,6 +4,7 @@ import 'package:fresh_planner/source/enums/ingredient_food_type.dart';
 import 'package:fresh_planner/source/enums/ingredient_metric.dart';
 import 'package:fresh_planner/source/objects/ingredient.dart';
 import 'package:fresh_planner/source/objects/user.dart';
+import 'package:fresh_planner/ui/styles/button_styles.dart';
 import 'package:fresh_planner/ui/styles/text_field_styles.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
 
@@ -263,18 +264,14 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[
-                          ElevatedButton(
-                            onPressed: addIngredient,
-                            style: ButtonStyle(
-                              backgroundColor: WidgetStateProperty.all<Color>(Color(0xFF399E5A)),
-                            ),
-                            child: Text(
-                              "    Add    ",
-                              style: TextStyle(
-                                fontSize: 20, 
-                                fontWeight: FontWeight.bold, 
-                                color: Colors.white,
-                                height: 2.5,
+                          Container(
+                            decoration: AppButtonStyles.circularShadow,
+                            child: ElevatedButton(
+                              onPressed: addIngredient,
+                              style: AppButtonStyles.mainBackStyle,
+                              child: Text(
+                                "    Add    ",
+                                style: AppButtonStyles.mainTextStyle,
                               ),
                             ),
                           ),

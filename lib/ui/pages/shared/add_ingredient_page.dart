@@ -34,8 +34,6 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
   String get metricText => _metricText;
   set metricText(String value) => setState(() => _metricText = value);
 
-
-
   IngredientMetric? _metricDropdownValue;
   void metricDropdownCallback(Object? selectedVaue) {
     if (selectedVaue is IngredientMetric) {

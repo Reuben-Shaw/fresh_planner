@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/database/database_calendar.dart';
 import 'package:fresh_planner/source/database/database_ingredients.dart';
 import 'package:fresh_planner/source/database/database_user.dart';
+import 'package:fresh_planner/source/objects/recipe.dart';
 import 'package:fresh_planner/ui/pages/main_page.dart';
 import 'package:fresh_planner/ui/pages/shared/ingredients_page.dart';
 import 'package:fresh_planner/ui/pages/shared/recipe_page.dart';
@@ -56,9 +57,21 @@ class _LoginPageState extends State<LoginPage> {
     }
     final ingredientDB = DatabaseIngredients();
     final ingredientData = await ingredientDB.getAllIngredients(userData.$2!.uid!);
-    if (ingredientData == null || !mounted) {
+    if (ingredientData == null) {
       errorText = "Internal server error, please try again";
       return;
+    }
+    
+    ingredientData.sort();
+    final calendarDB = DatabaseCalendar();
+    final recipeData = await calendarDB.getAllRecipes(userData.$2!.uid!);
+    if (recipeData == null || !mounted) {
+      errorText = "Internal server error, please try again";
+      return;
+    } else {
+      for (Recipe r in recipeData) {
+        debugPrint(r.toString());
+      }
     }
     
     ingredientData.sort();

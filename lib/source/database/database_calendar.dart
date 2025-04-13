@@ -5,16 +5,10 @@ import 'package:fresh_planner/source/objects/recipe.dart';
 class DatabaseCalendar {
   final _database = DatabaseHelperCalendar();
 
-  Future<(bool, String?)> addRecipe(String uid, Recipe r) async {
+  Future<(bool, String?)> addRecipe(String uid, Recipe recipe) async {
     try {
-      debugPrint("Adding new recipe with ${r.ingredients.length} ingredients");
-      
-      final List<(String, int)> ingredients = [];
-      for (final i in r.ingredients) {
-        ingredients.add((i.id!, i.amount));
-      }
-
-      final response = await _database.addRecipeAPI(uid, r.name, r.link, ingredients, r.colour);
+      debugPrint("Adding new recipe with ${recipe.ingredients.length} ingredients");
+      final response = await _database.addRecipeAPI(uid, recipe);
 
       bool success = response['success'] as bool? ?? false;
       if (success) {
@@ -27,6 +21,29 @@ class DatabaseCalendar {
     } catch (e) {
       debugPrint("Adding new recipe caused a crash: $e");
       return (false, null);
+    }
+  }
+
+  Future<List<Recipe>?> getAllRecipes(String uid) async {
+    try {
+      debugPrint("Getting recipes");
+      final response = await _database.getAllRecipesAPI(uid);
+
+      bool success = response['success'] as bool? ?? false;
+      if (success) {
+        debugPrint("Got recipes");
+        final List<dynamic> recipesData = response['recipes'];
+
+        return recipesData.map((ingredientJson) {
+          return Recipe.fromJson(ingredientJson);
+        }).toList();
+      } else {
+        debugPrint("Failed to get recipes: ${response['message'] ?? response['error'] ?? "!!NO ERROR OR MESSAGE!!"}");
+      }
+      return [];
+    } catch (e) {
+      debugPrint("Error fetching recipes: $e");
+      return [];
     }
   }
 } 

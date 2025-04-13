@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:fresh_planner/source/objects/recipe.dart';
 import 'package:http/http.dart' as http;
 
 class DatabaseHelperCalendar {
   static const String _standardUrl = "-mueafkqufq-nw.a.run.app";
   static const String _addRecipeUrl = "addrecipe";
+  static const String _getAllRecipesUrl = "getallrecipes";
   
-  Future<Map<String, dynamic>> addRecipeAPI(String uid, String name, String? link, List<(String, int)> ingredients, Color colour) async {
+  Future<Map<String, dynamic>> addRecipeAPI(String uid, Recipe recipe) async {
     try {
       final Uri url = Uri.parse("https://$_addRecipeUrl$_standardUrl");
       final response = await http.post(
@@ -16,10 +18,7 @@ class DatabaseHelperCalendar {
         },
         body: jsonEncode({
           'uid': uid,
-          'name': name,
-          'link' : link,
-          'ingredients': ingredients.map((e) => {'id': e.$1, 'amount': e.$2}).toList(),
-          'colour' : colour.toString(),
+          'recipe' : recipe.toMap(),
         }),
       );
 
@@ -33,6 +32,27 @@ class DatabaseHelperCalendar {
         }
       } else {
         return {"error": "Failed with status code ${response.statusCode}"};
+      }
+    } catch (e) {
+      return {"error": "An error occurred: $e"};
+    }
+  }
+
+  Future<Map<String, dynamic>> getAllRecipesAPI(String uid) async {
+    try {
+      final Uri url = Uri.parse("https://$_getAllRecipesUrl$_standardUrl?uid=$uid");
+      final response = await http.get(url);
+      
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        debugPrint("Body is : $body");
+        if (body is Map<String, dynamic>) {
+          return body;
+        } else {
+          return {"error": "Unexpected response format"};
+        }
+      } else {
+        return {"error": "Request failed with status code ${response.statusCode}"};
       }
     } catch (e) {
       return {"error": "An error occurred: $e"};

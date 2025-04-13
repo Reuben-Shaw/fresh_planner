@@ -20,8 +20,8 @@ class Recipe {
     return {
       'name': name,
       'link': link,
-      'ingredients': ingredients,
-      'colour': colour,
+      'ingredients': ingredients.map((i) => {'id': i.id, 'amount': i.amount}).toList(),
+      'colour': colourToJson(colour),
     };
   }
 
@@ -29,14 +29,35 @@ class Recipe {
     return Recipe(
       id: json['id'],
       name: json['name'],
-      link: json['link'],
-      ingredients: json['ingredients'],
-      colour: json['colour'],
+      link: json['link'] as String?,
+      ingredients: (json['ingredients'] as List<dynamic>?)
+        ?.map((i) => Ingredient.fromJson(i as Map<String, dynamic>))
+        .toList() ??
+      [],
+      colour: colourFromJson(json['colour']),
     );
   }
 
   @override
   String toString() {
-    return 'Recipe{name: $name, link: $link}';
+    return 'Recipe{name: $name, link: $link, ${ingredients.toString()} colour: $colour}';
   }
 }
+
+Map<String, double> colourToJson(Color colour) {
+    return {
+      'red': colour.r,
+      'blue': colour.b,
+      'green': colour.g,
+      'alpha': colour.a,
+    };
+  }
+
+Color colourFromJson(Map<String, dynamic> colourMap) {
+    return Color.from(
+      alpha: (colourMap['alpha']!).toDouble(),
+      red: (colourMap['red']!).toDouble(),
+      green: (colourMap['green']!).toDouble(),
+      blue: (colourMap['blue']!).toDouble(),
+    );
+  }

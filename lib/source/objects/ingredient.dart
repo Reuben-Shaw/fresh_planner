@@ -28,13 +28,13 @@ class Ingredient implements Comparable<Ingredient> {
       'metric': metricToJson(metric),
       'type': ingredientTypeToJson(type),
     };
-  }//TTe7goiJHi432daeiX7P
+  }
 
   factory Ingredient.fromJson(Map<String, dynamic> json) {
     return Ingredient(
       id: json['id'],
       name: json['name'],
-      amount: 0,
+      amount: json['amount'] ?? 0,
       cost: (json['cost'])?.toDouble(),
       costAmount: json['costAmount'],
       metric: metricFromJson(json['metric']),

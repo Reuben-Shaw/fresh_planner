@@ -20,11 +20,11 @@ class AddIngredientPage extends StatefulWidget {
 }
 
 class _AddIngredientPageState extends State<AddIngredientPage> {
-  final nameController = TextEditingController();
-  final costController = TextEditingController();
-  final costAmountController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _costController = TextEditingController();
+  final _costAmountController = TextEditingController();
 
-  InputDecoration costAmountHint = AppTextFieldStyles.primaryStyle("/amount");
+  InputDecoration _costAmountHint = AppTextFieldStyles.primaryStyle("/amount");
 
   String _errorText = "";
   String get errorText => _errorText;
@@ -35,7 +35,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
   set metricText(String value) => setState(() => _metricText = value);
 
   IngredientMetric? _metricDropdownValue;
-  void metricDropdownCallback(Object? selectedVaue) {
+  void _metricDropdownCallback(Object? selectedVaue) {
     if (selectedVaue is IngredientMetric) {
       setState(() {
         metricText = selectedVaue != IngredientMetric.item ? selectedVaue.metricSymbol : "";
@@ -45,7 +45,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
   }
 
   IngredientType? _typeDropdownValue;
-  void typeDropdownCallback(Object? selectedVaue) {
+  void _typeDropdownCallback(Object? selectedVaue) {
     if (selectedVaue is IngredientType) {
       setState(() {
         _typeDropdownValue = selectedVaue;
@@ -57,57 +57,57 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
   @override
   void initState() {
     super.initState();
-    costController.addListener(_updateCostAmount);
+    _costController.addListener(_updateCostAmount);
   }
   @override
   void dispose() {
-    costController.dispose();
+    _costController.dispose();
     super.dispose();
   }
 
   void _updateCostAmount() {
-    if (costController.text.isNotEmpty) {
+    if (_costController.text.isNotEmpty) {
       setState(() {
-        costAmountHint = AppTextFieldStyles.primaryStyle("/amount*");
+        _costAmountHint = AppTextFieldStyles.primaryStyle("/amount*");
       });
     } else {
       setState(() {
-        costAmountHint = AppTextFieldStyles.primaryStyle("/amount");
+        _costAmountHint = AppTextFieldStyles.primaryStyle("/amount");
       });
     }
   }
 
   void addIngredient() async {
-    if (nameController.text == "" || _metricDropdownValue == null) {
+    if (_nameController.text == "" || _metricDropdownValue == null) {
       errorText = "Ensure all required values are filled";
       return;
     }
-    if (costController.text.isNotEmpty && costAmountController.text.isEmpty) {
+    if (_costController.text.isNotEmpty && _costAmountController.text.isEmpty) {
       errorText = "Please ensure an amount per cost is provided";
       return;
     }
 
     double? costParsed;
     int? costAmountParsed;
-    if (costController.text.isNotEmpty || costAmountController.text.isNotEmpty) {
-      costParsed = double.tryParse(costController.text);
+    if (_costController.text.isNotEmpty || _costAmountController.text.isNotEmpty) {
+      costParsed = double.tryParse(_costController.text);
       if (costParsed == null) {
         errorText = "Cost is not numeric";
         return;
       }
-      costAmountParsed = int.tryParse(costAmountController.text);
+      costAmountParsed = int.tryParse(_costAmountController.text);
       if (costAmountParsed == null) {
         errorText = "Amount per cost is not numeric";
         return;
       }
     }
-    if (widget.ingredients.any((i) => i.name == nameController.text.toLowerCase())) {
+    if (widget.ingredients.any((i) => i.name == _nameController.text.toLowerCase())) {
       errorText = "Ingredient with the same name already exists";
       return;
     }
 
     final ingredient = Ingredient(
-      name: nameController.text.toLowerCase(), 
+      name: _nameController.text.toLowerCase(), 
       cost: costParsed,
       costAmount: costAmountParsed,
       metric: _metricDropdownValue!,
@@ -158,7 +158,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                       Container(
                         decoration: AppTextFieldStyles.dropShadow,
                         child: TextField(
-                          controller: nameController,
+                          controller: _nameController,
                           decoration: AppTextFieldStyles.primaryStyle("name*"),
                         ),
                       ),
@@ -173,7 +173,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                             );
                           }).toList(),
                           value: _metricDropdownValue,
-                          onChanged: metricDropdownCallback,
+                          onChanged: _metricDropdownCallback,
                           isExpanded: true,
                           underline: Text(""),
                           hint: Text(
@@ -200,7 +200,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                             child: Container(
                               decoration: AppTextFieldStyles.dropShadow,
                               child: TextField(
-                                controller: costController,
+                                controller: _costController,
                                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                                 decoration: AppTextFieldStyles.primaryStyle("cost"),
                               ),
@@ -212,9 +212,9 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                             child: Container(
                               decoration: AppTextFieldStyles.dropShadow,
                               child: TextField(
-                                controller: costAmountController,
+                                controller: _costAmountController,
                                 keyboardType: TextInputType.number,
-                                decoration: costAmountHint,
+                                decoration: _costAmountHint,
                               ),
                             ),
                           ),
@@ -240,7 +240,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                             );
                           }).toList(),
                           value: _typeDropdownValue,
-                          onChanged: typeDropdownCallback,
+                          onChanged: _typeDropdownCallback,
                           isExpanded: true,
                           underline: Text(""),
                           hint: Text(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/objects/ingredient.dart';
 
-class Recipe {
+class Recipe implements Comparable<Recipe> {
   String? id;
   final String name;
   final String? link;
@@ -15,6 +15,19 @@ class Recipe {
     required this.ingredients,
     required this.colour,
   });
+
+  double get cost {
+    double cost = 0;
+    for (Ingredient i in ingredients) {
+      cost += (i.cost ?? 0) / (i.costAmount ?? 1);
+    }
+    return cost;
+  }
+
+  @override
+  int compareTo(Recipe other) {
+    return (name.compareTo(other.name));
+  }
 
   Map<String, Object?> toMap() {
     return {

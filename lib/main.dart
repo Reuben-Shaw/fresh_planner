@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Fresh Planner',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        scaffoldBackgroundColor: Colors.white,
         useMaterial3: true,
       ),
       //home: IngredientsPage(user: User(email: "replythisnot@outlook.com", username: "testUser", uid: "wdmdDZ4loXbuJyqPzAoq")),

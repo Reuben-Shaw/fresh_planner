@@ -157,7 +157,6 @@ class _AddMealPageState extends State<AddMealPage> {
                 ),
               ),
             ),
-            
           ],
         ),
       ),

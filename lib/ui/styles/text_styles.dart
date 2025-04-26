@@ -6,4 +6,5 @@ class AppTextStyles {
   static const TextStyle hint = TextStyle(color: Color(0x33000000), fontSize: 18, fontWeight: FontWeight.bold, height: 1,);
   static const TextStyle standardBold = TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold, height: 1,);
   static const TextStyle standardRegular = TextStyle(color: Colors.black, fontSize: 15, height: 1,);
+  static const TextStyle error = TextStyle(color: Colors.red, fontSize: 14, fontWeight: FontWeight.bold, height: 1,);
 }

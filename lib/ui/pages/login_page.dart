@@ -75,8 +75,8 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.push(
       context,
       //MaterialPageRoute(builder: (context) => IngredientsPage(user: userData.$2!, ingredients: ingredientData,)),
-      //MaterialPageRoute(builder: (context) => RecipePage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData, calendarDB: DatabaseCalendar(),)),
-      MaterialPageRoute(builder: (context) => AddMealPage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData,)),
+      MaterialPageRoute(builder: (context) => RecipePage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData, calendarDB: DatabaseCalendar(),)),
+      //MaterialPageRoute(builder: (context) => AddMealPage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData,)),
     );
   }
 

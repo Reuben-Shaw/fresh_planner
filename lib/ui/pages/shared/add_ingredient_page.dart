@@ -130,7 +130,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+          children: <Widget>[
             IconButton(
               onPressed: () {
                 Navigator.of(context).pop();

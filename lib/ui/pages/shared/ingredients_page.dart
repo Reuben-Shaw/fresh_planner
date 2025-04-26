@@ -24,13 +24,15 @@ class _IngredientsPageState extends State<IngredientsPage> {
   final _ingredientDB = DatabaseIngredients();
 
   final Map<IngredientType, bool> _isOpen = {
-    for (var type in IngredientType.values) type: true,
+    for (var type in IngredientType.values) type: false,
   };
   final Map<IngredientType, List<IngredientCard>> _ingredientMap = {
     for (var type in IngredientType.values) type: [],
   };
+  List<IngredientCard> _searchedIngredients = [];
 
   Ingredient? _selectedIngredient;
+  bool _displaySearchList = false;
 
   @override
   void initState() {
@@ -69,6 +71,55 @@ class _IngredientsPageState extends State<IngredientsPage> {
     });
   }
 
+void _updateSearch(String searchedText) {
+  String text = searchedText.toLowerCase();
+  setState(() {
+      _selectedIngredient = null;
+
+    if (searchedText.isEmpty) {
+      _searchedIngredients.clear();
+      _displaySearchList = false;
+      return;
+    }
+
+    _displaySearchList = true;
+
+    if (_searchedIngredients.isEmpty) {
+      for (var entry in _ingredientMap.entries) {
+        final mapEntry = entry.value;
+
+        for (var listEntry in mapEntry) {
+          if (listEntry.ingredient.name.toLowerCase().contains(text)) {
+            _searchedIngredients.add(listEntry);
+          }
+        }
+      }
+    }
+    else {
+      List<IngredientCard> newIngredients = [];
+      for (var listEntry in _searchedIngredients) {
+        if (listEntry.ingredient.name.toLowerCase().contains(text)) {
+          newIngredients.add(listEntry);
+        }
+      }
+      newIngredients.sort();
+      _searchedIngredients = newIngredients;
+    }
+    });
+  }
+
+  GestureDetector _ingredientCardClick(IngredientCard ingredientCard) {
+    Ingredient ingredient = ingredientCard.ingredient;
+    return GestureDetector(onTap: () => _selectIngredient(ingredient),
+      child: Container(
+        color: ingredient.isEqual(_selectedIngredient)
+            ? Colors.green[100]
+            : Colors.transparent,
+        child: ingredientCard,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,6 +151,8 @@ class _IngredientsPageState extends State<IngredientsPage> {
                         widget.ingredients.sort();
                         _ingredientMap[result.type ?? IngredientType.misc]!.add(IngredientCard(ingredient: result, onRemove: () async => _removeIngredient(result), showAmount: false,));
                         _ingredientMap[result.type ?? IngredientType.misc]!.sort();
+                        _searchController.clear();
+                        _updateSearch("");
                       });
                     },
                     style: ButtonStyle(
@@ -119,52 +172,61 @@ class _IngredientsPageState extends State<IngredientsPage> {
                 controller: _searchController,
                 enableSuggestions: true,
                 autocorrect: true,
+                onChanged: (text) {
+                  _updateSearch(text);
+                },
                 decoration: AppTextFieldStyles.primaryStyle("search", icon: Icon(Icons.search, color: Color(0xFF26693C))),
               ),
             ),
             Expanded(
-              child: SingleChildScrollView(
-                child: ExpansionPanelList(
-                  expansionCallback: (index, isExpanded) {
-                    final type = _ingredientMap.entries.elementAt(index).key;
-                    setState(() {
-                      _isOpen[type] = isExpanded;
-                      debugPrint("Toggled $type -> ${_isOpen[type]}");
-                    });
-                  },
-                  children: _ingredientMap.entries.map((entry) {
-                    final index = entry.key;
-                    final mapEntry = entry.value;
-                    return ExpansionPanel(
-                      headerBuilder: (context, isExpanded) {
-                        return ListTile(
-                          title: Text(
-                            index.standardName,
-                            style: AppTextStyles.innerTitle,
-                          ),
-                        );
-                      },
-                      body: ListView(
-                        padding: EdgeInsets.symmetric(horizontal: 4.0),
-                        shrinkWrap: true,
-                        physics: ClampingScrollPhysics(),
-                        children: mapEntry.map((ingredientCard) {
-                          final ingredient = ingredientCard.ingredient;
-                          return (GestureDetector(
-                            onTap: () => _selectIngredient(ingredient),
-                            child: Container(
-                              color: ingredient.isEqual(_selectedIngredient)
-                                  ? Colors.green[100]
-                                  : Colors.transparent,
-                              child: ingredientCard,
+              child: Stack(
+                children: <Widget>[
+                  Visibility(
+                    visible: !_displaySearchList,
+                    child: SingleChildScrollView(
+                      child: ExpansionPanelList(
+                        expansionCallback: (index, isExpanded) {
+                          final type = _ingredientMap.entries.elementAt(index).key;
+                          setState(() {
+                            _isOpen[type] = isExpanded;
+                            debugPrint("Toggled $type -> ${_isOpen[type]}");
+                          });
+                        },
+                        children: _ingredientMap.entries.map((entry) {
+                          final index = entry.key;
+                          final mapEntry = entry.value;
+                          return ExpansionPanel(
+                            headerBuilder: (context, isExpanded) {
+                              return ListTile(
+                                title: Text(
+                                  index.standardName,
+                                  style: AppTextStyles.innerTitle,
+                                ),
+                              );
+                            },
+                            body: ListView(
+                              padding: EdgeInsets.symmetric(horizontal: 4.0),
+                              shrinkWrap: true,
+                              physics: ClampingScrollPhysics(),
+                              children: mapEntry.map((ingredientCard) {
+                                return _ingredientCardClick(ingredientCard);
+                              }).toList(),
                             ),
-                          ));
+                            isExpanded: _isOpen[index]!,
+                          );
                         }).toList(),
                       ),
-                      isExpanded: _isOpen[index]!,
-                    );
-                  }).toList(),
-                ),
+                    ),
+                  ),
+                  Visibility(
+                    visible: _displaySearchList,
+                    child: ListView(
+                      children: _searchedIngredients.map((ingredientCard) {
+                        return _ingredientCardClick(ingredientCard);
+                      }).toList(),
+                    ),
+                  ),
+                ],
               ),
             ),
             Row(

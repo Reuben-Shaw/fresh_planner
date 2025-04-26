@@ -107,7 +107,7 @@ class _AddMealPageState extends State<AddMealPage> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text(
-                              _recipeDropdownValue!.link!,
+                              _recipeDropdownValue?.link ?? "",
                               style: TextStyle(
                                 color: Color(0xFF3873CD),
                                 decoration: TextDecoration.underline,
@@ -117,30 +117,47 @@ class _AddMealPageState extends State<AddMealPage> {
                         ],
                       ),
                     ),
-                    Visibility(
-                      visible: (_recipeDropdownValue != null && _recipeDropdownValue!.ingredients.isNotEmpty),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            "Ingredients:",
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                _recipeDropdownValue == null ? "" : "Ingredients:",
+                              ),
+                              Container(
+                                height: 70,
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: ListView(
+                                  children: _recipeDropdownValue?.ingredients.map((i) => 
+                                    Text("• ${i.name}"),
+                                  ).toList() ?? [],
+                                ),
+                              ),
+                            ],
                           ),
-                          Container(
-                            height: 100,
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: ListView(
-                              children: _recipeDropdownValue!.ingredients.map((i) => 
-                                Text("• ${i.name}"),
-                              ).toList(),
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            IconButton(
+                              onPressed: () {}, 
+                              icon: Icon(
+                                Icons.fullscreen,
+                                color: Color(0xFF26693C),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
             ),
+            
           ],
         ),
       ),

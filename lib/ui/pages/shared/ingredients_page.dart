@@ -5,6 +5,7 @@ import 'package:fresh_planner/source/objects/ingredient.dart';
 import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/pages/shared/add_ingredient_page.dart';
 import 'package:fresh_planner/ui/styles/button_styles.dart';
+import 'package:fresh_planner/ui/styles/text_field_styles.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
 import 'package:fresh_planner/ui/widgets/ingredient_card.dart';
 
@@ -112,13 +113,14 @@ class _IngredientsPageState extends State<IngredientsPage> {
                 ),
               ],
             ),
-            SearchBar(
-              controller: _searchController,
-              padding: const WidgetStatePropertyAll<EdgeInsets>(
-                EdgeInsets.symmetric(horizontal: 16.0),
+            Container(
+              decoration: AppTextFieldStyles.dropShadow,
+              child: TextField(
+                controller: _searchController,
+                enableSuggestions: true,
+                autocorrect: true,
+                decoration: AppTextFieldStyles.primaryStyle("search", icon: Icon(Icons.search, color: Color(0xFF26693C))),
               ),
-              onChanged: (_) => setState(() {}),
-              trailing: const [Icon(Icons.search)],
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -136,10 +138,14 @@ class _IngredientsPageState extends State<IngredientsPage> {
                     return ExpansionPanel(
                       headerBuilder: (context, isExpanded) {
                         return ListTile(
-                          title: Text(index.standardName),
+                          title: Text(
+                            index.standardName,
+                            style: AppTextStyles.innerTitle,
+                          ),
                         );
                       },
                       body: ListView(
+                        padding: EdgeInsets.symmetric(horizontal: 4.0),
                         shrinkWrap: true,
                         physics: ClampingScrollPhysics(),
                         children: mapEntry.map((ingredientCard) {

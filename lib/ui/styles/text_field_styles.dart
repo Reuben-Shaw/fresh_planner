@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
 class AppTextFieldStyles {
-  static InputDecoration primaryStyle(String hint) { 
+  static InputDecoration primaryStyle(String hint, {Icon? icon}) { 
     return InputDecoration(filled: true,
       fillColor: Color(0xFFd7f1e0),
       hintText: hint,
@@ -13,6 +13,7 @@ class AppTextFieldStyles {
               style: BorderStyle.none,
           ),
       ),
+      prefixIcon: icon
     );
   }
 

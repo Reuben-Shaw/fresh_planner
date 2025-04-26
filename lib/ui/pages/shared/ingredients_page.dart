@@ -71,40 +71,40 @@ class _IngredientsPageState extends State<IngredientsPage> {
     });
   }
 
-void _updateSearch(String searchedText) {
-  String text = searchedText.toLowerCase();
-  setState(() {
-      _selectedIngredient = null;
+  void _updateSearch(String searchedText) {
+    String text = searchedText.toLowerCase();
+    setState(() {
+        _selectedIngredient = null;
 
-    if (searchedText.isEmpty) {
-      _searchedIngredients.clear();
-      _displaySearchList = false;
-      return;
-    }
+      if (searchedText.isEmpty) {
+        _searchedIngredients.clear();
+        _displaySearchList = false;
+        return;
+      }
 
-    _displaySearchList = true;
+      _displaySearchList = true;
 
-    if (_searchedIngredients.isEmpty) {
-      for (var entry in _ingredientMap.entries) {
-        final mapEntry = entry.value;
+      if (_searchedIngredients.isEmpty) {
+        for (var entry in _ingredientMap.entries) {
+          final mapEntry = entry.value;
 
-        for (var listEntry in mapEntry) {
-          if (listEntry.ingredient.name.toLowerCase().contains(text)) {
-            _searchedIngredients.add(listEntry);
+          for (var listEntry in mapEntry) {
+            if (listEntry.ingredient.name.toLowerCase().contains(text)) {
+              _searchedIngredients.add(listEntry);
+            }
           }
         }
       }
-    }
-    else {
-      List<IngredientCard> newIngredients = [];
-      for (var listEntry in _searchedIngredients) {
-        if (listEntry.ingredient.name.toLowerCase().contains(text)) {
-          newIngredients.add(listEntry);
+      else {
+        List<IngredientCard> newIngredients = [];
+        for (var listEntry in _searchedIngredients) {
+          if (listEntry.ingredient.name.toLowerCase().contains(text)) {
+            newIngredients.add(listEntry);
+          }
         }
+        newIngredients.sort();
+        _searchedIngredients = newIngredients;
       }
-      newIngredients.sort();
-      _searchedIngredients = newIngredients;
-    }
     });
   }
 

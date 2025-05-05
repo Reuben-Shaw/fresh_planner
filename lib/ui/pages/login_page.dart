@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide TimeOfDay;
 import 'package:fresh_planner/source/database/database_calendar.dart';
 import 'package:fresh_planner/source/database/database_ingredients.dart';
 import 'package:fresh_planner/source/database/database_user.dart';
+import 'package:fresh_planner/source/enums/time_of_day.dart';
 import 'package:fresh_planner/source/objects/recipe.dart';
 import 'package:fresh_planner/ui/pages/calendar/add_meal_page.dart';
 import 'package:fresh_planner/ui/pages/main_page.dart';
@@ -75,8 +76,8 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.push(
       context,
       //MaterialPageRoute(builder: (context) => IngredientsPage(user: userData.$2!, ingredients: ingredientData,)),
-      MaterialPageRoute(builder: (context) => RecipePage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData, calendarDB: DatabaseCalendar(),)),
-      //MaterialPageRoute(builder: (context) => AddMealPage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData,)),
+      //MaterialPageRoute(builder: (context) => RecipePage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData, calendarDB: DatabaseCalendar(),)),
+      MaterialPageRoute(builder: (context) => AddMealPage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData, day: DateTime(2025, 05, 16), time: TimeOfDay.lunch,)),
     );
   }
 

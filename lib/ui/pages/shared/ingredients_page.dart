@@ -208,6 +208,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                                   final index = entry.key;
                                   final mapEntry = entry.value;
                                   return ExpansionPanel(
+                                    backgroundColor: Colors.white,
                                     headerBuilder: (context, isExpanded) {
                                       return ListTile(
                                         title: Text(

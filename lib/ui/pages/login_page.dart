@@ -3,6 +3,7 @@ import 'package:fresh_planner/source/database/database_calendar.dart';
 import 'package:fresh_planner/source/database/database_ingredients.dart';
 import 'package:fresh_planner/source/database/database_user.dart';
 import 'package:fresh_planner/source/enums/time_of_day.dart';
+import 'package:fresh_planner/source/objects/meal.dart';
 import 'package:fresh_planner/source/objects/recipe.dart';
 import 'package:fresh_planner/ui/pages/calendar/add_meal_page.dart';
 import 'package:fresh_planner/ui/pages/calendar/calendar_page.dart';
@@ -74,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
     recipeData.sort();
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => CalendarPage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData,)),
+      MaterialPageRoute(builder: (context) => CalendarPage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData, meals: [Meal(recipe: recipeData[0], colour: Colors.red, time: TimeOfDay.lunch, repeatFromWeek: 0)])),
       //MaterialPageRoute(builder: (context) => IngredientsPage(user: userData.$2!, ingredients: ingredientData,)),
       //MaterialPageRoute(builder: (context) => RecipePage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData, calendarDB: DatabaseCalendar(),)),
       //MaterialPageRoute(builder: (context) => AddMealPage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData, day: DateTime(2025, 05, 16), time: TimeOfDay.lunch,)),

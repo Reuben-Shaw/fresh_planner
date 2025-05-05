@@ -12,9 +12,10 @@ import 'package:fresh_planner/ui/styles.dart';
 import 'package:fresh_planner/ui/widgets/calendar_cell.dart';
 
 class CalendarPage extends ParentPage {
-  const CalendarPage({super.key, required super.user, required super.ingredients, required this.recipes,});
+  const CalendarPage({super.key, required super.user, required super.ingredients, required this.recipes, required this.meals});
 
   final List<Recipe> recipes;
+  final List<Meal> meals;
 
   @override
   State<CalendarPage> createState() => _CalendarPageState();
@@ -26,16 +27,10 @@ class _CalendarPageState extends State<CalendarPage> {
 	int currentYear = 2025;
 
   TimeOfDay timeOfDay = TimeOfDay.lunch;
+
   
 
   List<GestureDetector> createCalendar() {
-    final List<Meal> meals = [
-      Meal(name: "Chorizo Carbonara", colour: Colors.red),
-      Meal(name: "Lemon Chicken Tacos", colour: Colors.lime),
-      Meal(name: "Salmon Pasta", colour: Colors.pink[200]!),
-      Meal(name: "Creamy Mushroom Pasta", colour: Colors.orange),
-    ];
-
     final List<GestureDetector> cells = [];
 
     final int monthStartDay;
@@ -47,7 +42,7 @@ class _CalendarPageState extends State<CalendarPage> {
 		int nextYear = currentYear;
 		final int priorMonthLength;
 
-    monthStartDay = (DateTime(currentYear, currentMonth, 1).weekday + 6) % 7;
+    monthStartDay = britishWeekday(DateTime(currentYear, currentMonth, 1));
     monthLength = getDaysInMonth(currentYear, currentMonth);
 
     if (currentMonth == 1) {
@@ -62,44 +57,56 @@ class _CalendarPageState extends State<CalendarPage> {
     priorMonthLength = getDaysInMonth(priorYear, priorMonth);
 
     int numberAfterAdded = 0;
-    Random rnd = Random();
+    Map<DateTime, CalendarCell?> cellMap = {};
 
     for (int week = 0; week < 6; week++) {
 			for (int day = 0; day < 7; day++) {
 				final int offsetIndex = (week * 7) + day + 1;
 
-				CalendarCell cell;
-
-        int randomSelect = rnd.nextInt(meals.length + 1);
-        Meal? randomMeal = randomSelect > meals.length - 1 ? null : meals[randomSelect];
-
 				// Logic for adding the days before the start of the month
 				if (offsetIndex < monthStartDay + 1) {
-					cell = CalendarCell(date: DateTime(priorYear, priorMonth, priorMonthLength - monthStartDay + offsetIndex), meal: randomMeal);
+          final day = DateTime(priorYear, priorMonth, priorMonthLength - monthStartDay + offsetIndex);
+					cellMap[day] = CalendarCell(date: day);
 				}
 				// Logic for adding the days after the end of the month
 				else if (offsetIndex > monthLength + monthStartDay) {
-					cell = CalendarCell(date: DateTime(nextYear, nextMonth, offsetIndex - (monthLength + monthStartDay)), meal: randomMeal);
+          final day = DateTime(nextYear, nextMonth, offsetIndex - (monthLength + monthStartDay));
+					cellMap[day] = CalendarCell(date: day);
           numberAfterAdded++;
 				}
 				// Logic for adding days in the month
 				else {
-          final DateTime day = DateTime(currentYear, currentMonth, offsetIndex - monthStartDay);
-					cell = CalendarCell(date: day, meal: randomMeal, isCurrentDay: day == DateUtils.dateOnly(currentDay));
+          final day = DateTime(currentYear, currentMonth, offsetIndex - monthStartDay);
+					cellMap[day] = CalendarCell(date: day);
 				}
-
-        final gestureCell = GestureDetector(
-          onTap:() async {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AddMealPage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, day: cell.date, time: timeOfDay,)),
-            );
-          }, 
-          child: cell
-        );
-        cells.add(gestureCell);
 			}
 		}
+
+    for (Meal m in widget.meals) {
+      if (m.isRepeatingWeek()) {
+        final startDate = m.repeatFromWeek! >= monthStartDay ? 
+          DateTime(currentYear, currentMonth, (m.repeatFromWeek! - monthStartDay + 1)) : 
+          DateTime(priorYear, priorMonth, (priorMonthLength - ((britishWeekday(DateTime(priorYear, priorMonth, priorMonthLength)) + 1) % monthStartDay))); 
+        for(int i = 0; i < 6; i++) {
+          final newDate = startDate.add(Duration(days: i * 7));
+          cellMap[newDate] = CalendarCell(date: newDate, meal: m,);
+        }
+      }
+    }
+
+    cellMap.forEach((key, value) {
+      final gestureCell = GestureDetector(
+        onTap:() async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddMealPage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, day: key, time: timeOfDay,)),
+          );
+        }, 
+        child: value
+      );
+      cells.add(gestureCell);
+    });
+    
 
     if (numberAfterAdded > 6) {
       cells.length = cells.length - 7;
@@ -113,6 +120,10 @@ class _CalendarPageState extends State<CalendarPage> {
         ? DateTime(year, month + 1, 1)
         : DateTime(year + 1, 1, 1);
     return firstDayOfNextMonth.subtract(const Duration(days: 1)).day;
+  }
+
+  int britishWeekday(DateTime date) {
+    return (date.weekday + 6) % 7;
   }
 
   @override

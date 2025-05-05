@@ -66,7 +66,7 @@ class CalendarCell extends StatelessWidget {
                 Visibility(
                   visible: meal != null,
                   child: Text(
-                    meal == null ? "" : (meal?.name)!,
+                    meal == null ? "" : (meal?.recipe.name)!,
                     textAlign: TextAlign.right,
                     style: TextStyle(
                       fontSize: 11,

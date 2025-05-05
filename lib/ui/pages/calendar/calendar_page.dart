@@ -5,16 +5,15 @@ import 'package:fresh_planner/source/objects/meal.dart';
 import 'package:fresh_planner/source/objects/recipe.dart';
 import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/pages/calendar/add_meal_page.dart';
+import 'package:fresh_planner/ui/pages/parent_page.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart' hide TimeOfDay;
-import 'package:fresh_planner/ui/styles/text_styles.dart';
+import 'package:fresh_planner/ui/styles.dart';
 import 'package:fresh_planner/ui/widgets/calendar_cell.dart';
 
-class CalendarPage extends StatefulWidget {
-  const CalendarPage({super.key, required this.user, required this.ingredients, required this.recipes});
+class CalendarPage extends ParentPage {
+  const CalendarPage({super.key, required super.user, required super.ingredients, required this.recipes,});
 
-  final User user;
-  final List<Ingredient> ingredients;
   final List<Recipe> recipes;
 
   @override
@@ -109,12 +108,12 @@ class _CalendarPageState extends State<CalendarPage> {
     return cells;
   }
 
-int getDaysInMonth(int year, int month) {
-  final firstDayOfNextMonth = (month < 12)
-      ? DateTime(year, month + 1, 1)
-      : DateTime(year + 1, 1, 1);
-  return firstDayOfNextMonth.subtract(const Duration(days: 1)).day;
-}
+  int getDaysInMonth(int year, int month) {
+    final firstDayOfNextMonth = (month < 12)
+        ? DateTime(year, month + 1, 1)
+        : DateTime(year + 1, 1, 1);
+    return firstDayOfNextMonth.subtract(const Duration(days: 1)).day;
+  }
 
   @override
   Widget build(BuildContext context) {

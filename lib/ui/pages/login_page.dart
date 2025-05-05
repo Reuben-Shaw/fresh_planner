@@ -9,9 +9,7 @@ import 'package:fresh_planner/ui/pages/calendar/calendar_page.dart';
 import 'package:fresh_planner/ui/pages/main_page.dart';
 import 'package:fresh_planner/ui/pages/shared/ingredients_page.dart';
 import 'package:fresh_planner/ui/pages/shared/recipe_page.dart';
-import 'package:fresh_planner/ui/styles/button_styles.dart';
-import 'package:fresh_planner/ui/styles/text_field_styles.dart';
-import 'package:fresh_planner/ui/styles/text_styles.dart';
+import 'package:fresh_planner/ui/styles.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key, required this.title});

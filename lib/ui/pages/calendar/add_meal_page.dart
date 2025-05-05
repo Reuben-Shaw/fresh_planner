@@ -6,10 +6,7 @@ import 'package:fresh_planner/source/objects/ingredient.dart';
 import 'package:fresh_planner/source/objects/recipe.dart';
 import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/pages/shared/recipe_page.dart';
-import 'package:fresh_planner/ui/styles/button_styles.dart';
-import 'package:fresh_planner/ui/styles/radiobutton_styles.dart';
-import 'package:fresh_planner/ui/styles/text_field_styles.dart';
-import 'package:fresh_planner/ui/styles/text_styles.dart';
+import 'package:fresh_planner/ui/styles.dart';
 import 'package:intl/intl.dart';
 
 class AddMealPage extends StatefulWidget {

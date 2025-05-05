@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/widgets/flexi_box.dart';
-import 'package:fresh_planner/ui/styles/text_styles.dart';
+import 'package:fresh_planner/ui/styles.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key, required this.user});

@@ -4,9 +4,7 @@ import 'package:fresh_planner/source/enums/ingredient_food_type.dart';
 import 'package:fresh_planner/source/objects/ingredient.dart';
 import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/pages/shared/add_ingredient_page.dart';
-import 'package:fresh_planner/ui/styles/button_styles.dart';
-import 'package:fresh_planner/ui/styles/text_field_styles.dart';
-import 'package:fresh_planner/ui/styles/text_styles.dart';
+import 'package:fresh_planner/ui/styles.dart';
 import 'package:fresh_planner/ui/widgets/ingredient_card.dart';
 
 class IngredientsPage extends StatefulWidget {

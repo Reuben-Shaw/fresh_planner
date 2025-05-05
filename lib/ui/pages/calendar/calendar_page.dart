@@ -84,13 +84,36 @@ class _CalendarPageState extends State<CalendarPage> {
 
     for (Meal m in widget.meals) {
       if (m.isRepeatingWeek()) {
-        final startDate = m.repeatFromWeek! >= monthStartDay ? 
-          DateTime(currentYear, currentMonth, (m.repeatFromWeek! - monthStartDay + 1)) : 
-          DateTime(priorYear, priorMonth, (priorMonthLength - ((britishWeekday(DateTime(priorYear, priorMonth, priorMonthLength)) + 1) % monthStartDay))); 
+        final startDate = getFirstInstanceOfDay(m.repeatFromWeek!, monthStartDay, priorYear, priorMonth, priorMonthLength); 
         for(int i = 0; i < 6; i++) {
           final newDate = startDate.add(Duration(days: i * 7));
           cellMap[newDate] = CalendarCell(date: newDate, meal: m,);
         }
+      }
+      else if (m.isRepeatingOtherWeek()) {
+        final firstInstanceOfDay = getFirstInstanceOfDay(britishWeekday(m.repeatFromOtherWeek!), monthStartDay, priorYear, priorMonth, priorMonthLength);
+
+        final difference = m.repeatFromOtherWeek!.difference(firstInstanceOfDay).inDays.abs() + 1;
+        final offset = difference % 14;
+
+        for(int i = 0; i < 3; i++)
+        {
+          final newDate = firstInstanceOfDay.add(Duration(days: (i * 14) + offset));
+          cellMap[newDate] = CalendarCell(date: newDate, meal: m,);
+        }
+      }
+      else if (m.isRepeatingDay()) {
+        final currentDate = DateTime(currentYear, currentMonth, m.repeatFromDay!);
+        cellMap[currentDate] = CalendarCell(date: currentDate, meal: m,);
+        
+        final priorDate = DateTime(priorYear, priorMonth, m.repeatFromDay!);
+        if (cellMap.containsKey(priorDate)) cellMap[priorDate] = CalendarCell(date: priorDate, meal: m,);
+
+        final nextDate = DateTime(nextYear, nextMonth, m.repeatFromDay!);
+        if (cellMap.containsKey(nextDate)) cellMap[nextDate] = CalendarCell(date: nextDate, meal: m,);
+      }
+      else if (m.isSingleDay()) {
+        cellMap[m.day!] = CalendarCell(date: m.day!, meal: m,);
       }
     }
 
@@ -124,6 +147,12 @@ class _CalendarPageState extends State<CalendarPage> {
 
   int britishWeekday(DateTime date) {
     return (date.weekday + 6) % 7;
+  }
+
+  DateTime getFirstInstanceOfDay(int dayOfWeek, int monthStartDay, int priorYear, int priorMonth, int priorMonthLength) {
+    return dayOfWeek >= monthStartDay ? 
+      DateTime(currentYear, currentMonth, (dayOfWeek - monthStartDay + 1)) : 
+      DateTime(priorYear, priorMonth, (priorMonthLength - ((britishWeekday(DateTime(priorYear, priorMonth, dayOfWeek)) + 1) % monthStartDay)));
   }
 
   @override

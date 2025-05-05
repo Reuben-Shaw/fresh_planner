@@ -5,6 +5,7 @@ import 'package:fresh_planner/source/enums/time_of_day.dart';
 import 'package:fresh_planner/source/objects/ingredient.dart';
 import 'package:fresh_planner/source/objects/recipe.dart';
 import 'package:fresh_planner/source/objects/user.dart';
+import 'package:fresh_planner/ui/pages/shared/recipe_page.dart';
 import 'package:fresh_planner/ui/styles/button_styles.dart';
 import 'package:fresh_planner/ui/styles/radiobutton_styles.dart';
 import 'package:fresh_planner/ui/styles/text_field_styles.dart';
@@ -85,29 +86,56 @@ class _AddMealPageState extends State<AddMealPage> {
                             color: Color(0xFF979797),
                           ),
                           Text(
-                            " - Lunchtime: 17/10/24",
+                            " - ${widget.time.standardName}: ${DateFormat("dd/MM/yy").format(widget.day)}",
                             style: AppTextStyles.subTitle,
                           ),
                         ],
                       ),
-                      Container(
-                        decoration: AppTextFieldStyles.dropShadowWithColour,
-                        child: DropdownButton(
-                          items: widget.recipes.map((r) {
-                            return DropdownMenuItem<Recipe>(
-                              value: r,
-                              child: Text("   ${r.name}"),
-                            );
-                          }).toList(),
-                          value: _recipeDropdownValue,
-                          onChanged: _recipeDropdownCallback,
-                          isExpanded: true,
-                          underline: Text(""),
-                          hint: Text(
-                            "   select a recipe",
-                            style: AppTextStyles.hint,
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Container(
+                              decoration: AppTextFieldStyles.dropShadowWithColour,
+                              child: DropdownButton(
+                                items: widget.recipes.map((r) {
+                                  return DropdownMenuItem<Recipe>(
+                                    value: r,
+                                    child: Text("   ${r.name}"),
+                                  );
+                                }).toList(),
+                                value: _recipeDropdownValue,
+                                onChanged: _recipeDropdownCallback,
+                                isExpanded: true,
+                                underline: Text(""),
+                                hint: Text(
+                                  "   select a recipe",
+                                  style: AppTextStyles.hint,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
+                          IconButton(
+                            onPressed: () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => RecipePage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, calendarDB: _calendarDB,)),
+                              );
+                              if (result is! Recipe) return;
+                              setState(() {
+                                widget.recipes.add(result);
+                                widget.recipes.sort();
+                                _recipeDropdownValue = result;
+                              });
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all<Color>(Color(0xFF399E5A)),
+                            ), 
+                            icon: Icon(
+                              Icons.add,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                       Container(
                         color: Color(0xFFd7f1e0),

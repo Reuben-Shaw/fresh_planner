@@ -1,16 +1,21 @@
 import 'dart:math';
-
+import 'package:fresh_planner/source/enums/time_of_day.dart';
+import 'package:fresh_planner/source/objects/ingredient.dart';
 import 'package:fresh_planner/source/objects/meal.dart';
+import 'package:fresh_planner/source/objects/recipe.dart';
 import 'package:fresh_planner/source/objects/user.dart';
+import 'package:fresh_planner/ui/pages/calendar/add_meal_page.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide TimeOfDay;
 import 'package:fresh_planner/ui/styles/text_styles.dart';
 import 'package:fresh_planner/ui/widgets/calendar_cell.dart';
 
 class CalendarPage extends StatefulWidget {
-  const CalendarPage({super.key, required this.user});
+  const CalendarPage({super.key, required this.user, required this.ingredients, required this.recipes});
 
   final User user;
+  final List<Ingredient> ingredients;
+  final List<Recipe> recipes;
 
   @override
   State<CalendarPage> createState() => _CalendarPageState();
@@ -20,9 +25,11 @@ class _CalendarPageState extends State<CalendarPage> {
   DateTime currentDay = DateTime.now();
 	int currentMonth = 4;
 	int currentYear = 2025;
+
+  TimeOfDay timeOfDay = TimeOfDay.lunch;
   
 
-  List<CalendarCell> createCalendar() {
+  List<GestureDetector> createCalendar() {
     final List<Meal> meals = [
       Meal(name: "Chorizo Carbonara", colour: Colors.red),
       Meal(name: "Lemon Chicken Tacos", colour: Colors.lime),
@@ -30,7 +37,7 @@ class _CalendarPageState extends State<CalendarPage> {
       Meal(name: "Creamy Mushroom Pasta", colour: Colors.orange),
     ];
 
-    final List<CalendarCell> cells = [];
+    final List<GestureDetector> cells = [];
 
     final int monthStartDay;
 		final int monthLength;
@@ -81,7 +88,17 @@ class _CalendarPageState extends State<CalendarPage> {
           final DateTime day = DateTime(currentYear, currentMonth, offsetIndex - monthStartDay);
 					cell = CalendarCell(date: day, meal: randomMeal, isCurrentDay: day == DateUtils.dateOnly(currentDay));
 				}
-        cells.add(cell);
+
+        final gestureCell = GestureDetector(
+          onTap:() async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddMealPage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, day: cell.date, time: timeOfDay,)),
+            );
+          }, 
+          child: cell
+        );
+        cells.add(gestureCell);
 			}
 		}
 

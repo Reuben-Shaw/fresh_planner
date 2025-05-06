@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:fresh_planner/source/database/database_calendar.dart';
 import 'package:fresh_planner/source/enums/time_of_day.dart';
 import 'package:fresh_planner/source/objects/ingredient.dart';
 import 'package:fresh_planner/source/objects/meal.dart';
@@ -12,10 +13,11 @@ import 'package:fresh_planner/ui/styles.dart';
 import 'package:fresh_planner/ui/widgets/calendar_cell.dart';
 
 class CalendarPage extends ParentPage {
-  const CalendarPage({super.key, required super.user, required super.ingredients, required this.recipes, required this.meals});
+  const CalendarPage({super.key, required super.user, required super.ingredients, required this.recipes, required this.meals, required this.calendarDB});
 
   final List<Recipe> recipes;
   final List<Meal> meals;
+  final DatabaseCalendar calendarDB;
 
   @override
   State<CalendarPage> createState() => _CalendarPageState();
@@ -122,7 +124,7 @@ class _CalendarPageState extends State<CalendarPage> {
         onTap:() async {
           await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddMealPage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, day: key, time: timeOfDay,)),
+            MaterialPageRoute(builder: (context) => AddMealPage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, calendarDB: widget.calendarDB, day: key, time: timeOfDay,)),
           );
         }, 
         child: value

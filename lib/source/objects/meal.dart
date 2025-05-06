@@ -3,17 +3,17 @@ import 'package:fresh_planner/source/enums/time_of_day.dart';
 import 'package:fresh_planner/source/objects/recipe.dart';
 
 class Meal implements Comparable<Meal> {
-  final Recipe recipe;
-  final Color colour;
+  String? id;
+  Recipe recipe;
   final TimeOfDay time;
-  final DateTime? day;
-  final int? repeatFromWeek;
-  final DateTime? repeatFromOtherWeek;
-  final int? repeatFromDay;
+  int? repeatFromWeek;
+  DateTime? repeatFromOtherWeek;
+  int? repeatFromDay;
+  DateTime? day;
 
   Meal({
+    this.id,
     required this.recipe,
-    required this.colour,
     required this.time,
     this.repeatFromWeek,
     this.repeatFromOtherWeek,
@@ -23,17 +23,24 @@ class Meal implements Comparable<Meal> {
 
   Map<String, Object?> toMap() {
     return {
-      'recipe_id': recipe.id,
-      'colour': colour,
+      'recipe': recipe.id,
       'time': timeOfDayToJson(time),
+      'repeatFromWeek': repeatFromWeek,
+      'repeatFromOtherWeek': repeatFromOtherWeek?.toIso8601String(),
+      'repeatFromDay': repeatFromDay,
+      'day': day?.toIso8601String(),
     };
   }
 
   factory Meal.fromJson(Map<String, dynamic> json) {
     return Meal(
-      recipe: json['recipe'],
-      colour: json['colour'],
-      time: timeOfDayFromJson('time'),
+      id: json['id'],
+      recipe: Recipe.fromJson(json['recipe']),
+      time: timeOfDayFromJson(json['time']),
+      repeatFromWeek: json['repeatFromWeek'] as int?,
+      repeatFromOtherWeek: parseIso8601(json['repeatFromOtherWeek']),
+      repeatFromDay: json['repeatFromDay'] as int?,
+      day: parseIso8601(json['day']),
     );
   }
 
@@ -56,11 +63,15 @@ class Meal implements Comparable<Meal> {
     final bool repeatingOtherWeek = other.repeatFromOtherWeek == null;
     final bool repeatingDay = other.repeatFromDay == null;
 
-    if (repeatFromWeek == null && (repeatingWeek || repeatingOtherWeek || repeatingDay)) return -1;
-    if (repeatFromOtherWeek == null && (repeatingOtherWeek || repeatingDay)) return -1;
-    if (repeatFromDay == null && repeatingDay) return -1;
+    if (repeatFromWeek != null && (repeatingOtherWeek || repeatingDay)) return -1;
+    if (repeatFromOtherWeek != null && (repeatingDay)) return -1;
+    if (repeatFromDay != null) return -1;
     return day == null ? 0 : other.day == null ? 0 : day!.day.compareTo(other.day!.day);
   }
+}
+
+DateTime? parseIso8601(String? json) {
+  return json == null ? null : DateTime.tryParse(json);
 }
 
 String timeOfDayToJson(TimeOfDay timeOfDay) {

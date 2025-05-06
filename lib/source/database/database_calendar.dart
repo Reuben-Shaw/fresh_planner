@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/database/database_helper_calendar.dart';
+import 'package:fresh_planner/source/objects/meal.dart';
 import 'package:fresh_planner/source/objects/recipe.dart';
 
 class DatabaseCalendar {
@@ -46,4 +47,38 @@ class DatabaseCalendar {
       return [];
     }
   }
+
+  Future<(bool, String?)> addMeal(String uid, Meal meal) async {
+    try {
+      final response = await _database.addMealAPI(uid, meal);
+      bool success = response['success'] as bool? ?? false;
+      if (success) {
+        debugPrint("Meal added with id ${response['id']}");
+        return (true, response['id'] as String?);
+      } else {
+        debugPrint("Add meal failed: ${response['error'] ?? response['message']}");
+        return (false, null);
+      }
+    } catch (e) {
+      debugPrint("Crash in addMeal: $e");
+      return (false, null);
+    }
+  }
+
+  Future<List<Meal>?> getAllMeals(String uid) async {
+    try {
+      final response = await _database.getAllMealsAPI(uid);
+      if (response['success'] == true) {
+        final List<dynamic> mealsData = response['meals'];
+        return mealsData.map((m) => Meal.fromJson(m)).toList();
+      } else {
+        debugPrint("Get meals failed: ${response['error'] ?? response['message']}");
+      }
+      return [];
+    } catch (e) {
+      debugPrint("Error fetching meals: $e");
+      return [];
+    }
+  }
+
 } 

@@ -3,6 +3,7 @@ import 'package:fresh_planner/source/database/database_calendar.dart';
 import 'package:fresh_planner/source/enums/meal_repetition.dart';
 import 'package:fresh_planner/source/enums/time_of_day.dart';
 import 'package:fresh_planner/source/objects/ingredient.dart';
+import 'package:fresh_planner/source/objects/meal.dart';
 import 'package:fresh_planner/source/objects/recipe.dart';
 import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/pages/shared/recipe_page.dart';
@@ -10,11 +11,12 @@ import 'package:fresh_planner/ui/styles.dart';
 import 'package:intl/intl.dart';
 
 class AddMealPage extends StatefulWidget {
-  const AddMealPage({super.key, required this.user, required this.ingredients, required this.recipes, required this.day, required this.time});
+  const AddMealPage({super.key, required this.user, required this.ingredients, required this.recipes, required this.calendarDB, required this.day, required this.time});
 
   final User user;
   final List<Ingredient> ingredients;
   final List<Recipe> recipes;
+  final DatabaseCalendar calendarDB;
   final DateTime day;
   final TimeOfDay time;
 
@@ -27,6 +29,8 @@ class _AddMealPageState extends State<AddMealPage> {
 
   bool? _isFresh = true;
   MealRepetition? _repetition = MealRepetition.never;
+
+  String errorText = "";
 
   Recipe? _recipeDropdownValue;
   void _recipeDropdownCallback(Object? selectedVaue) {
@@ -47,6 +51,36 @@ class _AddMealPageState extends State<AddMealPage> {
       3 => "rd",
       _ => "th",
     }}";
+  }
+
+  int britishWeekday(DateTime date) {
+    return (date.weekday + 6) % 7;
+  }
+
+  void addNewMeal() async {
+    errorText = "";
+    if (_recipeDropdownValue == null) {
+      errorText = "Please ensure a recipe is selected";
+      return;
+    }
+
+    final meal = Meal(
+      recipe: _recipeDropdownValue!,
+      time: widget.time,
+      repeatFromWeek: _repetition == MealRepetition.everyWeek ? britishWeekday(widget.day) : null,
+      repeatFromOtherWeek: _repetition == MealRepetition.everyOtherWeek ? widget.day : null,
+      repeatFromDay: _repetition == MealRepetition.everyDate ? widget.day.day : null,
+      day: _repetition == MealRepetition.never ? widget.day : null,
+    );
+
+    (bool, String?) response = await widget.calendarDB.addMeal(widget.user.uid!, meal);
+    if (!response.$1 || !mounted) {
+      errorText = "Internal server error, please try again";
+      return;
+    }
+    meal.id = response.$2;
+
+    Navigator.pop(context, meal,); 
   }
   
   @override
@@ -318,7 +352,7 @@ class _AddMealPageState extends State<AddMealPage> {
                           Container(
                             decoration: AppButtonStyles.circularShadow,
                             child: ElevatedButton(
-                              onPressed: (){},
+                              onPressed: addNewMeal,
                               style: AppButtonStyles.mainBackStyle,
                               child: Text(
                                 "    Add    ",

@@ -56,7 +56,7 @@ class CalendarCell extends StatelessWidget {
                   height: 15,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: meal == null ? Colors.transparent : (meal?.colour)!,
+                    color: meal == null ? Colors.transparent : (meal?.recipe.colour)!,
                   ),
                 ),
               ],

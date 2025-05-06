@@ -66,16 +66,22 @@ class _LoginPageState extends State<LoginPage> {
     
     final calendarDB = DatabaseCalendar();
     final recipeData = await calendarDB.getAllRecipes(userData.$2!.uid!);
-    if (recipeData == null || !mounted) {
+    if (recipeData == null) {
+      errorText = "Internal server error, please try again";
+      return;
+    }
+    final mealData = await calendarDB.getAllMeals(userData.$2!.uid!);
+    if (mealData == null || !mounted) {
       errorText = "Internal server error, please try again";
       return;
     }
     
     ingredientData.sort();
     recipeData.sort();
+    mealData.sort();
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => CalendarPage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData, meals: [Meal(recipe: recipeData[1], colour: Colors.yellow, time: TimeOfDay.lunch, repeatFromWeek: 0), Meal(recipe: recipeData[0], colour: Colors.red, time: TimeOfDay.lunch, repeatFromOtherWeek: DateTime(2025, 3, 3))])),
+      MaterialPageRoute(builder: (context) => CalendarPage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData, meals: mealData, calendarDB: calendarDB,)),
       //MaterialPageRoute(builder: (context) => IngredientsPage(user: userData.$2!, ingredients: ingredientData,)),
       //MaterialPageRoute(builder: (context) => RecipePage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData, calendarDB: DatabaseCalendar(),)),
       //MaterialPageRoute(builder: (context) => AddMealPage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData, day: DateTime(2025, 05, 16), time: TimeOfDay.lunch,)),

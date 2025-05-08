@@ -58,20 +58,17 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
     final ingredientDB = DatabaseIngredients();
-    final ingredientData = await ingredientDB.getAllIngredients(userData.$2!.uid!);
-    if (ingredientData == null) {
-      errorText = "Internal server error, please try again";
-      return;
-    }
-    
     final calendarDB = DatabaseCalendar();
-    final recipeData = await calendarDB.getAllRecipes(userData.$2!.uid!);
-    if (recipeData == null) {
-      errorText = "Internal server error, please try again";
-      return;
-    }
-    final mealData = await calendarDB.getAllMeals(userData.$2!.uid!);
-    if (mealData == null || !mounted) {
+
+    final ingredientTask = ingredientDB.getAllIngredients(userData.$2!.uid!);
+    final recipeTask = calendarDB.getAllRecipes(userData.$2!.uid!);
+    final mealTask = calendarDB.getAllMeals(userData.$2!.uid!);
+
+    final ingredientData = await ingredientTask;
+    final recipeData = await recipeTask;
+    final mealData = await mealTask;
+
+    if (ingredientData == null || recipeData == null || mealData == null || !mounted) {
       errorText = "Internal server error, please try again";
       return;
     }

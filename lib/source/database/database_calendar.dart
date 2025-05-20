@@ -81,4 +81,21 @@ class DatabaseCalendar {
     }
   }
 
+  Future<bool> deleteMeal(String uid, Meal meal) async {
+    if (meal.id == null) return false;
+    try {
+      final response = await _database.deleteMealAPI(uid, meal.id!);
+      bool success = response['success'] as bool? ?? false;
+      if (success) {
+        debugPrint("Meal deleted with id ${meal.id!}");
+        return true;
+      } else {
+        debugPrint("Deleting meal failed: ${response['error'] ?? response['message']}");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("Crash in deleteMeal: $e");
+      return false;
+    }
+  }
 } 

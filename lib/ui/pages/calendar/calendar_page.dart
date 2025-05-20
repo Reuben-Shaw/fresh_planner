@@ -32,7 +32,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
   
 
-  List<GestureDetector> createCalendar() {
+  List<GestureDetector> _createCalendar() {
     final List<GestureDetector> cells = [];
 
     final int monthStartDay;
@@ -127,6 +127,9 @@ class _CalendarPageState extends State<CalendarPage> {
             MaterialPageRoute(builder: (context) => AddMealPage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, calendarDB: widget.calendarDB, day: key, time: timeOfDay,)),
           );
         }, 
+        onLongPress: () async {
+          await _showDeleteDialog(value);
+        },
         child: value
       );
       cells.add(gestureCell);
@@ -155,6 +158,52 @@ class _CalendarPageState extends State<CalendarPage> {
     return dayOfWeek >= monthStartDay ? 
       DateTime(currentYear, currentMonth, (dayOfWeek - monthStartDay + 1)) : 
       DateTime(priorYear, priorMonth, (priorMonthLength - ((britishWeekday(DateTime(priorYear, priorMonth, dayOfWeek)) + 1) % monthStartDay)));
+  }
+
+  Future<void> _showDeleteDialog(CalendarCell? cell) async {
+    if (cell == null || cell.meal == null) return;
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Delete Meal"),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text("Deleting ${cell.meal?.recipe.name} will remove it from your calendar, and remove any repetition rules attached"),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text("Delete", style: TextStyle(color: Colors.red,),),
+              onPressed: () async {
+                final success = await widget.calendarDB.deleteMeal(widget.user.uid!, cell.meal!);
+
+                if (!mounted) return;
+                if (success) {
+                  setState(() {
+                    widget.meals.remove(cell.meal!);
+                    _createCalendar();
+                  });
+                  Navigator.of(context).pop();
+                } else {
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -201,7 +250,7 @@ class _CalendarPageState extends State<CalendarPage> {
               shrinkWrap: true,
               childAspectRatio: 0.5,
               children: <Widget> [
-                ...createCalendar(),
+                ..._createCalendar(),
               ],
             ),
           ],

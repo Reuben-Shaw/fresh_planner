@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide TimeOfDay;
 import 'package:fresh_planner/source/database/database_helper_calendar.dart';
+import 'package:fresh_planner/source/enums/time_of_day.dart';
 import 'package:fresh_planner/source/objects/meal.dart';
 import 'package:fresh_planner/source/objects/recipe.dart';
 
@@ -44,7 +45,7 @@ class DatabaseCalendar {
       return [];
     } catch (e) {
       debugPrint("Error fetching recipes: $e");
-      return [];
+      return null;
     }
   }
 
@@ -65,19 +66,30 @@ class DatabaseCalendar {
     }
   }
 
-  Future<List<Meal>?> getAllMeals(String uid) async {
+  Future<Map<TimeOfDay, List<Meal>>?> getAllMeals(String uid) async {
     try {
       final response = await _database.getAllMealsAPI(uid);
       if (response['success'] == true) {
+        debugPrint("Got meals");
         final List<dynamic> mealsData = response['meals'];
-        return mealsData.map((m) => Meal.fromJson(m)).toList();
+        final List<Meal> returnedMeals = mealsData.map((m) => Meal.fromJson(m)).toList();
+
+        final Map<TimeOfDay, List<Meal>> mealsByTime = {
+          TimeOfDay.breakfast: [],
+          TimeOfDay.lunch: [],
+          TimeOfDay.dinner: [],
+        };
+        for (final meal in returnedMeals) {
+          mealsByTime[meal.time]!.add(meal);
+        }
+        return mealsByTime;
       } else {
         debugPrint("Get meals failed: ${response['error'] ?? response['message']}");
       }
-      return [];
+      return null;
     } catch (e) {
       debugPrint("Error fetching meals: $e");
-      return [];
+      return null;
     }
   }
 

@@ -122,7 +122,7 @@ class _AddMealPageState extends State<AddMealPage> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[
                               Icon(
-                                Icons.sunny,
+                                widget.time == TimeOfDay.breakfast ? Icons.sunny_snowing : widget.time == TimeOfDay.lunch ? Icons.sunny : Icons.nightlight,
                                 color: Color(0xFF979797),
                               ),
                               Text(

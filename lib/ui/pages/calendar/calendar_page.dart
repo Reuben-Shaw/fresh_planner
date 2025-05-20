@@ -16,7 +16,7 @@ class CalendarPage extends ParentPage {
   const CalendarPage({super.key, required super.user, required super.ingredients, required this.recipes, required this.meals, required this.calendarDB});
 
   final List<Recipe> recipes;
-  final List<Meal> meals;
+  final Map<TimeOfDay, List<Meal>> meals;
   final DatabaseCalendar calendarDB;
 
   @override
@@ -28,10 +28,34 @@ class _CalendarPageState extends State<CalendarPage> {
 	int currentMonth = 4;
 	int currentYear = 2025;
 
-  TimeOfDay timeOfDay = TimeOfDay.lunch;
+  TimeOfDay __timeOfDay = TimeOfDay.lunch;
+  TimeOfDay get _timeOfDay => __timeOfDay;
+  set _timeOfDay(TimeOfDay value) {
+    setState(() {
+      __timeOfDay = value;
+    });
+  }
 
+  @override
+  void initState() {
+    super.initState();
+
+    DateTime time = DateTime.now();
+    DateTime date = DateTime(time.year, time.month, time.day, 0, 0, 0);
+
+    if (date.add(Duration(hours: 14, minutes: 59)).isBefore(time)) {
+      debugPrint("Dinner time");
+      _timeOfDay = TimeOfDay.dinner;
+    } else if (date.add(Duration(hours: 9, minutes: 59)).isBefore(time)) {
+      debugPrint("Lunch time");
+      _timeOfDay = TimeOfDay.lunch;
+    } else {
+      debugPrint("Breakfast time");
+      _timeOfDay = TimeOfDay.breakfast;
+    }
+    debugPrint("Time Of Day is $_timeOfDay");
+  }
   
-
   List<GestureDetector> _createCalendar() {
     final List<GestureDetector> cells = [];
 
@@ -84,7 +108,7 @@ class _CalendarPageState extends State<CalendarPage> {
 			}
 		}
 
-    for (Meal m in widget.meals) {
+    for (Meal m in widget.meals[_timeOfDay]!) {
       if (m.isRepeatingWeek()) {
         final startDate = getFirstInstanceOfDay(m.repeatFromWeek!, monthStartDay, priorYear, priorMonth, priorMonthLength); 
         for(int i = 0; i < 6; i++) {
@@ -122,10 +146,16 @@ class _CalendarPageState extends State<CalendarPage> {
     cellMap.forEach((key, value) {
       final gestureCell = GestureDetector(
         onTap:() async {
-          await Navigator.push(
+          final result = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddMealPage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, calendarDB: widget.calendarDB, day: key, time: timeOfDay,)),
+            MaterialPageRoute(builder: (context) => AddMealPage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, calendarDB: widget.calendarDB, day: key, time: _timeOfDay,)),
           );
+          if (result is! Meal) return;
+          setState(() {
+            widget.meals[result.time]!.add(result);
+            widget.meals[result.time]!.sort();
+            _createCalendar();
+          });
         }, 
         onLongPress: () async {
           await _showDeleteDialog(value);
@@ -191,7 +221,8 @@ class _CalendarPageState extends State<CalendarPage> {
                 if (!mounted) return;
                 if (success) {
                   setState(() {
-                    widget.meals.remove(cell.meal!);
+                    widget.meals[_timeOfDay]!.remove(cell.meal!);
+                    widget.meals[_timeOfDay]!.sort();
                     _createCalendar();
                   });
                   Navigator.of(context).pop();
@@ -208,49 +239,106 @@ class _CalendarPageState extends State<CalendarPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(
-      title:  Text(
-          DateFormat("MMMM").format(DateTime(currentYear, currentMonth, 1)),
-          style: AppTextStyles.mainTitle,
-        ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 4.0),
+    return Scaffold(
+      body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Row(
-              children: <Widget> [
-                Expanded(
-                  child: Text('M', textAlign: TextAlign.center),
-                ),
-                Expanded(
-                  child: Text('T', textAlign: TextAlign.center),
-                ),
-                Expanded(
-                  child: Text('W', textAlign: TextAlign.center),
-                ),
-                Expanded(
-                  child: Text('T', textAlign: TextAlign.center),
-                ),
-                Expanded(
-                  child: Text('F', textAlign: TextAlign.center),
-                ),
-                Expanded(
-                  child: Text('S', textAlign: TextAlign.center),
-                ),
-                Expanded(
-                  child: Text('S', textAlign: TextAlign.center),
-                ),
-              ],
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: Icon(Icons.arrow_back,),
             ),
-            GridView.count(
-              crossAxisCount: 7,
-              shrinkWrap: true,
-              childAspectRatio: 0.5,
-              children: <Widget> [
-                ..._createCalendar(),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text("April", style: AppTextStyles.mainTitle,),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(35)),
+                          border: Border.all(color: Color(0xFF399E5A), width: 2),
+                        ),
+                        child: Row(
+                          spacing: 4,
+                          children: <Widget>[
+                            IconButton(
+                              icon: Icon(
+                                Icons.sunny_snowing,
+                                color: _timeOfDay == TimeOfDay.breakfast ? Colors.white : Color(0xFF26693C),
+                              ), 
+                              onPressed: () => { _timeOfDay = TimeOfDay.breakfast }, 
+                              style: ButtonStyle(
+                                backgroundColor: _timeOfDay == TimeOfDay.breakfast ? WidgetStateProperty.all<Color>(Color(0xFF26693C)) : WidgetStateProperty.all<Color>(Colors.white),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.sunny,
+                                color: _timeOfDay == TimeOfDay.lunch ? Colors.white : Color(0xFF26693C),
+                              ), 
+                              onPressed: () => { _timeOfDay = TimeOfDay.lunch }, 
+                              style: ButtonStyle(
+                                backgroundColor: _timeOfDay == TimeOfDay.lunch ? WidgetStateProperty.all<Color>(Color(0xFF26693C)) : WidgetStateProperty.all<Color>(Colors.white),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.nightlight,
+                                color: _timeOfDay == TimeOfDay.dinner ? Colors.white : Color(0xFF26693C),
+                              ), 
+                              onPressed: () => { _timeOfDay = TimeOfDay.dinner }, 
+                              style: ButtonStyle(
+                                backgroundColor: _timeOfDay == TimeOfDay.dinner ? WidgetStateProperty.all<Color>(Color(0xFF26693C)) : WidgetStateProperty.all<Color>(Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 10,),
+                Row(
+                  children: <Widget> [
+                    Expanded(
+                      child: Text('M', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
+                    ),
+                    Expanded(
+                      child: Text('T', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
+                    ),
+                    Expanded(
+                      child: Text('W', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
+                    ),
+                    Expanded(
+                      child: Text('T', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
+                    ),
+                    Expanded(
+                      child: Text('F', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
+                    ),
+                    Expanded(
+                      child: Text('S', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
+                    ),
+                    Expanded(
+                      child: Text('S', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 4,),
+                GridView.count(
+                  crossAxisCount: 7,
+                  shrinkWrap: true,
+                  childAspectRatio: 0.5,
+                  children: <Widget> [
+                    ..._createCalendar(),
+                  ],
+                ),
               ],
             ),
           ],

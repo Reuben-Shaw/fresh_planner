@@ -84,10 +84,12 @@ class _LoginPageState extends State<LoginPage> {
     }
     
     _isLoading = false;
-    
+
     ingredientData.sort();
     recipeData.sort();
-    mealData.sort();
+    mealData.forEach((time, meals) {
+      meals.sort();
+    });
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => CalendarPage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData, meals: mealData, calendarDB: calendarDB,)),

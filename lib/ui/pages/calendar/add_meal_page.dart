@@ -8,6 +8,7 @@ import 'package:fresh_planner/source/objects/recipe.dart';
 import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/pages/shared/recipe_page.dart';
 import 'package:fresh_planner/ui/styles.dart';
+import 'package:fresh_planner/ui/widgets/loading_screen.dart';
 import 'package:intl/intl.dart';
 
 class AddMealPage extends StatefulWidget {
@@ -26,6 +27,10 @@ class AddMealPage extends StatefulWidget {
 
 class _AddMealPageState extends State<AddMealPage> {
   final _calendarDB = DatabaseCalendar();
+  
+  bool __isLoading = false;
+  bool get _isLoading => __isLoading;
+  set _isLoading(bool value) => setState(() => __isLoading = value);
 
   bool? _isFresh = true;
   MealRepetition? _repetition = MealRepetition.never;
@@ -72,10 +77,12 @@ class _AddMealPageState extends State<AddMealPage> {
       repeatFromDay: _repetition == MealRepetition.everyDate ? widget.day.day : null,
       day: _repetition == MealRepetition.never ? widget.day : null,
     );
+    _isLoading = true;
 
     (bool, String?) response = await widget.calendarDB.addMeal(widget.user.uid!, meal);
     if (!response.$1 || !mounted) {
       errorText = "Internal server error, please try again";
+      _isLoading = false;
       return;
     }
     meal.id = response.$2;
@@ -87,285 +94,293 @@ class _AddMealPageState extends State<AddMealPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: <Widget>[
-            IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: Icon(Icons.arrow_back,),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        "Adding a\nMeal",
-                        style: AppTextStyles.mainTitle,
-                      ),
-                      SizedBox(height: 5,),
-                      Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(Icons.arrow_back,),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Icon(
-                            Icons.sunny,
-                            color: Color(0xFF979797),
-                          ),
                           Text(
-                            " - ${widget.time.standardName}: ${DateFormat("dd/MM/yy").format(widget.day)}",
-                            style: AppTextStyles.subTitle,
+                            "Adding a\nMeal",
+                            style: AppTextStyles.mainTitle,
                           ),
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Container(
-                              decoration: AppTextFieldStyles.dropShadowWithColour,
-                              child: DropdownButton(
-                                items: widget.recipes.map((r) {
-                                  return DropdownMenuItem<Recipe>(
-                                    value: r,
-                                    child: Text("   ${r.name}"),
-                                  );
-                                }).toList(),
-                                value: _recipeDropdownValue,
-                                onChanged: _recipeDropdownCallback,
-                                isExpanded: true,
-                                underline: Text(""),
-                                hint: Text(
-                                  "   select a recipe",
-                                  style: AppTextStyles.hint,
-                                ),
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () async {
-                              final result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => RecipePage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, calendarDB: _calendarDB,)),
-                              );
-                              if (result is! Recipe) return;
-                              setState(() {
-                                widget.recipes.add(result);
-                                widget.recipes.sort();
-                                _recipeDropdownValue = result;
-                              });
-                            },
-                            style: ButtonStyle(
-                              backgroundColor: WidgetStateProperty.all<Color>(Color(0xFF399E5A)),
-                            ), 
-                            icon: Icon(
-                              Icons.add,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        color: Color(0xFFd7f1e0),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Column(
+                          SizedBox(height: 5,),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Text(
-                                    _recipeDropdownValue?.name ?? "",
-                                  ),
-                                  IconButton(
-                                    onPressed: (){}, 
-                                    icon: Icon(
-                                      Icons.edit_square,
-                                      color: Color(0xFF26693C),
-                                    ),
-                                  ),
-                                ],
+                              Icon(
+                                Icons.sunny,
+                                color: Color(0xFF979797),
                               ),
-                              Visibility(
-                                visible: _recipeDropdownValue?.link != null,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Text(
-                                      "Link to Recipe:"
+                              Text(
+                                " - ${widget.time.standardName}: ${DateFormat("dd/MM/yy").format(widget.day)}",
+                                style: AppTextStyles.subTitle,
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Container(
+                                  decoration: AppTextFieldStyles.dropShadowWithColour,
+                                  child: DropdownButton(
+                                    items: widget.recipes.map((r) {
+                                      return DropdownMenuItem<Recipe>(
+                                        value: r,
+                                        child: Text("   ${r.name}"),
+                                      );
+                                    }).toList(),
+                                    value: _recipeDropdownValue,
+                                    onChanged: _recipeDropdownCallback,
+                                    isExpanded: true,
+                                    underline: Text(""),
+                                    hint: Text(
+                                      "   select a recipe",
+                                      style: AppTextStyles.hint,
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                      child: Text(
-                                        _recipeDropdownValue?.link ?? "",
-                                        style: TextStyle(
-                                          color: Color(0xFF3873CD),
-                                          decoration: TextDecoration.underline,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              IconButton(
+                                onPressed: () async {
+                                  final result = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => RecipePage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, calendarDB: _calendarDB,)),
+                                  );
+                                  if (result is! Recipe) return;
+                                  setState(() {
+                                    widget.recipes.add(result);
+                                    widget.recipes.sort();
+                                    _recipeDropdownValue = result;
+                                  });
+                                },
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all<Color>(Color(0xFF399E5A)),
+                                ), 
+                                icon: Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            color: Color(0xFFd7f1e0),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Column(
                                 children: <Widget>[
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Text(
-                                          _recipeDropdownValue == null ? "" : "Ingredients:",
-                                        ),
-                                        Container(
-                                          height: 70,
-                                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                          child: ListView(
-                                            children: _recipeDropdownValue?.ingredients.map((i) => 
-                                              Text("• ${i.name}"),
-                                            ).toList() ?? [],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
+                                      Text(
+                                        _recipeDropdownValue?.name ?? "",
+                                      ),
                                       IconButton(
-                                        onPressed: () {}, 
+                                        onPressed: (){}, 
                                         icon: Icon(
-                                          Icons.fullscreen,
+                                          Icons.edit_square,
                                           color: Color(0xFF26693C),
                                         ),
                                       ),
                                     ],
                                   ),
+                                  Visibility(
+                                    visible: _recipeDropdownValue?.link != null,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text(
+                                          "Link to Recipe:"
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                          child: Text(
+                                            _recipeDropdownValue?.link ?? "",
+                                            style: TextStyle(
+                                              color: Color(0xFF3873CD),
+                                              decoration: TextDecoration.underline,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Text(
+                                              _recipeDropdownValue == null ? "" : "Ingredients:",
+                                            ),
+                                            Container(
+                                              height: 70,
+                                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                              child: ListView(
+                                                children: _recipeDropdownValue?.ingredients.map((i) => 
+                                                  Text("• ${i.name}"),
+                                                ).toList() ?? [],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: <Widget>[
+                                          IconButton(
+                                            onPressed: () {}, 
+                                            icon: Icon(
+                                              Icons.fullscreen,
+                                              color: Color(0xFF26693C),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ],
+                              ),
+                            ),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                "Meal Type:",
+                                style: AppTextStyles.innerTitle,
+                              ),
+                              AppRadiobuttonStyle.tileDec(
+                                context, 
+                                "Cooked Fresh",
+                                Radio<bool>(
+                                  value: true,
+                                  groupValue: _isFresh,
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      _isFresh = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                              AppRadiobuttonStyle.tileDec(
+                                context, 
+                                "Leftovers",
+                                Radio<bool>(
+                                  value: false,
+                                  groupValue: _isFresh,
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      _isFresh = value;
+                                    });
+                                  },
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            "Meal Type:",
-                            style: AppTextStyles.innerTitle,
-                          ),
-                          AppRadiobuttonStyle.tileDec(
-                            context, 
-                            "Cooked Fresh",
-                            Radio<bool>(
-                              value: true,
-                              groupValue: _isFresh,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  _isFresh = value;
-                                });
-                              },
-                            ),
-                          ),
-                          AppRadiobuttonStyle.tileDec(
-                            context, 
-                            "Leftovers",
-                            Radio<bool>(
-                              value: false,
-                              groupValue: _isFresh,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  _isFresh = value;
-                                });
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            "Repeat:",
-                            style: AppTextStyles.innerTitle,
-                          ),
-                          AppRadiobuttonStyle.tileDec(
-                            context, 
-                            MealRepetition.never.standardName,
-                            Radio<MealRepetition>(
-                              value: MealRepetition.never,
-                              groupValue: _repetition,
-                              onChanged: (MealRepetition? value) {
-                                setState(() {
-                                  _repetition = value;
-                                });
-                              },
-                            ),
-                          ),
-                          AppRadiobuttonStyle.tileDec(
-                            context, 
-                            "${MealRepetition.everyWeek.standardName}${DateFormat('EEE').format(widget.day)}",
-                            Radio<MealRepetition>(
-                              value: MealRepetition.everyWeek,
-                              groupValue: _repetition,
-                              onChanged: (MealRepetition? value) {
-                                setState(() {
-                                  _repetition = value;
-                                });
-                              },
-                            ),
-                          ),
-                          AppRadiobuttonStyle.tileDec(
-                            context, 
-                            "${MealRepetition.everyOtherWeek.standardName}${DateFormat('EEE').format(widget.day)}",
-                            Radio<MealRepetition>(
-                              value: MealRepetition.everyOtherWeek,
-                              groupValue: _repetition,
-                              onChanged: (MealRepetition? value) {
-                                setState(() {
-                                  _repetition = value;
-                                });
-                              },
-                            ),
-                          ),
-                          AppRadiobuttonStyle.tileDec(
-                            context, 
-                            "${MealRepetition.everyDate.standardName}${_dayWithSuffix(widget.day)}",
-                            Radio<MealRepetition>(
-                              value: MealRepetition.everyDate,
-                              groupValue: _repetition,
-                              onChanged: (MealRepetition? value) {
-                                setState(() {
-                                  _repetition = value;
-                                });
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: <Widget>[
-                          Container(
-                            decoration: AppButtonStyles.circularShadow,
-                            child: ElevatedButton(
-                              onPressed: addNewMeal,
-                              style: AppButtonStyles.mainBackStyle,
-                              child: Text(
-                                "    Add    ",
-                                style: AppButtonStyles.mainTextStyle,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                "Repeat:",
+                                style: AppTextStyles.innerTitle,
                               ),
-                            ),
+                              AppRadiobuttonStyle.tileDec(
+                                context, 
+                                MealRepetition.never.standardName,
+                                Radio<MealRepetition>(
+                                  value: MealRepetition.never,
+                                  groupValue: _repetition,
+                                  onChanged: (MealRepetition? value) {
+                                    setState(() {
+                                      _repetition = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                              AppRadiobuttonStyle.tileDec(
+                                context, 
+                                "${MealRepetition.everyWeek.standardName}${DateFormat('EEE').format(widget.day)}",
+                                Radio<MealRepetition>(
+                                  value: MealRepetition.everyWeek,
+                                  groupValue: _repetition,
+                                  onChanged: (MealRepetition? value) {
+                                    setState(() {
+                                      _repetition = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                              AppRadiobuttonStyle.tileDec(
+                                context, 
+                                "${MealRepetition.everyOtherWeek.standardName}${DateFormat('EEE').format(widget.day)}",
+                                Radio<MealRepetition>(
+                                  value: MealRepetition.everyOtherWeek,
+                                  groupValue: _repetition,
+                                  onChanged: (MealRepetition? value) {
+                                    setState(() {
+                                      _repetition = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                              AppRadiobuttonStyle.tileDec(
+                                context, 
+                                "${MealRepetition.everyDate.standardName}${_dayWithSuffix(widget.day)}",
+                                Radio<MealRepetition>(
+                                  value: MealRepetition.everyDate,
+                                  groupValue: _repetition,
+                                  onChanged: (MealRepetition? value) {
+                                    setState(() {
+                                      _repetition = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              Container(
+                                decoration: AppButtonStyles.circularShadow,
+                                child: ElevatedButton(
+                                  onPressed: addNewMeal,
+                                  style: AppButtonStyles.mainBackStyle,
+                                  child: Text(
+                                    "    Add    ",
+                                    style: AppButtonStyles.mainTextStyle,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
+              ],
+            ),
+            Visibility(
+              visible: _isLoading,
+              child: LoadingScreen(),
             ),
           ],
         ),

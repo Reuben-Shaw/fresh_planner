@@ -6,6 +6,7 @@ import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/pages/shared/ingredients_page.dart';
 import 'package:fresh_planner/ui/styles.dart';
 import 'package:fresh_planner/ui/widgets/ingredient_card.dart';
+import 'package:fresh_planner/ui/widgets/loading_screen.dart';
 
 class RecipePage extends StatefulWidget {
   const RecipePage({super.key, required this.user, required this.ingredients, required this.recipes, required this.calendarDB});
@@ -22,7 +23,10 @@ class RecipePage extends StatefulWidget {
 class _RecipePageState extends State<RecipePage> {
   final _nameController = TextEditingController();
   final _linkController = TextEditingController();
-
+  
+  bool __isLoading = false;
+  bool get _isLoading => __isLoading;
+  set _isLoading(bool value) => setState(() => __isLoading = value);
 
   String _errorText = "";
   String get errorText => _errorText;
@@ -51,9 +55,11 @@ class _RecipePageState extends State<RecipePage> {
       colour: _selectedColour ?? Colors.red,
     );
 
+    _isLoading = true;
     (bool, String?) response = await widget.calendarDB.addRecipe(widget.user.uid!, recipe);
     if (!response.$1 || !mounted) {
       errorText = "Internal server error, please try again";
+      _isLoading = false;
       return;
     }
     recipe.id = response.$2;
@@ -65,191 +71,199 @@ class _RecipePageState extends State<RecipePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: <Widget>[
-            IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: Icon(Icons.arrow_back,),
-            ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Column(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(Icons.arrow_back,),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text(
-                          "Create a\nRecipe",
-                          style: AppTextStyles.mainTitle,
+                        Column(
+                          children: <Widget>[
+                            Text(
+                              "Create a\nRecipe",
+                              style: AppTextStyles.mainTitle,
+                            ),
+                            SizedBox(height: 5,),
+                            Text(
+                              "*must be included",
+                              style: AppTextStyles.subTitle,
+                            ),
+                            SizedBox(height: 20,),
+                          ],
                         ),
-                        SizedBox(height: 5,),
-                        Text(
-                          "*must be included",
-                          style: AppTextStyles.subTitle,
-                        ),
-                        SizedBox(height: 20,),
-                      ],
-                    ),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Container(
-                                decoration: AppTextFieldStyles.dropShadow,
-                                child: TextField(
-                                  controller: _nameController,
-                                  decoration: AppTextFieldStyles.primaryStyle("name*"),
-                                ),
-                              ),
-                              SizedBox(height: 20,),
-                              Container(
-                                decoration: AppTextFieldStyles.dropShadow,
-                                child: TextField(
-                                  controller: _linkController,
-                                  decoration: AppTextFieldStyles.primaryStyle("link to recipe"),
-                                ),
-                              ),
-                              SizedBox(height: 20,),
-                              Text(
-                                "Add Ingredients:",
-                                style: AppTextStyles.innerTitle,
-                              ),
-                              SizedBox(height: 10,),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 5, right: 50),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Text(
-                                      "Ingredient*",
-                                      style: AppTextStyles.standardBold,
-                                    ),
-                                    Text(
-                                      "Amount",
-                                      style: AppTextStyles.standardBold,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Divider(height: 5, thickness: 2, indent: 0, endIndent: 0, color: Colors.black),
-                              const SizedBox(height: 10,),
-                              ListView(
-                                shrinkWrap: true,
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
-                                  ..._ingredientCards,
-                                  GestureDetector(
-                                    onTap: () async {
-                                      final result = await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => IngredientsPage(user: widget.user, ingredients: widget.ingredients,)),
-                                      );
-                                      if (result is! Ingredient) return;
-                                      setState(() {
-                                        _ingredientCards.add(IngredientCard(ingredient: result, showAmount: true,));
-                                        _ingredientCards.sort();
-                                      });
-                                    },
-                                    child: Text(
-                                      "+ Select Ingredient",
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
+                                  Container(
+                                    decoration: AppTextFieldStyles.dropShadow,
+                                    child: TextField(
+                                      controller: _nameController,
+                                      decoration: AppTextFieldStyles.primaryStyle("name*"),
                                     ),
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
-                                errorText,
-                                style: AppTextStyles.error,
-                              ),
-                              SizedBox(height: 5,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: <Widget>[
-                                  Row(
-                                    spacing: 10,
+                                  SizedBox(height: 20,),
+                                  Container(
+                                    decoration: AppTextFieldStyles.dropShadow,
+                                    child: TextField(
+                                      controller: _linkController,
+                                      decoration: AppTextFieldStyles.primaryStyle("link to recipe"),
+                                    ),
+                                  ),
+                                  SizedBox(height: 20,),
+                                  Text(
+                                    "Add Ingredients:",
+                                    style: AppTextStyles.innerTitle,
+                                  ),
+                                  SizedBox(height: 10,),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 5, right: 50),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Text(
+                                          "Ingredient*",
+                                          style: AppTextStyles.standardBold,
+                                        ),
+                                        Text(
+                                          "Amount",
+                                          style: AppTextStyles.standardBold,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Divider(height: 5, thickness: 2, indent: 0, endIndent: 0, color: Colors.black),
+                                  const SizedBox(height: 10,),
+                                  ListView(
+                                    shrinkWrap: true,
                                     children: <Widget>[
+                                      ..._ingredientCards,
                                       GestureDetector(
-                                        child: Container(
-                                          width: 37,
-                                          height: 37,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: _selectedColour ?? Colors.red,
+                                        onTap: () async {
+                                          final result = await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(builder: (context) => IngredientsPage(user: widget.user, ingredients: widget.ingredients,)),
+                                          );
+                                          if (result is! Ingredient) return;
+                                          setState(() {
+                                            _ingredientCards.add(IngredientCard(ingredient: result, showAmount: true,));
+                                            _ingredientCards.sort();
+                                          });
+                                        },
+                                        child: Text(
+                                          "+ Select Ingredient",
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
                                           ),
                                         ),
                                       ),
-                                      Column(
-                                        spacing: 5,
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    errorText,
+                                    style: AppTextStyles.error,
+                                  ),
+                                  SizedBox(height: 5,),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: <Widget>[
+                                      Row(
+                                        spacing: 10,
                                         children: <Widget>[
-                                          Row(
-                                            spacing: 5,
-                                            children: <Widget>[
-                                              ...[
-                                                Colors.red,
-                                                Colors.orange,
-                                                Colors.yellow,
-                                                Colors.lightGreen,
-                                                Colors.green,
-                                              ].map((c) => ColourCircle(colour: c, onTap: () => _updateColour(c),)),
-                                            ],
+                                          GestureDetector(
+                                            child: Container(
+                                              width: 37,
+                                              height: 37,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: _selectedColour ?? Colors.red,
+                                              ),
+                                            ),
                                           ),
-                                          Row(
+                                          Column(
                                             spacing: 5,
                                             children: <Widget>[
-                                              ...[
-                                                Colors.lightBlue,
-                                                Colors.blue,
-                                                Colors.purple,
-                                                Colors.pink[200]!,
-                                                Colors.pink,
-                                              ].map((c) => (ColourCircle(colour: c, onTap: () => _updateColour(c),)))
+                                              Row(
+                                                spacing: 5,
+                                                children: <Widget>[
+                                                  ...[
+                                                    Colors.red,
+                                                    Colors.orange,
+                                                    Colors.yellow,
+                                                    Colors.lightGreen,
+                                                    Colors.green,
+                                                  ].map((c) => ColourCircle(colour: c, onTap: () => _updateColour(c),)),
+                                                ],
+                                              ),
+                                              Row(
+                                                spacing: 5,
+                                                children: <Widget>[
+                                                  ...[
+                                                    Colors.lightBlue,
+                                                    Colors.blue,
+                                                    Colors.purple,
+                                                    Colors.pink[200]!,
+                                                    Colors.pink,
+                                                  ].map((c) => (ColourCircle(colour: c, onTap: () => _updateColour(c),)))
+                                                ],
+                                              ),
                                             ],
                                           ),
                                         ],
                                       ),
+                                      Container(
+                                        decoration: AppButtonStyles.curvedShadow,
+                                        child: ElevatedButton(
+                                          onPressed: _addRecipe,
+                                          style: AppButtonStyles.mainBackStyle,
+                                          child: Text(
+                                            "   Create   ",
+                                            style: AppButtonStyles.mainTextStyle,
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
-                                  Container(
-                                    decoration: AppButtonStyles.curvedShadow,
-                                    child: ElevatedButton(
-                                      onPressed: _addRecipe,
-                                      style: AppButtonStyles.mainBackStyle,
-                                      child: Text(
-                                        "   Create   ",
-                                        style: AppButtonStyles.mainTextStyle,
-                                      ),
-                                    ),
-                                  ),
+                                  SizedBox(height: 10,)
                                 ],
                               ),
-                              SizedBox(height: 10,)
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
+            ),
+            Visibility(
+              visible: _isLoading,
+              child: LoadingScreen(),
             ),
           ],
         ),

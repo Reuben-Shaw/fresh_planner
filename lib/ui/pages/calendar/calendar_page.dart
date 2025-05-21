@@ -351,15 +351,20 @@ class _CalendarPageState extends State<CalendarPage> {
                       ],
                     ),
                     SizedBox(height: 4,),
-                    GridView.count(
+                  ],
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: GridView.count(
                       crossAxisCount: 7,
                       shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
                       childAspectRatio: 0.5,
-                      children: <Widget> [
+                      children: <Widget>[
                         ..._createCalendar(),
                       ],
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),

@@ -138,6 +138,7 @@ class _CalendarPageState extends State<CalendarPage> {
         for(int i = 0; i < 3; i++)
         {
           final newDate = firstInstanceOfDay.add(Duration(days: (i * 14) + offset));
+          if (!newDate.isBefore(cellMap.keys.last)) continue;
           cellMap[newDate] = CalendarCell(date: newDate, meal: m,);
         }
       }
@@ -151,7 +152,7 @@ class _CalendarPageState extends State<CalendarPage> {
         final nextDate = DateTime(nextYear, nextMonth, m.repeatFromDay!);
         if (cellMap.containsKey(nextDate)) cellMap[nextDate] = CalendarCell(date: nextDate, meal: m,);
       }
-      else if (m.isSingleDay()) {
+      else if (m.isSingleDay() && m.day!.month == currentMonth && m.day!.year == currentYear) {
         cellMap[m.day!] = CalendarCell(date: m.day!, meal: m,);
       }
     }
@@ -182,7 +183,7 @@ class _CalendarPageState extends State<CalendarPage> {
     
 
     if (numberAfterAdded > 6) {
-      cells.length = cells.length - 7;
+      cells.length = cells.length;
     }
 
     return cells;
@@ -225,14 +226,15 @@ class _CalendarPageState extends State<CalendarPage> {
             TextButton(
               child: const Text("Cancel"),
               onPressed: () {
-                _isLoading = true;
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
               child: const Text("Delete", style: TextStyle(color: Colors.red,),),
               onPressed: () async {
+                _isLoading = true;
                 final success = await widget.calendarDB.deleteMeal(widget.user.uid!, cell.meal!);
+                _isLoading = false;
 
                 if (!mounted) return;
                 if (success) {
@@ -241,7 +243,6 @@ class _CalendarPageState extends State<CalendarPage> {
                     widget.meals[_timeOfDay]!.sort();
                     _createCalendar();
                   });
-                  Navigator.of(context).pop();
                 } else {
                   Navigator.of(context).pop();
                 }
@@ -354,14 +355,52 @@ class _CalendarPageState extends State<CalendarPage> {
                   ],
                 ),
                 Expanded(
-                  child: SingleChildScrollView(
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: (ScrollNotification scrollInfo) {
+                      if (scrollInfo is ScrollUpdateNotification) {
+                        final minScroll = scrollInfo.metrics.minScrollExtent;
+                        final maxScroll = scrollInfo.metrics.maxScrollExtent;
+                        final currentScroll = scrollInfo.metrics.pixels;
+                        final overscrollDirection = scrollInfo.scrollDelta ?? 0;
+
+                        
+                        debugPrint("$overscrollDirection");
+                        if (currentScroll >= maxScroll) {
+                          if (overscrollDirection > 0) {
+                            setState(() {
+                              if (currentMonth == 12) {
+                                currentMonth = 1;
+                                currentYear += 1;
+                              } else {
+                                currentMonth += 1;
+                              }
+                              debugPrint("Gone up a month");
+                              _createCalendar();
+                            });
+                          }
+                        } else if (currentScroll <= minScroll) {
+                          if (overscrollDirection < 0) {
+                            setState(() {
+                              if (currentMonth == 1) {
+                                currentMonth = 12;
+                                currentYear -= 1;
+                              } else {
+                                currentMonth -= 1;
+                              }
+                              debugPrint("Gone down a month");
+                              _createCalendar();
+                            });
+                          }
+                        }
+                      }
+                      return false;
+                    },
                     child: GridView.count(
                       crossAxisCount: 7,
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
                       childAspectRatio: 0.5,
                       children: <Widget>[
                         ..._createCalendar(),
+                        SizedBox(height: 48,)
                       ],
                     ),
                   ),

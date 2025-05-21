@@ -7,6 +7,7 @@ import 'package:fresh_planner/source/objects/recipe.dart';
 import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/pages/calendar/add_meal_page.dart';
 import 'package:fresh_planner/ui/pages/parent_page.dart';
+import 'package:fresh_planner/ui/widgets/loading_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart' hide TimeOfDay;
 import 'package:fresh_planner/ui/styles.dart';
@@ -24,9 +25,10 @@ class CalendarPage extends ParentPage {
 }
 
 class _CalendarPageState extends State<CalendarPage> { 
-  DateTime currentDay = DateTime.now();
-	int currentMonth = 4;
-	int currentYear = 2025;
+  DateTime currentDate = DateTime.now();
+	int currentDay = 1;
+	int currentMonth = 1;
+	int currentYear = 1970;
 
   TimeOfDay __timeOfDay = TimeOfDay.lunch;
   TimeOfDay get _timeOfDay => __timeOfDay;
@@ -36,12 +38,23 @@ class _CalendarPageState extends State<CalendarPage> {
     });
   }
 
+  bool __isLoading = false;
+  bool get _isLoading => __isLoading;
+  set _isLoading(bool value) => setState(() => __isLoading = value);
+
   @override
   void initState() {
     super.initState();
 
     DateTime time = DateTime.now();
     DateTime date = DateTime(time.year, time.month, time.day, 0, 0, 0);
+
+    setState(() {
+      currentDate = date;
+      currentDay = date.day;
+      currentMonth = date.month;
+      currentYear = date.year;  
+    });
 
     if (date.add(Duration(hours: 14, minutes: 59)).isBefore(time)) {
       debugPrint("Dinner time");
@@ -103,7 +116,7 @@ class _CalendarPageState extends State<CalendarPage> {
 				// Logic for adding days in the month
 				else {
           final day = DateTime(currentYear, currentMonth, offsetIndex - monthStartDay);
-					cellMap[day] = CalendarCell(date: day);
+					cellMap[day] = CalendarCell(date: day, isCurrentDay: day == currentDate,);
 				}
 			}
 		}
@@ -146,10 +159,12 @@ class _CalendarPageState extends State<CalendarPage> {
     cellMap.forEach((key, value) {
       final gestureCell = GestureDetector(
         onTap:() async {
+          _isLoading = true;
           final result = await Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => AddMealPage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, calendarDB: widget.calendarDB, day: key, time: _timeOfDay,)),
           );
+          _isLoading = false;
           if (result is! Meal) return;
           setState(() {
             widget.meals[result.time]!.add(result);
@@ -210,6 +225,7 @@ class _CalendarPageState extends State<CalendarPage> {
             TextButton(
               child: const Text("Cancel"),
               onPressed: () {
+                _isLoading = true;
                 Navigator.of(context).pop();
               },
             ),
@@ -241,105 +257,115 @@ class _CalendarPageState extends State<CalendarPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: <Widget>[
-            IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: Icon(Icons.arrow_back,),
-            ),
             Column(
-              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text("April", style: AppTextStyles.mainTitle,),
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(35)),
-                          border: Border.all(color: Color(0xFF399E5A), width: 2),
-                        ),
-                        child: Row(
-                          spacing: 4,
-                          children: <Widget>[
-                            IconButton(
-                              icon: Icon(
-                                Icons.sunny_snowing,
-                                color: _timeOfDay == TimeOfDay.breakfast ? Colors.white : Color(0xFF26693C),
-                              ), 
-                              onPressed: () => { _timeOfDay = TimeOfDay.breakfast }, 
-                              style: ButtonStyle(
-                                backgroundColor: _timeOfDay == TimeOfDay.breakfast ? WidgetStateProperty.all<Color>(Color(0xFF26693C)) : WidgetStateProperty.all<Color>(Colors.white),
-                              ),
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(Icons.arrow_back,),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            "${DateFormat('MMMM').format(DateTime(currentYear, currentMonth))} ${currentYear == currentDate.year ? "" : "- $currentYear"}"
+                          , style: AppTextStyles.mainTitle,),
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(Radius.circular(35)),
+                              border: Border.all(color: Color(0xFF399E5A), width: 2),
                             ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.sunny,
-                                color: _timeOfDay == TimeOfDay.lunch ? Colors.white : Color(0xFF26693C),
-                              ), 
-                              onPressed: () => { _timeOfDay = TimeOfDay.lunch }, 
-                              style: ButtonStyle(
-                                backgroundColor: _timeOfDay == TimeOfDay.lunch ? WidgetStateProperty.all<Color>(Color(0xFF26693C)) : WidgetStateProperty.all<Color>(Colors.white),
-                              ),
+                            child: Row(
+                              spacing: 4,
+                              children: <Widget>[
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.sunny_snowing,
+                                    color: _timeOfDay == TimeOfDay.breakfast ? Colors.white : Color(0xFF26693C),
+                                  ), 
+                                  onPressed: () => { _timeOfDay = TimeOfDay.breakfast }, 
+                                  style: ButtonStyle(
+                                    backgroundColor: _timeOfDay == TimeOfDay.breakfast ? WidgetStateProperty.all<Color>(Color(0xFF26693C)) : WidgetStateProperty.all<Color>(Colors.white),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.sunny,
+                                    color: _timeOfDay == TimeOfDay.lunch ? Colors.white : Color(0xFF26693C),
+                                  ), 
+                                  onPressed: () => { _timeOfDay = TimeOfDay.lunch }, 
+                                  style: ButtonStyle(
+                                    backgroundColor: _timeOfDay == TimeOfDay.lunch ? WidgetStateProperty.all<Color>(Color(0xFF26693C)) : WidgetStateProperty.all<Color>(Colors.white),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.nightlight,
+                                    color: _timeOfDay == TimeOfDay.dinner ? Colors.white : Color(0xFF26693C),
+                                  ), 
+                                  onPressed: () => { _timeOfDay = TimeOfDay.dinner }, 
+                                  style: ButtonStyle(
+                                    backgroundColor: _timeOfDay == TimeOfDay.dinner ? WidgetStateProperty.all<Color>(Color(0xFF26693C)) : WidgetStateProperty.all<Color>(Colors.white),
+                                  ),
+                                ),
+                              ],
                             ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.nightlight,
-                                color: _timeOfDay == TimeOfDay.dinner ? Colors.white : Color(0xFF26693C),
-                              ), 
-                              onPressed: () => { _timeOfDay = TimeOfDay.dinner }, 
-                              style: ButtonStyle(
-                                backgroundColor: _timeOfDay == TimeOfDay.dinner ? WidgetStateProperty.all<Color>(Color(0xFF26693C)) : WidgetStateProperty.all<Color>(Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 10,),
-                Row(
-                  children: <Widget> [
-                    Expanded(
-                      child: Text('M', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
                     ),
-                    Expanded(
-                      child: Text('T', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
+                    SizedBox(height: 10,),
+                    Row(
+                      children: <Widget> [
+                        Expanded(
+                          child: Text('M', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
+                        ),
+                        Expanded(
+                          child: Text('T', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
+                        ),
+                        Expanded(
+                          child: Text('W', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
+                        ),
+                        Expanded(
+                          child: Text('T', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
+                        ),
+                        Expanded(
+                          child: Text('F', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
+                        ),
+                        Expanded(
+                          child: Text('S', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
+                        ),
+                        Expanded(
+                          child: Text('S', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
+                        ),
+                      ],
                     ),
-                    Expanded(
-                      child: Text('W', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
+                    SizedBox(height: 4,),
+                    GridView.count(
+                      crossAxisCount: 7,
+                      shrinkWrap: true,
+                      childAspectRatio: 0.5,
+                      children: <Widget> [
+                        ..._createCalendar(),
+                      ],
                     ),
-                    Expanded(
-                      child: Text('T', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
-                    ),
-                    Expanded(
-                      child: Text('F', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
-                    ),
-                    Expanded(
-                      child: Text('S', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
-                    ),
-                    Expanded(
-                      child: Text('S', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 4,),
-                GridView.count(
-                  crossAxisCount: 7,
-                  shrinkWrap: true,
-                  childAspectRatio: 0.5,
-                  children: <Widget> [
-                    ..._createCalendar(),
                   ],
                 ),
               ],
+            ),
+            Visibility(
+              visible: _isLoading,
+              child: LoadingScreen(),
             ),
           ],
         ),

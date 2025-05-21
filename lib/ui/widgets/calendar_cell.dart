@@ -17,7 +17,7 @@ class CalendarCell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: (Colors.green[900])!)
+        border: Border.all(color: Color(0xFF26693C))
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 2.0),
@@ -26,10 +26,10 @@ class CalendarCell extends StatelessWidget {
           children: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget> [
+              children: <Widget>[
                 Stack(
                   alignment: Alignment.center,
-                  children: [
+                  children: <Widget>[
                     Visibility(
                       visible: isCurrentDay,
                       child: Container(
@@ -37,7 +37,7 @@ class CalendarCell extends StatelessWidget {
                         height: 28,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.green[900],
+                          color: Color(0xFF26693C),
                         ),
                       ),
                     ),
@@ -45,7 +45,7 @@ class CalendarCell extends StatelessWidget {
                       date.day.toString(),
                       style: TextStyle(
                         fontSize: 20,
-                        color: isCurrentDay ? Colors.white : Colors.green[900], 
+                        color: isCurrentDay ? Colors.white : Color(0xFF26693C), 
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -76,13 +76,22 @@ class CalendarCell extends StatelessWidget {
                 Visibility(
                   visible: meal == null,
                   child: Column(
-                    children: [
-                      Container(
-                        width: 42,
-                        height: 42,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.green,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Container(
+                          width: 42,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.green,
+                          ),
+                          child: Center(
+                            child: Icon(
+                              Icons.add,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
                     ],

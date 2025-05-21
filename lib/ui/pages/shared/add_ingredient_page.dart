@@ -139,6 +139,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
               children: <Widget>[
                 IconButton(
                   onPressed: () {
+                    _isLoading = true;
                     Navigator.of(context).pop();
                   },
                   icon: Icon(Icons.arrow_back,),

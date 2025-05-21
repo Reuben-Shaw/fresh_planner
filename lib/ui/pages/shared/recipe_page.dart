@@ -69,6 +69,17 @@ class _RecipePageState extends State<RecipePage> {
     Navigator.pop(context, recipe,); 
   }
 
+  void _removeIngredient(Ingredient ingredient) async {
+    for (IngredientCard i in _ingredientCards) {
+      if (i.ingredient == ingredient) {
+        setState(() {
+          _ingredientCards.remove(i);
+        });
+        return;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -168,7 +179,7 @@ class _RecipePageState extends State<RecipePage> {
                                           _isLoading = false;
                                           if (result is! Ingredient) return;
                                           setState(() {
-                                            _ingredientCards.add(IngredientCard(ingredient: result, showAmount: true,));
+                                            _ingredientCards.add(IngredientCard(ingredient: result, showAmount: true, onRemove: () async => _removeIngredient(result),));
                                             _ingredientCards.sort();
                                           });
                                         },

@@ -17,9 +17,13 @@ class Recipe implements Comparable<Recipe> {
   });
 
   double get cost {
+    return calcCost(ingredients);
+  }
+
+  static double calcCost(List<Ingredient> ingredients) {
     double cost = 0;
     for (Ingredient i in ingredients) {
-      cost += (i.cost ?? 0) / (i.costAmount ?? 1);
+      cost += ((i.cost ?? 0) / (i.costAmount ?? 1)) * i.amount;
     }
     return cost;
   }

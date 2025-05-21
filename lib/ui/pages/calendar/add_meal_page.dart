@@ -32,6 +32,10 @@ class _AddMealPageState extends State<AddMealPage> {
   bool get _isLoading => __isLoading;
   set _isLoading(bool value) => setState(() => __isLoading = value);
 
+  bool __isExpanded = false;
+  bool get _isExpanded => __isExpanded;
+  set _isExpanded(bool value) => setState(() => __isExpanded = value);
+
   bool? _isFresh = true;
   MealRepetition? _repetition = MealRepetition.never;
 
@@ -180,88 +184,90 @@ class _AddMealPageState extends State<AddMealPage> {
                               ),
                             ],
                           ),
-                          Container(
-                            color: Color(0xFFd7f1e0),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Column(
-                                children: <Widget>[
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: <Widget>[
-                                      Text(
-                                        _recipeDropdownValue?.name ?? "",
-                                      ),
-                                      IconButton(
-                                        onPressed: (){}, 
-                                        icon: Icon(
-                                          Icons.edit_square,
-                                          color: Color(0xFF26693C),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Visibility(
-                                    visible: _recipeDropdownValue?.link != null,
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Text(
-                                          "Link to Recipe:"
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                          child: Text(
-                                            _recipeDropdownValue?.link ?? "",
-                                            style: TextStyle(
-                                              color: Color(0xFF3873CD),
-                                              decoration: TextDecoration.underline,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text(
-                                              _recipeDropdownValue == null ? "" : "Ingredients:",
-                                            ),
-                                            Container(
-                                              height: 70,
-                                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                              child: ListView(
-                                                children: _recipeDropdownValue?.ingredients.map((i) => 
-                                                  Text("• ${i.name}"),
-                                                ).toList() ?? [],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: <Widget>[
-                                          IconButton(
-                                            onPressed: () {}, 
-                                            icon: Icon(
-                                              Icons.fullscreen,
-                                              color: Color(0xFF26693C),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                          // Container(
+                          //   color: Color(0xFFd7f1e0),
+                          //   child: Padding(
+                          //     padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          //     child: Column(
+                          //       children: <Widget>[
+                          //         Row(
+                          //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //           children: <Widget>[
+                          //             Text(
+                          //               _recipeDropdownValue?.name ?? "",
+                          //             ),
+                          //             IconButton(
+                          //               onPressed: (){}, 
+                          //               icon: Icon(
+                          //                 Icons.edit_square,
+                          //                 color: Color(0xFF26693C),
+                          //               ),
+                          //             ),
+                          //           ],
+                          //         ),
+                          //         Visibility(
+                          //           visible: _recipeDropdownValue?.link != null,
+                          //           child: Column(
+                          //             crossAxisAlignment: CrossAxisAlignment.start,
+                          //             children: <Widget>[
+                          //               Text(
+                          //                 "Link to Recipe:"
+                          //               ),
+                          //               Padding(
+                          //                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          //                 child: Text(
+                          //                   _recipeDropdownValue?.link ?? "",
+                          //                   style: TextStyle(
+                          //                     color: Color(0xFF3873CD),
+                          //                     decoration: TextDecoration.underline,
+                          //                   ),
+                          //                 ),
+                          //               ),
+                          //             ],
+                          //           ),
+                          //         ),
+                          //         Row(
+                          //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //           children: <Widget>[
+                          //             Flexible(
+                          //               child: Column(
+                          //                 crossAxisAlignment: CrossAxisAlignment.start,
+                          //                 children: <Widget>[
+                          //                   Text(
+                          //                     _recipeDropdownValue == null ? "" : "Ingredients:",
+                          //                   ),
+                          //                   !_isExpanded 
+                          //                     ? SizedBox(
+                          //                       height: 70,
+                          //                       child: _ingredientListView(),
+                          //                     ) 
+                          //                     : Flexible(
+                          //                       child: _ingredientListView(),
+                          //                     ),
+                          //                 ],
+                          //               ),
+                          //             ),
+                          //             Column(
+                          //               mainAxisAlignment: MainAxisAlignment.end,
+                          //               children: <Widget>[
+                          //                 IconButton(
+                          //                   onPressed: () {
+                          //                     _isExpanded = !_isExpanded;
+                          //                   }, 
+                          //                   icon: Icon(
+                          //                     _isExpanded ? Icons.fullscreen_exit : Icons.fullscreen,
+                          //                     color: Color(0xFF26693C),
+                          //                   ),
+                          //                 ),
+                          //               ],
+                          //             ),
+                          //           ],
+                          //         ),
+                          //       ],
+                          //     ),
+                          //   ),
+                          // ),
+                          _ingredientListView(),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
@@ -385,6 +391,21 @@ class _AddMealPageState extends State<AddMealPage> {
               visible: _isLoading,
               child: LoadingScreen(),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+  SingleChildScrollView _ingredientListView() { 
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      physics: NeverScrollableScrollPhysics(),
+      child: Flexible(
+        child: Column(
+          children: <Widget>[
+            ..._recipeDropdownValue?.ingredients.map((i) => 
+                Text("• ${i.name}"),
+              ).toList() ?? []
           ],
         ),
       ),

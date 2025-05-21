@@ -9,6 +9,7 @@ import 'package:fresh_planner/ui/pages/shared/ingredients_page.dart';
 import 'package:fresh_planner/ui/styles.dart';
 import 'package:fresh_planner/ui/widgets/ingredient_card.dart';
 import 'package:fresh_planner/ui/widgets/loading_screen.dart';
+import 'package:intl/intl.dart';
 
 class RecipePage extends StatefulWidget {
   const RecipePage({super.key, required this.user, required this.ingredients, required this.recipes, required this.calendarDB});
@@ -185,12 +186,28 @@ class _RecipePageState extends State<RecipePage> {
                                         },
                                         child: Text(
                                           "+ Select Ingredient",
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black,
-                                          ),
+                                          style: AppTextStyles.largerBold,
                                         ),
+                                      ),
+                                      Row(
+                                        children: <Widget>[
+                                          Text(
+                                            "Cost of Recipe: ",
+                                            style: AppTextStyles.largerBold,
+                                          ),
+                                          Text(
+                                            NumberFormat.currency(
+                                              locale: "en_UK", symbol: "£"
+                                            ).format(Recipe.calcCost(
+                                              _ingredientCards.map((card) => card.ingredient).toList()
+                                            )),
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFF26693C),
+                                            ),
+                                          ),  
+                                        ],
                                       ),
                                     ],
                                   ),

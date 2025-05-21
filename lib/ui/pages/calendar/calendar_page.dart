@@ -25,9 +25,10 @@ class CalendarPage extends ParentPage {
 }
 
 class _CalendarPageState extends State<CalendarPage> { 
-  DateTime currentDay = DateTime.now();
-	int currentMonth = 4;
-	int currentYear = 2025;
+  DateTime currentDate = DateTime.now();
+	int currentDay = 1;
+	int currentMonth = 1;
+	int currentYear = 1970;
 
   TimeOfDay __timeOfDay = TimeOfDay.lunch;
   TimeOfDay get _timeOfDay => __timeOfDay;
@@ -47,6 +48,13 @@ class _CalendarPageState extends State<CalendarPage> {
 
     DateTime time = DateTime.now();
     DateTime date = DateTime(time.year, time.month, time.day, 0, 0, 0);
+
+    setState(() {
+      currentDate = date;
+      currentDay = date.day;
+      currentMonth = date.month;
+      currentYear = date.year;  
+    });
 
     if (date.add(Duration(hours: 14, minutes: 59)).isBefore(time)) {
       debugPrint("Dinner time");
@@ -108,7 +116,7 @@ class _CalendarPageState extends State<CalendarPage> {
 				// Logic for adding days in the month
 				else {
           final day = DateTime(currentYear, currentMonth, offsetIndex - monthStartDay);
-					cellMap[day] = CalendarCell(date: day);
+					cellMap[day] = CalendarCell(date: day, isCurrentDay: day == currentDate,);
 				}
 			}
 		}
@@ -269,7 +277,9 @@ class _CalendarPageState extends State<CalendarPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Text("April", style: AppTextStyles.mainTitle,),
+                          Text(
+                            "${DateFormat('MMMM').format(DateTime(currentYear, currentMonth))} ${currentYear == currentDate.year ? "" : "- $currentYear"}"
+                          , style: AppTextStyles.mainTitle,),
                           Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.all(Radius.circular(35)),

@@ -137,6 +137,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
               children: <Widget>[
                 IconButton(
                   onPressed: () {
+                    _isLoading = true;
                     Navigator.of(context).pop();
                   },
                   icon: Icon(Icons.arrow_back,),
@@ -159,10 +160,12 @@ class _IngredientsPageState extends State<IngredientsPage> {
                               decoration: AppButtonStyles.circularShadow,
                               child: IconButton(
                                 onPressed: () async {
+                                  _isLoading = true;
                                   final result = await Navigator.push(
                                     context,
                                     MaterialPageRoute(builder: (context) => AddIngredientPage(user: widget.user, ingredients: widget.ingredients, ingredientDB: _ingredientDB,)),
                                   );
+                                  _isLoading = false;
                                   if (result is! Ingredient) return;
                                   setState(() {
                                     widget.ingredients.add(result);

@@ -101,6 +101,7 @@ class _AddMealPageState extends State<AddMealPage> {
               children: <Widget>[
                 IconButton(
                   onPressed: () {
+                    _isLoading = true;
                     Navigator.of(context).pop();
                   },
                   icon: Icon(Icons.arrow_back,),
@@ -156,10 +157,12 @@ class _AddMealPageState extends State<AddMealPage> {
                               ),
                               IconButton(
                                 onPressed: () async {
+                                  _isLoading = true;
                                   final result = await Navigator.push(
                                     context,
                                     MaterialPageRoute(builder: (context) => RecipePage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, calendarDB: _calendarDB,)),
                                   );
+                                  _isLoading = false;
                                   if (result is! Recipe) return;
                                   setState(() {
                                     widget.recipes.add(result);

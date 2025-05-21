@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/database/database_calendar.dart';
 import 'package:fresh_planner/source/objects/ingredient.dart';
@@ -78,6 +80,7 @@ class _RecipePageState extends State<RecipePage> {
               children: <Widget>[
                 IconButton(
                   onPressed: () {
+                    _isLoading = true;
                     Navigator.of(context).pop();
                   },
                   icon: Icon(Icons.arrow_back,),
@@ -157,10 +160,12 @@ class _RecipePageState extends State<RecipePage> {
                                       ..._ingredientCards,
                                       GestureDetector(
                                         onTap: () async {
+                                          _isLoading = true;
                                           final result = await Navigator.push(
                                             context,
                                             MaterialPageRoute(builder: (context) => IngredientsPage(user: widget.user, ingredients: widget.ingredients,)),
                                           );
+                                          _isLoading = false;
                                           if (result is! Ingredient) return;
                                           setState(() {
                                             _ingredientCards.add(IngredientCard(ingredient: result, showAmount: true,));

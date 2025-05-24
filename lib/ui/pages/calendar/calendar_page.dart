@@ -180,7 +180,6 @@ class _CalendarPageState extends State<CalendarPage> {
       );
       cells.add(gestureCell);
     });
-    
 
     if (numberAfterAdded > 6) {
       cells.length = cells.length;
@@ -399,8 +398,15 @@ class _CalendarPageState extends State<CalendarPage> {
                       crossAxisCount: 7,
                       childAspectRatio: 0.5,
                       children: <Widget>[
+                        SizedBox(height: 32,),
+                        SizedBox(height: 32,),
+                        SizedBox(height: 32,),
+                        SizedBox(height: 32,),
+                        SizedBox(height: 32,),
+                        SizedBox(height: 32,),
+                        SizedBox(height: 32,),
                         ..._createCalendar(),
-                        SizedBox(height: 48,)
+                        SizedBox(height: 32,),
                       ],
                     ),
                   ),

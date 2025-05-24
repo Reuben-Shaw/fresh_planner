@@ -70,6 +70,7 @@ class _CalendarPageState extends State<CalendarPage> {
   }
   
   List<GestureDetector> _createCalendar() {
+    debugPrint("\n\n\n\n\n\n======$currentMonth======");
     final List<GestureDetector> cells = [];
 
     final int monthStartDay;
@@ -120,6 +121,7 @@ class _CalendarPageState extends State<CalendarPage> {
 				}
 			}
 		}
+    // debugPrint("cellMap length after for: ${cellMap.length} with ${cellMap.keys.last} as last");
 
     for (Meal m in widget.meals[_timeOfDay]!) {
       if (m.isRepeatingWeek()) {
@@ -133,15 +135,24 @@ class _CalendarPageState extends State<CalendarPage> {
         final firstInstanceOfDay = getFirstInstanceOfDay(britishWeekday(m.repeatFromOtherWeek!), monthStartDay, priorYear, priorMonth, priorMonthLength);
         debugPrint("${m.recipe.name} - First instace of day: $firstInstanceOfDay with ${britishWeekday(m.repeatFromOtherWeek!)}");
 
-        final difference = m.repeatFromOtherWeek!.difference(firstInstanceOfDay).inDays.abs();
+        debugPrint("${m.repeatFromOtherWeek!}.difference($firstInstanceOfDay).inDays.abs() = ${m.repeatFromOtherWeek!.difference(firstInstanceOfDay).inDays.abs()}");
+        debugPrint("offset = ${(m.repeatFromOtherWeek!.difference(firstInstanceOfDay).inDays.abs()) % 14}");
+        int difference = m.repeatFromOtherWeek!.difference(firstInstanceOfDay).inDays.abs();
+        if (m.repeatFromOtherWeek!.isAfter(firstInstanceOfDay)) difference++;
         final offset = difference % 14;
 
         for(int i = 0; i < 3; i++)
         {
-          final newDate = firstInstanceOfDay.add(Duration(days: (i * 14) + offset));
-          if (!newDate.isBefore(cellMap.keys.last)) continue;
+          debugPrint("$firstInstanceOfDay + (($i * 14 = ${i * 14}) + $offset = ${(i * 14) + offset}) = ${addDays(firstInstanceOfDay, (i * 14) + offset)}");
+          final newDate = addDays(firstInstanceOfDay, (i * 14) + offset);
+          // debugPrint("$newDate is before ${cellMap.keys.last} == ${newDate.isBefore(cellMap.keys.last)}");
+          // debugPrint("$newDate != ${cellMap.keys.last} == ${newDate != cellMap.keys.last}");
+          // debugPrint("!newDate.isBefore(cellMap.keys.last) && newDate != cellMap.keys.last = ${!newDate.isBefore(cellMap.keys.last) && newDate != cellMap.keys.last}");
+          if (!newDate.isBefore(cellMap.keys.last) && newDate != cellMap.keys.last) continue;
           cellMap[newDate] = CalendarCell(date: newDate, meal: m,);
+          // debugPrint("cellMap length after: ${cellMap.length}");
         }
+        // debugPrint("cellMap length after everything: ${cellMap.length}");
       }
       else if (m.isRepeatingDay()) {
         final currentDate = DateTime(currentYear, currentMonth, m.repeatFromDay!);
@@ -183,7 +194,7 @@ class _CalendarPageState extends State<CalendarPage> {
     });
 
     if (numberAfterAdded > 6) {
-      cells.length = cells.length;
+      cells.length = cells.length - 7;
     }
 
     return cells;
@@ -201,9 +212,48 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   DateTime getFirstInstanceOfDay(int dayOfWeek, int monthStartDay, int priorYear, int priorMonth, int priorMonthLength) {
-    return dayOfWeek >= monthStartDay ? 
-      DateTime(currentYear, currentMonth, (dayOfWeek - monthStartDay + 1)) : 
-      DateTime(priorYear, priorMonth, (priorMonthLength - dayOfWeek + 1));
+    // return dayOfWeek >= monthStartDay ? 
+    //   DateTime(currentYear, currentMonth, (dayOfWeek - monthStartDay + 1)) : 
+    //   DateTime(priorYear, priorMonth, (priorMonthLength - dayOfWeek + 1));
+
+    if (dayOfWeek >= monthStartDay) {
+      return DateTime(currentYear, currentMonth, (dayOfWeek - monthStartDay + 1));
+    }
+    return DateTime(priorYear, priorMonth, (priorMonthLength - (monthStartDay - 1)) + dayOfWeek);
+  }
+
+  DateTime addDays(DateTime startDate, int numberOfDays) {
+    final targetDate = startDate.add(Duration(days: numberOfDays));
+
+    // Ensure the calendar day matches what we expect (in case DST pushes us into previous/next day)
+    if (targetDate.day != startDate.day + (numberOfDays % 31)) {
+      return DateTime(
+        targetDate.year,
+        targetDate.month,
+        targetDate.day,
+        startDate.hour,
+        startDate.minute,
+        startDate.second,
+        startDate.millisecond,
+        startDate.microsecond,
+      );
+    }
+
+    // Also correct time if the hour changed due to DST
+    if (targetDate.hour != startDate.hour) {
+      return DateTime(
+        targetDate.year,
+        targetDate.month,
+        targetDate.day,
+        startDate.hour,
+        startDate.minute,
+        startDate.second,
+        startDate.millisecond,
+        startDate.microsecond,
+      );
+    }
+
+    return targetDate;
   }
 
   Future<void> _showDeleteDialog(CalendarCell? cell) async {
@@ -364,7 +414,7 @@ class _CalendarPageState extends State<CalendarPage> {
                         final overscrollDirection = scrollInfo.scrollDelta ?? 0;
 
                         
-                        debugPrint("$overscrollDirection");
+                        //debugPrint("$overscrollDirection");
                         if (currentScroll >= maxScroll) {
                           if (overscrollDirection > 0) {
                             setState(() {

@@ -131,8 +131,9 @@ class _CalendarPageState extends State<CalendarPage> {
       }
       else if (m.isRepeatingOtherWeek()) {
         final firstInstanceOfDay = getFirstInstanceOfDay(britishWeekday(m.repeatFromOtherWeek!), monthStartDay, priorYear, priorMonth, priorMonthLength);
+        debugPrint("${m.recipe.name} - First instace of day: $firstInstanceOfDay with ${britishWeekday(m.repeatFromOtherWeek!)}");
 
-        final difference = m.repeatFromOtherWeek!.difference(firstInstanceOfDay).inDays.abs() + 1;
+        final difference = m.repeatFromOtherWeek!.difference(firstInstanceOfDay).inDays.abs();
         final offset = difference % 14;
 
         for(int i = 0; i < 3; i++)
@@ -202,7 +203,7 @@ class _CalendarPageState extends State<CalendarPage> {
   DateTime getFirstInstanceOfDay(int dayOfWeek, int monthStartDay, int priorYear, int priorMonth, int priorMonthLength) {
     return dayOfWeek >= monthStartDay ? 
       DateTime(currentYear, currentMonth, (dayOfWeek - monthStartDay + 1)) : 
-      DateTime(priorYear, priorMonth, (priorMonthLength - ((britishWeekday(DateTime(priorYear, priorMonth, dayOfWeek)) + 1) % monthStartDay)));
+      DateTime(priorYear, priorMonth, (priorMonthLength - dayOfWeek + 1));
   }
 
   Future<void> _showDeleteDialog(CalendarCell? cell) async {

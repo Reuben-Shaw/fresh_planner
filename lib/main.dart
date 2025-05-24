@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fresh_planner/source/database/database_calendar.dart';
+import 'package:fresh_planner/source/database/database_ingredients.dart';
+import 'package:fresh_planner/source/database/database_user.dart';
 import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/pages/calendar/calendar_page.dart';
 import 'package:fresh_planner/ui/pages/login_page.dart';
@@ -21,7 +24,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       //home: IngredientsPage(user: User(email: "replythisnot@outlook.com", username: "testUser", uid: "wdmdDZ4loXbuJyqPzAoq")),
-      home: LoginPage(title: "")
+      home: LoginPage(title: "", userDB: DatabaseUser(), ingredientDB: DatabaseIngredients(), calendarDB: DatabaseCalendar(),)
     );
   }
 }

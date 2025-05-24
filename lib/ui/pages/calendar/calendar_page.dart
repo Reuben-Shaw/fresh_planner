@@ -307,6 +307,7 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: Key("calendar_page"),
       body: SafeArea(
         child: Stack(
           children: <Widget>[

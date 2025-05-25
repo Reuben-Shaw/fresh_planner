@@ -1,33 +1,98 @@
-// import 'package:flutter/material.dart' hide TimeOfDay;
-// import 'package:flutter_test/flutter_test.dart';
-// import 'package:fresh_planner/main.dart';
-// import 'package:fresh_planner/source/enums/time_of_day.dart';
-// import 'package:fresh_planner/source/objects/meal.dart';
-// import 'package:fresh_planner/source/objects/recipe.dart';
+import 'package:flutter/material.dart' hide TimeOfDay;
+import 'package:flutter_test/flutter_test.dart';
+import 'package:fresh_planner/main.dart';
+import 'package:fresh_planner/source/enums/ingredient_food_type.dart';
+import 'package:fresh_planner/source/enums/ingredient_metric.dart';
+import 'package:fresh_planner/source/enums/time_of_day.dart';
+import 'package:fresh_planner/source/objects/ingredient.dart';
+import 'package:fresh_planner/source/objects/meal.dart';
+import 'package:fresh_planner/source/objects/recipe.dart';
+import 'package:fresh_planner/source/objects/user.dart';
+import 'package:fresh_planner/ui/pages/login_page.dart';
+import 'package:fresh_planner/ui/pages/shared/add_ingredient_page.dart';
+import '../database/database_calendar_test.dart';
+import '../database/database_ingredients_test.dart';
 
-// void main() {
-  
-//   // test("Check if meal sorting works", () {
-//   //   final r1 = Recipe(name: "TestRecipe1", ingredients: [], colour: Colors.red);
-//   //   final r2 = Recipe(name: "TestRecipe2", ingredients: [], colour: Colors.red);
-//   //   final r3 = Recipe(name: "TestRecipe3", ingredients: [], colour: Colors.red);
-//   //   final r4 = Recipe(name: "TestRecipe4", ingredients: [], colour: Colors.red);
-//   //   final r5 = Recipe(name: "TestRecipe5", ingredients: [], colour: Colors.red);
+void main() {
+  late Widget testPage;
 
-//   //   final m1 = Meal(recipe: r1, time: TimeOfDay.lunch, day: DateTime(2025, 5, 7));
-//   //   final m2 = Meal(recipe: r2, time: TimeOfDay.lunch, repeatFromOtherWeek: DateTime(2025, 3, 2));
-//   //   final m3 = Meal(recipe: r3, time: TimeOfDay.lunch, day: DateTime(2025, 5, 3));
-//   //   final m4 = Meal(recipe: r4, time: TimeOfDay.lunch, repeatFromWeek: 6);
-//   //   final m5 = Meal(recipe: r5, time: TimeOfDay.lunch, repeatFromDay: 27);
-//   //   final List<Meal> meals = [m1, m2, m3, m4, m5,];
+  setUp(() {
+    testPage = MaterialApp(
+      home: AddIngredientPage(
+        user: User(email: "correctemail@test.com", username: "testUser", uid: "testID"),
+        ingredients: [],
+        ingredientDB: DatabaseIngredientsTest(),
+      ),
+    );
+  });
 
-//   //   expect(meals, [m1, m2, m3, m4, m5]);
-//   //   meals.sort();
+  testWidgets("Empty Input", (tester) async {
+    await tester.pumpWidget(testPage); 
 
-//   //   expect(meals, [m4, m2, m5, m3, m1]);
+    await tester.tap(find.byKey(Key("add_button")));
+    await tester.pump();
+    expect(find.text("Ensure all required values are filled"), findsOneWidget);
+  });
 
-//   //   for (Meal m in meals) {
-//   //     printOnFailure(m.recipe.name);
-//   //   }
-//   // });
-// }
+  testWidgets("Ensures ingredient is correctly created", (tester) async {
+    Ingredient? ingredient;
+
+    await tester.pumpWidget(MaterialApp(
+      home: Builder(
+        builder: (context) {
+          return Scaffold(
+            body: ElevatedButton(
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => testPage),
+                );
+                if (result is! Ingredient) {
+                  debugPrint("Not Ingredient");
+                  return;
+                } 
+                ingredient = result;
+                debugPrint("Popped with $result");
+                final expectedReturn = Ingredient(
+                  id: "testID",
+                  name: "testingredient",
+                  metric: IngredientMetric.grams,
+                  cost: 3,
+                  amount: 1,
+                  type: IngredientType.herbSpice,
+                );
+
+                expect(result, isNotNull);
+                expect(ingredient, equals(expectedReturn));
+              },
+              child: Text("Open Login"),
+            ),
+          );
+        },
+      ),
+    ));
+
+    await tester.tap(find.text("Open Login"));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byKey(Key("name_textfield")), "testIngredient");
+
+    final metricDropdown = find.byKey(const ValueKey("metric_dropdown"));
+    await tester.tap(metricDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text("   Grams").last);
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byKey(Key("cost_textfield")), "3");
+    await tester.enterText(find.byKey(Key("amount_textfield")), "1");
+
+    final typeDropdown = find.byKey(const ValueKey("type_dropdown"));
+    await tester.tap(typeDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text("   Herbs & Spices").last);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(Key("add_button")));
+    await tester.pumpAndSettle();
+  });
+}

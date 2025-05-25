@@ -12,10 +12,10 @@ import '../database/database_ingredients_test.dart';
 import '../database/database_user_test.dart';
 
 void main() {
-  late Widget testWidget;
+  late Widget testPage;
 
   setUp(() {
-    testWidget = MaterialApp(
+    testPage = MaterialApp(
       home: LoginPage(
         title: "Fresh Planner Test",
         userDB: DatabaseUserTest(),
@@ -26,14 +26,14 @@ void main() {
   });
   
   testWidgets("Test Blank Input", (tester) async {   
-    await tester.pumpWidget(testWidget); 
+    await tester.pumpWidget(testPage); 
     await tester.tap(find.byKey(Key("login_button")));
     await tester.pump();
     expect(find.text("Please ensure all data is filled"), findsOneWidget);
   });
 
   testWidgets("Test Wrong Input", (tester) async {
-    await tester.pumpWidget(testWidget); 
+    await tester.pumpWidget(testPage); 
     
     await tester.enterText(find.byKey(Key("email_textfield")), "wrongemail@test.com");
     await tester.enterText(find.byKey(Key("password_textfield")), "wrongpassword");
@@ -43,7 +43,7 @@ void main() {
   });
 
   testWidgets("Test Correct Input", (tester) async {
-    await tester.pumpWidget(testWidget); 
+    await tester.pumpWidget(testPage); 
     
     await tester.enterText(find.byKey(Key("email_textfield")), "correctemail@test.com");
     await tester.enterText(find.byKey(Key("password_textfield")), "correctPassword");
@@ -57,7 +57,7 @@ void main() {
   });
 
   testWidgets("Test Signup With Existing Email", (tester) async {
-    await tester.pumpWidget(testWidget); 
+    await tester.pumpWidget(testPage); 
     
     await tester.tap(find.byKey(Key("register_text")));
     await tester.pump();
@@ -72,7 +72,7 @@ void main() {
   });
 
   testWidgets("Test Signup With Non-Matching Passwords", (tester) async {
-    await tester.pumpWidget(testWidget); 
+    await tester.pumpWidget(testPage); 
     
     await tester.tap(find.byKey(Key("register_text")));
     await tester.pump();

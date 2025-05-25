@@ -114,16 +114,19 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
       metric: _metricDropdownValue!,
       type: _typeDropdownValue != IngredientType.misc ? _typeDropdownValue : null,
     );
-
     _isLoading = true;
+    debugPrint("debug 1");
     (bool, String?) response = await widget.ingredientDB.addIngredient(widget.user.uid!, ingredient);
+    debugPrint("debug 2");
     if (!response.$1 || !mounted) {
+      debugPrint("debug 3");
       errorText = "Internal server error, please try again";
       _isLoading = false;
       return;
     }
     ingredient.id = response.$2;
 
+    debugPrint("adding is done with $ingredient");
     Navigator.pop(context, ingredient,); 
   }
 
@@ -164,6 +167,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                           Container(
                             decoration: AppTextFieldStyles.dropShadow,
                             child: TextField(
+                              key: Key("name_textfield"),
                               controller: _nameController,
                               decoration: AppTextFieldStyles.primaryStyle("name*"),
                             ),
@@ -172,6 +176,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                           Container(
                             decoration: AppTextFieldStyles.dropShadowWithColour,
                             child: DropdownButton(
+                              key: Key("metric_dropdown"),
                               items: IngredientMetric.values.map((type) {
                                 return DropdownMenuItem<IngredientMetric>(
                                   value: type,
@@ -206,6 +211,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                                 child: Container(
                                   decoration: AppTextFieldStyles.dropShadow,
                                   child: TextField(
+                                    key: Key("cost_textfield"),
                                     controller: _costController,
                                     keyboardType: TextInputType.numberWithOptions(decimal: true),
                                     decoration: AppTextFieldStyles.primaryStyle("cost"),
@@ -218,6 +224,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                                 child: Container(
                                   decoration: AppTextFieldStyles.dropShadow,
                                   child: TextField(
+                                    key: Key("amount_textfield"),
                                     controller: _costAmountController,
                                     keyboardType: TextInputType.number,
                                     decoration: _costAmountHint,
@@ -239,6 +246,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                           Container(
                             decoration: AppTextFieldStyles.dropShadowWithColour,
                             child: DropdownButton(
+                              key: Key("type_dropdown"),
                               items: IngredientType.values.map((type) {
                                 return DropdownMenuItem<IngredientType>(
                                   value: type,
@@ -271,6 +279,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                               Container(
                                 decoration: AppButtonStyles.circularShadow,
                                 child: ElevatedButton(
+                                  key: Key("add_button"),
                                   onPressed: addIngredient,
                                   style: AppButtonStyles.mainBackStyle,
                                   child: Text(

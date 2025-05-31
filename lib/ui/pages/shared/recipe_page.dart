@@ -128,7 +128,6 @@ Widget build(BuildContext context) {
                       SizedBox(height: 5),
                       Text("*must be included", style: AppTextStyles.subTitle),
                       SizedBox(height: 20),
-
                       Container(
                         decoration: AppTextFieldStyles.dropShadow,
                         child: TextField(

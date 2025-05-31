@@ -10,6 +10,7 @@ import 'package:fresh_planner/ui/pages/shared/recipe_page.dart';
 import 'package:fresh_planner/ui/styles.dart';
 import 'package:fresh_planner/ui/widgets/loading_screen.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AddMealPage extends StatefulWidget {
   const AddMealPage({super.key, required this.user, required this.ingredients, required this.recipes, required this.calendarDB, required this.day, required this.time});
@@ -136,6 +137,7 @@ class _AddMealPageState extends State<AddMealPage> {
                               ),
                             ],
                           ),
+                          SizedBox(height: 10,),
                           Row(
                             children: <Widget>[
                               Expanded(
@@ -159,6 +161,7 @@ class _AddMealPageState extends State<AddMealPage> {
                                   ),
                                 ),
                               ),
+                              SizedBox(width: 5,),
                               IconButton(
                                 onPressed: () async {
                                   _isLoading = true;
@@ -184,8 +187,15 @@ class _AddMealPageState extends State<AddMealPage> {
                               ),
                             ],
                           ),
-                          Container(
-                            color: Color(0xFFd7f1e0),
+                          SizedBox(height: 15,),
+                          DecoratedBox(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.transparent,
+                              ),
+                              color: Color(0xFFd7f1e0),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 8.0),
                               child: Column(
@@ -218,12 +228,18 @@ class _AddMealPageState extends State<AddMealPage> {
                                         SizedBox(height: 5,),
                                         Padding(
                                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                          child: Text(
-                                            _recipeDropdownValue?.link ?? "",
-                                            style: TextStyle(
-                                              color: Color(0xFF3873CD),
-                                              decoration: TextDecoration.underline,
+                                          child: InkWell(
+                                            child: Text(
+                                              _recipeDropdownValue?.link ?? "",
+                                              style: TextStyle(
+                                                color: Color(0xFF3873CD),
+                                                decoration: TextDecoration.underline,
+                                              ),
                                             ),
+                                            onTap: () async {
+                                              if (_recipeDropdownValue?.link == null) return; 
+                                              await launchUrl(Uri.parse(_recipeDropdownValue!.link!));
+                                            },
                                           ),
                                         ),
                                       ],
@@ -397,21 +413,28 @@ class _AddMealPageState extends State<AddMealPage> {
     );
   }
 
-  Widget _ingredientListView(bool isExpanded) { 
-    return SizedBox(
-      height: isExpanded ? null : 120,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        physics: NeverScrollableScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            ..._recipeDropdownValue?.ingredients.map((i) => 
-                Text("• ${i.name}"),
-              ).toList() ?? [],
-            SizedBox(height: 10,),
-          ],
-        ),
+  Widget _ingredientListView(bool isExpanded) {
+    return isExpanded
+      ? _buildIngredientList()
+      : ConstrainedBox(
+        constraints: BoxConstraints(
+        maxHeight: 120,
+      ),
+      child: _buildIngredientList(),
+    );
+  }
+
+  Widget _buildIngredientList() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          ..._recipeDropdownValue?.ingredients.map((i) => 
+            Text("• ${i.name}"),
+          ).toList() ?? [],
+          SizedBox(height: 10),
+        ],
       ),
     );
   }

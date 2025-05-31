@@ -188,97 +188,100 @@ class _AddMealPageState extends State<AddMealPage> {
                             ],
                           ),
                           SizedBox(height: 15,),
-                          DecoratedBox(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.transparent,
+                          Container(
+                            decoration: AppTextFieldStyles.dropShadow,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.transparent,
+                                ),
+                                color: Color(0xFFd7f1e0),
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              color: Color(0xFFd7f1e0),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Column(
-                                children: <Widget>[
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: <Widget>[
-                                      Text(
-                                        _recipeDropdownValue?.name ?? "",
-                                        style: AppTextStyles.innerTitle,
-                                      ),
-                                      IconButton(
-                                        onPressed: (){}, 
-                                        icon: Icon(
-                                          Icons.edit_square,
-                                          color: Color(0xFF26693C),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Visibility(
-                                    visible: _recipeDropdownValue?.link != null,
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Column(
+                                  children: <Widget>[
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: <Widget>[
                                         Text(
-                                          "Link to Recipe:",
-                                          style: AppTextStyles.largerBold,
+                                          _recipeDropdownValue?.name ?? "",
+                                          style: AppTextStyles.innerTitle,
                                         ),
-                                        SizedBox(height: 5,),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                          child: InkWell(
-                                            child: Text(
-                                              _recipeDropdownValue?.link ?? "",
-                                              style: TextStyle(
-                                                color: Color(0xFF3873CD),
-                                                decoration: TextDecoration.underline,
-                                              ),
-                                            ),
-                                            onTap: () async {
-                                              if (_recipeDropdownValue?.link == null) return; 
-                                              await launchUrl(Uri.parse(_recipeDropdownValue!.link!));
-                                            },
+                                        IconButton(
+                                          onPressed: (){}, 
+                                          icon: Icon(
+                                            Icons.edit_square,
+                                            color: Color(0xFF26693C),
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                  SizedBox(height: 10,),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: <Widget>[
-                                      Flexible(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text(
-                                              _recipeDropdownValue == null ? "" : "Ingredients:",
-                                              style: AppTextStyles.largerBold,
-                                            ),
-                                            SizedBox(height: 5,),
-                                            _ingredientListView(_isExpanded)
-                                          ],
-                                        ),
-                                      ),
-                                      Column(
+                                    Visibility(
+                                      visible: _recipeDropdownValue?.link != null,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: <Widget>[
-                                          IconButton(
-                                            onPressed: () {
-                                              _isExpanded = !_isExpanded;
-                                            }, 
-                                            icon: Icon(
-                                              _isExpanded ? Icons.fullscreen_exit : Icons.fullscreen,
-                                              color: Color(0xFF26693C),
+                                          Text(
+                                            "Link to Recipe:",
+                                            style: AppTextStyles.largerBold,
+                                          ),
+                                          SizedBox(height: 5,),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                            child: InkWell(
+                                              child: Text(
+                                                _recipeDropdownValue?.link ?? "",
+                                                style: TextStyle(
+                                                  color: Color(0xFF3873CD),
+                                                  decoration: TextDecoration.underline,
+                                                ),
+                                              ),
+                                              onTap: () async {
+                                                if (_recipeDropdownValue?.link == null) return; 
+                                                await launchUrl(Uri.parse(_recipeDropdownValue!.link!));
+                                              },
                                             ),
                                           ),
                                         ],
                                       ),
-                                    ],
-                                  ),
-                                ],
+                                    ),
+                                    SizedBox(height: 10,),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: <Widget>[
+                                        Flexible(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                              Text(
+                                                _recipeDropdownValue == null ? "" : "Ingredients:",
+                                                style: AppTextStyles.largerBold,
+                                              ),
+                                              SizedBox(height: 5,),
+                                              _ingredientListView(_isExpanded)
+                                            ],
+                                          ),
+                                        ),
+                                        Column(
+                                          children: <Widget>[
+                                            IconButton(
+                                              onPressed: () {
+                                                _isExpanded = !_isExpanded;
+                                              }, 
+                                              icon: Icon(
+                                                _isExpanded ? Icons.fullscreen_exit : Icons.fullscreen,
+                                                color: Color(0xFF26693C),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),

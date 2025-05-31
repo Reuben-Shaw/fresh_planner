@@ -294,26 +294,55 @@ class _IngredientsPageState extends State<IngredientsPage> {
                               },
                               child: Row(
                                 children: <Widget>[
-                                  Text("Amount: "),
-                                  Text(_selectedIngredient == null ? "0" : _selectedIngredient!.amount.toString()),
-                                  Text(_selectedIngredient == null ? "" : _selectedIngredient!.metric.metricSymbol),
+                                  Text("Amount: ", style: AppTextStyles.largerBold,),
+                                  Text(
+                                    _selectedIngredient == null ? "0" : _selectedIngredient!.amount.toString(), 
+                                    style: TextStyle(
+                                      fontSize: 26,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF26693C),
+                                    ),
+                                  ),
+                                  Stack(
+                                    children: <Widget>[
+                                      Column(
+                                        children: [
+                                          Icon(
+                                            Icons.arrow_drop_up_rounded,
+                                          ),
+                                          SizedBox(height: 8,),
+                                        ],
+                                      ),
+                                      Column(
+                                        children: [
+                                          SizedBox(height: 8,),
+                                          Icon(
+                                            Icons.arrow_drop_down_rounded,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  Text(_selectedIngredient == null ? "" : _selectedIngredient!.metric.metricSymbol, style: AppTextStyles.standardBold),
                                 ],
                               ),
                             ),
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.pop(context, _selectedIngredient,); 
-                              }, 
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
-                                foregroundColor: WidgetStateProperty.all<Color>(Colors.black),
-                              ),
-                              child: Text(
-                                "Select",
+                            Container(
+                              decoration: AppButtonStyles.curvedShadow,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context, _selectedIngredient,); 
+                                }, 
+                                style: AppButtonStyles.mainBackStyle,
+                                child: Text(
+                                  " Select ",
+                                  style: AppButtonStyles.mainTextStyle,
+                                ),
                               ),
                             ),
                           ],
                         ),
+                        SizedBox(height: 15,),
                       ],
                     ),
                   ),

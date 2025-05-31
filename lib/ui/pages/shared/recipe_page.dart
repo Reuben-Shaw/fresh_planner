@@ -165,6 +165,7 @@ Widget build(BuildContext context) {
                       GestureDetector(
                         onTap: () async {
                           _isLoading = true;
+                          await Future.delayed(Duration(milliseconds: 50));
                           final result = await Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => IngredientsPage(user: widget.user, ingredients: widget.ingredients)),
@@ -180,20 +181,24 @@ Widget build(BuildContext context) {
                             _ingredientCards.sort();
                           });
                         },
-                        child: Text("+ Select Ingredient", style: AppTextStyles.largerBold),
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Text("Cost of Recipe: ", style: AppTextStyles.largerBold),
-                          Text(
-                            NumberFormat.currency(locale: "en_UK", symbol: "£").format(
-                              Recipe.calcCost(_ingredientCards.map((card) => card.ingredient).toList())
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text("+ Select Ingredient", style: AppTextStyles.largerBold),
+                            Row(
+                              children: <Widget>[
+                                Text("Cost of Recipe: ", style: AppTextStyles.largerBold),
+                                Text(
+                                  NumberFormat.currency(locale: "en_UK", symbol: "£").format(
+                                    Recipe.calcCost(_ingredientCards.map((card) => card.ingredient).toList())
+                                  ),
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF26693C)),
+                                ),
+                              ],
                             ),
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF26693C)),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-
                       SizedBox(height: 20), // spacing before the static footer
                     ],
                   ),

@@ -184,7 +184,20 @@ Widget build(BuildContext context) {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text("+ Select Ingredient", style: AppTextStyles.largerBold),
+                            Row(
+                              children: <Widget>[
+                                Text(
+                                  "+ ", 
+                                  style: TextStyle(
+                                    fontSize: 18, 
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF26693C),
+                                    height: 1,
+                                  ),
+                                ),
+                                Text("Select Ingredient", style: AppTextStyles.largerBold),
+                              ],
+                            ),
                             Row(
                               children: <Widget>[
                                 Text("Cost of Recipe: ", style: AppTextStyles.largerBold),
@@ -192,7 +205,7 @@ Widget build(BuildContext context) {
                                   NumberFormat.currency(locale: "en_UK", symbol: "£").format(
                                     Recipe.calcCost(_ingredientCards.map((card) => card.ingredient).toList())
                                   ),
-                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF26693C)),
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF26693C),),
                                 ),
                               ],
                             ),

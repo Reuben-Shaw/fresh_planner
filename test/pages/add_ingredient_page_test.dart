@@ -34,6 +34,54 @@ void main() {
     expect(find.text("Ensure all required values are filled"), findsOneWidget);
   });
 
+  testWidgets("Empty Amount Filled Cost", (tester) async {
+    await tester.pumpWidget(testPage); 
+
+    await tester.enterText(find.byKey(Key("name_textfield")), "testIngredient");
+
+    final metricDropdown = find.byKey(const ValueKey("metric_dropdown"));
+    await tester.tap(metricDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text("   Grams").last);
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byKey(Key("cost_textfield")), "3");
+
+    await tester.tap(find.byKey(Key("add_button")));
+    await tester.pump();
+
+    expect(find.text("Please ensure an amount per cost is provided"), findsOneWidget);
+  });
+
+  testWidgets("Metric Updates Symbol", (tester) async {
+    await tester.pumpWidget(testPage); 
+
+    final metricDropdown = find.byKey(const ValueKey("metric_dropdown"));
+    await tester.tap(metricDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text("   Grams").last);
+    await tester.pumpAndSettle();
+    expect(find.text("g"), findsOneWidget);
+
+    await tester.tap(metricDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text("   Items").last);
+    await tester.pumpAndSettle();
+    expect(find.text("item"), findsNothing);
+
+    await tester.tap(metricDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text("   Milliliters").last);
+    await tester.pumpAndSettle();
+    expect(find.text("ml"), findsOneWidget);
+
+    await tester.tap(metricDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text("   Percentage").last);
+    await tester.pumpAndSettle();
+    expect(find.text("%"), findsOneWidget);
+  });
+
   testWidgets("Ensures ingredient is correctly created", (tester) async {
     Ingredient? ingredient;
 

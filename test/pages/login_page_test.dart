@@ -85,4 +85,19 @@ void main() {
     await tester.pump();
     expect(find.text("Please ensure passwords match"), findsOneWidget);
   });
+
+  testWidgets("Test Signup Correct", (tester) async {
+    await tester.pumpWidget(testPage); 
+    
+    await tester.tap(find.byKey(Key("register_text")));
+    await tester.pump();
+    await tester.enterText(find.byKey(Key("email_textfield")), "validemail@test.com");
+    await tester.enterText(find.byKey(Key("username_textfield")), "testUser");
+    await tester.enterText(find.byKey(Key("password_textfield")), "password");
+    await tester.enterText(find.byKey(Key("reenter_password_textfield")), "password");
+    await tester.pump();
+    await tester.tap(find.byKey(Key("login_button")));
+    await tester.pump();
+    expect(find.text(""), findsOneWidget);
+  });
 }

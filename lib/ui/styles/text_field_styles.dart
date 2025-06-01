@@ -41,4 +41,17 @@ class AppTextFieldStyles {
       ),
     ],
   );
+
+  static BoxDecoration altDropShadowWithColour = BoxDecoration(
+    color: Color(0xFF399E5A),
+    borderRadius: BorderRadius.all(Radius.circular(10)),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withValues(alpha: 0.25),
+        spreadRadius: 0,
+        blurRadius: 4,
+        offset: Offset(0, 4),
+      ),
+    ],
+  );
 }

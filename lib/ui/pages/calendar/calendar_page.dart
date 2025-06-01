@@ -171,19 +171,8 @@ class _CalendarPageState extends State<CalendarPage> {
 
     cellMap.forEach((key, value) {
       final gestureCell = GestureDetector(
-        onTap:() async {
-          _isLoading = true;
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddMealPage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, calendarDB: widget.calendarDB, day: key, time: _timeOfDay,)),
-          );
-          _isLoading = false;
-          if (result is! Meal) return;
-          setState(() {
-            widget.meals[result.time]!.add(result);
-            widget.meals[result.time]!.sort();
-            _createCalendar();
-          });
+        onTap: () async {
+          await _onCellClick(key, value);
         }, 
         onLongPress: () async {
           await _showDeleteDialog(value);
@@ -209,6 +198,27 @@ class _CalendarPageState extends State<CalendarPage> {
 
   int britishWeekday(DateTime date) {
     return (date.weekday + 6) % 7;
+  }
+
+  Future<void> _onCellClick(DateTime day, CalendarCell? cell) async {
+    _isLoading = true;
+    Meal? meal = cell?.meal;
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddMealPage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, calendarDB: widget.calendarDB, day: day, time: _timeOfDay, currentMeal: meal,)),
+    );
+    _isLoading = false;
+    if (result is Meal) {
+      setState(() {
+        widget.meals[result.time]!.add(result);
+        widget.meals[result.time]!.sort();
+        _createCalendar();
+      });
+    } else if (result is String && result == "delete") {
+      widget.meals[_timeOfDay]!.remove(cell!.meal!);
+      widget.meals[_timeOfDay]!.sort();
+      _createCalendar();
+    }
   }
 
   DateTime getFirstInstanceOfDay(int dayOfWeek, int monthStartDay, int priorYear, int priorMonth, int priorMonthLength) {

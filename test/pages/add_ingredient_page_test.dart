@@ -82,7 +82,7 @@ void main() {
     expect(find.text("%"), findsOneWidget);
   });
 
-  testWidgets("Ensures ingredient is correctly created", (tester) async {
+  testWidgets("Ensures Ingredient is Correctly Created", (tester) async {
     Ingredient? ingredient;
 
     await tester.pumpWidget(MaterialApp(

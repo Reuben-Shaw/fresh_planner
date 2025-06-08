@@ -1,10 +1,7 @@
-import 'dart:math';
 import 'package:fresh_planner/source/database/database_calendar.dart';
 import 'package:fresh_planner/source/enums/time_of_day.dart';
-import 'package:fresh_planner/source/objects/ingredient.dart';
 import 'package:fresh_planner/source/objects/meal.dart';
 import 'package:fresh_planner/source/objects/recipe.dart';
-import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/pages/calendar/add_meal_page.dart';
 import 'package:fresh_planner/ui/pages/parent_page.dart';
 import 'package:fresh_planner/ui/widgets/loading_screen.dart';
@@ -25,7 +22,7 @@ class CalendarPage extends ParentPage {
 }
 
 class _CalendarPageState extends State<CalendarPage> { 
-  DateTime currentDate = DateTime.now();
+  DateTime currentDate = DateTime.now().toUtc();
 	int currentDay = 1;
 	int currentMonth = 1;
 	int currentYear = 1970;
@@ -48,6 +45,8 @@ class _CalendarPageState extends State<CalendarPage> {
 
   final GlobalKey<TooltipState> tooltipkey = GlobalKey<TooltipState>();
 
+  DateTime _normalizeUtc(DateTime dt) => DateTime.utc(dt.year, dt.month, dt.day,);
+  
   @override
   void initState() {
     super.initState();
@@ -75,9 +74,7 @@ class _CalendarPageState extends State<CalendarPage> {
     debugPrint("Time Of Day is $_timeOfDay");
   }
 
-  DateTime _normalizeLocal(DateTime dt) => DateTime(dt.year, dt.month, dt.hour != 23 ? dt.day : dt.day + 1,);
   List<GestureDetector> _createCalendar() {
-    debugPrint("\n\n\n\n\n\n======$currentMonth======");
     final List<GestureDetector> cells = [];
 
     final int monthStartDay;
@@ -89,7 +86,7 @@ class _CalendarPageState extends State<CalendarPage> {
 		int nextYear = currentYear;
 		final int priorMonthLength;
 
-    monthStartDay = britishWeekday(DateTime(currentYear, currentMonth, 1));
+    monthStartDay = britishWeekday(DateTime.utc(currentYear, currentMonth, 1));
     monthLength = getDaysInMonth(currentYear, currentMonth);
 
     if (currentMonth == 1) {
@@ -112,39 +109,33 @@ class _CalendarPageState extends State<CalendarPage> {
 
 				// Logic for adding the days before the start of the month
 				if (offsetIndex < monthStartDay + 1) {
-          final day = DateTime(priorYear, priorMonth, priorMonthLength - monthStartDay + offsetIndex);
+          final day = DateTime.utc(priorYear, priorMonth, priorMonthLength - monthStartDay + offsetIndex);
 					cellMap[day] = CalendarCell(date: day);
 				}
 				// Logic for adding the days after the end of the month
 				else if (offsetIndex > monthLength + monthStartDay) {
-          final day = DateTime(nextYear, nextMonth, offsetIndex - (monthLength + monthStartDay));
+          final day = DateTime.utc(nextYear, nextMonth, offsetIndex - (monthLength + monthStartDay));
 					cellMap[day] = CalendarCell(date: day);
           numberAfterAdded++;
 				}
 				// Logic for adding days in the month
 				else {
-          final day = DateTime(currentYear, currentMonth, offsetIndex - monthStartDay);
+          final day = DateTime.utc(currentYear, currentMonth, offsetIndex - monthStartDay);
 					cellMap[day] = CalendarCell(date: day, isCurrentDay: day == currentDate,);
 				}
 			}
 		}
-    debugPrint("cellMap length after for: ${cellMap.length} with ${cellMap.keys.last} as last");
 
     for (Meal m in widget.meals[_timeOfDay]!) {
       if (m.isRepeatingWeek()) {
-        final startDate = _normalizeLocal(getFirstInstanceOfDay(m.repeatFromWeek!, cellMap)); 
+        final startDate = getFirstInstanceOfDay(m.repeatFromWeek!, cellMap); 
         for(int i = 0; i < 6; i++) {
-          final newDate = _normalizeLocal(startDate.add(Duration(days: i * 7)));
+          final newDate = startDate.add(Duration(days: i * 7));
           cellMap[newDate] = CalendarCell(date: newDate, meal: m,);
-          debugPrint("cellMap length after: ${cellMap.length}");
         }
       }
       else if (m.isRepeatingOtherWeek()) {
         final firstInstanceOfDay = getFirstInstanceOfDay(britishWeekday(m.repeatFromOtherWeek!), cellMap);
-        debugPrint("${m.recipe.name} - First instace of day: $firstInstanceOfDay with ${britishWeekday(m.repeatFromOtherWeek!)}");
-
-        debugPrint("${m.repeatFromOtherWeek!}.difference($firstInstanceOfDay).inDays.abs() = ${m.repeatFromOtherWeek!.difference(firstInstanceOfDay).inDays.abs()}");
-        debugPrint("offset = ${(m.repeatFromOtherWeek!.difference(firstInstanceOfDay).inDays.abs()) % 14}");
         int difference = m.repeatFromOtherWeek!.difference(firstInstanceOfDay).inDays.abs();
         // Adding 1 to account for passing through daylight savings
         if (difference % 7 != 0) difference++;
@@ -152,27 +143,20 @@ class _CalendarPageState extends State<CalendarPage> {
 
         for(int i = 0; i < 3; i++)
         {
-          debugPrint("$firstInstanceOfDay + (($i * 14 = ${i * 14}) + $offset = ${(i * 14) + offset}) = ${addDays(firstInstanceOfDay, (i * 14) + offset)}");
-          final newDate = addDays(firstInstanceOfDay, (i * 14) + offset);
-          // debugPrint("$newDate is before ${cellMap.keys.last} == ${newDate.isBefore(cellMap.keys.last)}");
-          // debugPrint("$newDate != ${cellMap.keys.last} == ${newDate != cellMap.keys.last}");
-          // debugPrint("!newDate.isBefore(cellMap.keys.last) && newDate != cellMap.keys.last = ${!newDate.isBefore(cellMap.keys.last) && newDate != cellMap.keys.last}");
+          final newDate = firstInstanceOfDay.add(Duration(days: (i * 14) + offset));
           if (!newDate.isBefore(cellMap.keys.last) && newDate != cellMap.keys.last) continue;
           cellMap[newDate] = CalendarCell(date: newDate, meal: m,);
-          debugPrint("cellMap length after: ${cellMap.length}");
         }
-        // debugPrint("cellMap length after everything: ${cellMap.length}");
       }
       else if (m.isRepeatingDay()) {
-        final currentDate = DateTime(currentYear, currentMonth, m.repeatFromDay!);
+        final currentDate = DateTime.utc(currentYear, currentMonth, m.repeatFromDay!);
         cellMap[currentDate] = CalendarCell(date: currentDate, meal: m,);
         
-        final priorDate = DateTime(priorYear, priorMonth, m.repeatFromDay!);
+        final priorDate = DateTime.utc(priorYear, priorMonth, m.repeatFromDay!);
         if (cellMap.containsKey(priorDate)) cellMap[priorDate] = CalendarCell(date: priorDate, meal: m,);
 
-        final nextDate = DateTime(nextYear, nextMonth, m.repeatFromDay!);
+        final nextDate = DateTime.utc(nextYear, nextMonth, m.repeatFromDay!);
         if (cellMap.containsKey(nextDate)) cellMap[nextDate] = CalendarCell(date: nextDate, meal: m,);
-        debugPrint("cellMap length after: ${cellMap.length}");
       }
       else if (m.isSingleDay() && m.day!.month == currentMonth && m.day!.year == currentYear) {
         cellMap[m.day!] = CalendarCell(date: m.day!, meal: m,);
@@ -203,8 +187,8 @@ class _CalendarPageState extends State<CalendarPage> {
 
   int getDaysInMonth(int year, int month) {
     final firstDayOfNextMonth = (month < 12)
-        ? DateTime(year, month + 1, 1)
-        : DateTime(year + 1, 1, 1);
+        ? DateTime.utc(year, month + 1, 1)
+        : DateTime.utc(year + 1, 1, 1);
     return firstDayOfNextMonth.subtract(const Duration(days: 1)).day;
   }
 
@@ -240,7 +224,7 @@ class _CalendarPageState extends State<CalendarPage> {
   void setCostForNextSevenDays(Map<DateTime, CalendarCell?> cellMap) {
     double upcomingCost = 0;
     for (int i = 0; i < 7; i++) {
-      DateTime dateCheck = DateTime(currentDate.year, currentDate.month, currentDate.day + i);
+      DateTime dateCheck = DateTime.utc(currentDate.year, currentDate.month, currentDate.day + i);
       if (cellMap.containsKey(dateCheck)) {
         upcomingCost += cellMap[dateCheck]?.meal?.cost() ?? 0;
       }
@@ -248,40 +232,6 @@ class _CalendarPageState extends State<CalendarPage> {
     setState(() {
       _upcomingCost = upcomingCost;
     });
-  }
-
-  DateTime addDays(DateTime startDate, int numberOfDays) {
-    final targetDate = startDate.add(Duration(days: numberOfDays));
-
-    // Ensure the calendar day matches what we expect (in case DST pushes us into previous/next day)
-    if (targetDate.day != startDate.day + (numberOfDays % 31)) {
-      return DateTime(
-        targetDate.year,
-        targetDate.month,
-        targetDate.day,
-        startDate.hour,
-        startDate.minute,
-        startDate.second,
-        startDate.millisecond,
-        startDate.microsecond,
-      );
-    }
-
-    // Also correct time if the hour changed due to DST
-    if (targetDate.hour != startDate.hour) {
-      return DateTime(
-        targetDate.year,
-        targetDate.month,
-        targetDate.day,
-        startDate.hour,
-        startDate.minute,
-        startDate.second,
-        startDate.millisecond,
-        startDate.microsecond,
-      );
-    }
-
-    return targetDate;
   }
 
   Future<void> _showDeleteDialog(CalendarCell? cell) async {

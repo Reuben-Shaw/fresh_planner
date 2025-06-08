@@ -48,7 +48,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
   final GlobalKey<TooltipState> tooltipkey = GlobalKey<TooltipState>();
 
-  CalendarCell _cloneCell(CalendarCell? c, Meal m, DateTime d) => CalendarCell(date: d, meal: m, isCurrentDay: c!.isCurrentDay, isPassed: c.isPassed,);
+  CalendarCell _cloneCell(CalendarCell? c, Meal m, DateTime d) => CalendarCell(date: d, meal: m, isCurrentDay: c!.isCurrentDay, isPassed: c.isPassed, isFaded: c.isFaded,);
   
   @override
   void initState() {
@@ -117,18 +117,23 @@ class _CalendarPageState extends State<CalendarPage> {
 				// Logic for adding the days before the start of the month
 				if (offsetIndex < monthStartDay + 1) {
           final day = DateTime.utc(priorYear, priorMonth, priorMonthLength - monthStartDay + offsetIndex);
-					cellMap[day] = CalendarCell(date: day, isPassed: day.isBefore(currentDate),);
+					cellMap[day] = CalendarCell(date: day, isPassed: day.isBefore(currentDate), isFaded: true,);
 				}
 				// Logic for adding the days after the end of the month
 				else if (offsetIndex > monthLength + monthStartDay) {
           final day = DateTime.utc(nextYear, nextMonth, offsetIndex - (monthLength + monthStartDay));
-					cellMap[day] = CalendarCell(date: day, isPassed: day.isBefore(currentDate),);
+					cellMap[day] = CalendarCell(date: day, isPassed: day.isBefore(currentDate), isFaded: true);
           numberAfterAdded++;
 				}
 				// Logic for adding days in the month
 				else {
           final day = DateTime.utc(currentYear, currentMonth, offsetIndex - monthStartDay);
-					cellMap[day] = CalendarCell(date: day, isCurrentDay: day == currentDate, isPassed: day.isBefore(currentDate),);
+					cellMap[day] = CalendarCell(
+            date: day, 
+            isCurrentDay: day == currentDate, 
+            isPassed: day.isBefore(currentDate), 
+            isFaded: currentMonth == currentDate.month ? day.isBefore(currentDate) : false,
+          );
 				}
 			}
 		}
@@ -446,7 +451,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     key: tooltipkey,
                     triggerMode: TooltipTriggerMode.manual,
                     showDuration: const Duration(seconds: 1),
-                    message: "Price of ${_timeOfDay.standardName.toLowerCase()} for the next 7 days",
+                    message: "Predicted cost of ${_timeOfDay.standardName.toLowerCase()} for the next 7 days",
                     child: Row(
                       children: <Widget>[
                         Padding(

@@ -206,6 +206,7 @@ class _AddMealPageState extends State<AddMealPage> {
                                       widget.recipes.add(result);
                                       widget.recipes.sort();
                                       _selectedRecipe = result;
+                                      _recipeDropdownValue = result;
                                     });
                                   },
                                   style: ButtonStyle(

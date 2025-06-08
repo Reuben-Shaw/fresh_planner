@@ -74,7 +74,8 @@ class _CalendarPageState extends State<CalendarPage> {
     }
     debugPrint("Time Of Day is $_timeOfDay");
   }
-  
+
+  DateTime _normalizeLocal(DateTime dt) => DateTime(dt.year, dt.month, dt.hour != 23 ? dt.day : dt.day + 1,);
   List<GestureDetector> _createCalendar() {
     debugPrint("\n\n\n\n\n\n======$currentMonth======");
     final List<GestureDetector> cells = [];
@@ -127,14 +128,15 @@ class _CalendarPageState extends State<CalendarPage> {
 				}
 			}
 		}
-    // debugPrint("cellMap length after for: ${cellMap.length} with ${cellMap.keys.last} as last");
+    debugPrint("cellMap length after for: ${cellMap.length} with ${cellMap.keys.last} as last");
 
     for (Meal m in widget.meals[_timeOfDay]!) {
       if (m.isRepeatingWeek()) {
-        final startDate = getFirstInstanceOfDay(m.repeatFromWeek!, cellMap); 
+        final startDate = _normalizeLocal(getFirstInstanceOfDay(m.repeatFromWeek!, cellMap)); 
         for(int i = 0; i < 6; i++) {
-          final newDate = startDate.add(Duration(days: i * 7));
+          final newDate = _normalizeLocal(startDate.add(Duration(days: i * 7)));
           cellMap[newDate] = CalendarCell(date: newDate, meal: m,);
+          debugPrint("cellMap length after: ${cellMap.length}");
         }
       }
       else if (m.isRepeatingOtherWeek()) {
@@ -157,7 +159,7 @@ class _CalendarPageState extends State<CalendarPage> {
           // debugPrint("!newDate.isBefore(cellMap.keys.last) && newDate != cellMap.keys.last = ${!newDate.isBefore(cellMap.keys.last) && newDate != cellMap.keys.last}");
           if (!newDate.isBefore(cellMap.keys.last) && newDate != cellMap.keys.last) continue;
           cellMap[newDate] = CalendarCell(date: newDate, meal: m,);
-          // debugPrint("cellMap length after: ${cellMap.length}");
+          debugPrint("cellMap length after: ${cellMap.length}");
         }
         // debugPrint("cellMap length after everything: ${cellMap.length}");
       }
@@ -170,6 +172,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
         final nextDate = DateTime(nextYear, nextMonth, m.repeatFromDay!);
         if (cellMap.containsKey(nextDate)) cellMap[nextDate] = CalendarCell(date: nextDate, meal: m,);
+        debugPrint("cellMap length after: ${cellMap.length}");
       }
       else if (m.isSingleDay() && m.day!.month == currentMonth && m.day!.year == currentYear) {
         cellMap[m.day!] = CalendarCell(date: m.day!, meal: m,);

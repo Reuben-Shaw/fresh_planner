@@ -48,14 +48,14 @@ class _CalendarPageState extends State<CalendarPage> {
 
   final GlobalKey<TooltipState> tooltipkey = GlobalKey<TooltipState>();
 
-  DateTime _normalizeUtc(DateTime dt) => DateTime.utc(dt.year, dt.month, dt.day,);
+  CalendarCell _cloneCell(CalendarCell? c, Meal m, DateTime d) => CalendarCell(date: d, meal: m, isCurrentDay: c!.isCurrentDay, isPassed: c.isPassed,);
   
   @override
   void initState() {
     super.initState();
 
     DateTime time = DateTime.now();
-    DateTime date = DateTime(time.year, time.month, time.day, 0, 0, 0);
+    DateTime date = DateTime.utc(time.year, time.month, time.day, 0, 0, 0);
 
     setState(() {
       currentDate = date;
@@ -64,10 +64,10 @@ class _CalendarPageState extends State<CalendarPage> {
       currentYear = date.year;  
     });
 
-    if (date.add(Duration(hours: 14, minutes: 59)).isBefore(time)) {
+    if (date.toLocal().add(Duration(hours: 14, minutes: 59)).isBefore(time)) {
       debugPrint("Dinner time");
       _timeOfDay = TimeOfDay.dinner;
-    } else if (date.add(Duration(hours: 9, minutes: 59)).isBefore(time)) {
+    } else if (date.toLocal().add(Duration(hours: 9, minutes: 59)).isBefore(time)) {
       debugPrint("Lunch time");
       _timeOfDay = TimeOfDay.lunch;
     } else {
@@ -117,18 +117,18 @@ class _CalendarPageState extends State<CalendarPage> {
 				// Logic for adding the days before the start of the month
 				if (offsetIndex < monthStartDay + 1) {
           final day = DateTime.utc(priorYear, priorMonth, priorMonthLength - monthStartDay + offsetIndex);
-					cellMap[day] = CalendarCell(date: day);
+					cellMap[day] = CalendarCell(date: day, isPassed: day.isBefore(currentDate),);
 				}
 				// Logic for adding the days after the end of the month
 				else if (offsetIndex > monthLength + monthStartDay) {
           final day = DateTime.utc(nextYear, nextMonth, offsetIndex - (monthLength + monthStartDay));
-					cellMap[day] = CalendarCell(date: day);
+					cellMap[day] = CalendarCell(date: day, isPassed: day.isBefore(currentDate),);
           numberAfterAdded++;
 				}
 				// Logic for adding days in the month
 				else {
           final day = DateTime.utc(currentYear, currentMonth, offsetIndex - monthStartDay);
-					cellMap[day] = CalendarCell(date: day, isCurrentDay: day == currentDate,);
+					cellMap[day] = CalendarCell(date: day, isCurrentDay: day == currentDate, isPassed: day.isBefore(currentDate),);
 				}
 			}
 		}
@@ -141,7 +141,7 @@ class _CalendarPageState extends State<CalendarPage> {
         final startDate = getFirstInstanceOfDay(m.repeatFromWeek!, cellMap); 
         for(int i = 0; i < 6; i++) {
           final newDate = startDate.add(Duration(days: i * 7));
-          cellMap[newDate] = CalendarCell(date: newDate, meal: m,);
+          cellMap[newDate] = _cloneCell(cellMap[newDate], m, newDate,);
         }
       }
       else if (m.isRepeatingOtherWeek()) {
@@ -155,21 +155,21 @@ class _CalendarPageState extends State<CalendarPage> {
         {
           final newDate = firstInstanceOfDay.add(Duration(days: (i * 14) + offset));
           if (!newDate.isBefore(cellMap.keys.last) && newDate != cellMap.keys.last) continue;
-          cellMap[newDate] = CalendarCell(date: newDate, meal: m,);
+          cellMap[newDate] = _cloneCell(cellMap[newDate], m, newDate,);
         }
       }
       else if (m.isRepeatingDay()) {
         final currentDate = DateTime.utc(currentYear, currentMonth, m.repeatFromDay!);
-        cellMap[currentDate] = CalendarCell(date: currentDate, meal: m,);
+        cellMap[currentDate] = _cloneCell(cellMap[currentDate], m, currentDate,);
         
         final priorDate = DateTime.utc(priorYear, priorMonth, m.repeatFromDay!);
-        if (cellMap.containsKey(priorDate)) cellMap[priorDate] = CalendarCell(date: priorDate, meal: m,);
+        if (cellMap.containsKey(priorDate)) cellMap[priorDate] = _cloneCell(cellMap[priorDate], m, priorDate,);
 
         final nextDate = DateTime.utc(nextYear, nextMonth, m.repeatFromDay!);
-        if (cellMap.containsKey(nextDate)) cellMap[nextDate] = CalendarCell(date: nextDate, meal: m,);
+        if (cellMap.containsKey(nextDate)) cellMap[nextDate] = _cloneCell(cellMap[nextDate], m, nextDate,);
       }
       else if (m.isSingleDay() && m.day!.isAfter(firstDate) && m.day!.isBefore(lastDate)) {
-        cellMap[m.day!] = CalendarCell(date: m.day!, meal: m,);
+        cellMap[m.day!] = _cloneCell(cellMap[m.day!], m, m.day!,);
       }
     }
 
@@ -209,6 +209,8 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   Future<void> _onCellClick(DateTime day, CalendarCell? cell) async {
+    if (cell?.isPassed ?? true) return;
+    
     _isLoading = true;
     Meal? meal = cell?.meal;
     final result = await Navigator.push(
@@ -438,38 +440,41 @@ class _CalendarPageState extends State<CalendarPage> {
                     ),
                   ),
                 ),
-                Tooltip(
-                  key: tooltipkey,
-                  triggerMode: TooltipTriggerMode.manual,
-                  showDuration: const Duration(seconds: 1),
-                  message: "Price of ${_timeOfDay.standardName.toLowerCase()} for the next 7 days",
-                  child: Row(
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 4.0),
-                      ),
-                      Text(
-                        "Predicted Cost: ",
-                        style: AppTextStyles.largerBold,
-                      ),
-                      Text(
-                        NumberFormat.currency(locale: "en_UK", symbol: "£").format(_upcomingCost),
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold
+                Visibility(
+                  visible: currentMonth == currentDate.month,
+                  child: Tooltip(
+                    key: tooltipkey,
+                    triggerMode: TooltipTriggerMode.manual,
+                    showDuration: const Duration(seconds: 1),
+                    message: "Price of ${_timeOfDay.standardName.toLowerCase()} for the next 7 days",
+                    child: Row(
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 4.0),
                         ),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.help,
-                          color: Color(0xFF26693C),
+                        Text(
+                          "Predicted Cost: ",
+                          style: AppTextStyles.largerBold,
                         ),
-                        onPressed: () {
-                          tooltipkey.currentState?.ensureTooltipVisible();
-                        },
-                      ),
-                    ],
+                        Text(
+                          NumberFormat.currency(locale: "en_UK", symbol: "£").format(_upcomingCost),
+                          style: TextStyle(
+                            color: Color(0xFF26693C),
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.help,
+                            color: Color(0xFF26693C),
+                          ),
+                          onPressed: () {
+                            tooltipkey.currentState?.ensureTooltipVisible();
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

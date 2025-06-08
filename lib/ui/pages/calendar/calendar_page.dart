@@ -144,7 +144,7 @@ class _CalendarPageState extends State<CalendarPage> {
         debugPrint("${m.repeatFromOtherWeek!}.difference($firstInstanceOfDay).inDays.abs() = ${m.repeatFromOtherWeek!.difference(firstInstanceOfDay).inDays.abs()}");
         debugPrint("offset = ${(m.repeatFromOtherWeek!.difference(firstInstanceOfDay).inDays.abs()) % 14}");
         int difference = m.repeatFromOtherWeek!.difference(firstInstanceOfDay).inDays.abs();
-        if (m.repeatFromOtherWeek!.isAfter(firstInstanceOfDay)) difference++;
+        if (difference % 7 != 0) difference++;
         final offset = difference % 14;
 
         for(int i = 0; i < 3; i++)

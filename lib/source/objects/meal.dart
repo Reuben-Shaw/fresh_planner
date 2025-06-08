@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide TimeOfDay;
+import 'package:fresh_planner/source/enums/meal_repetition.dart';
 import 'package:fresh_planner/source/enums/time_of_day.dart';
 import 'package:fresh_planner/source/objects/recipe.dart';
 
@@ -10,6 +11,7 @@ class Meal implements Comparable<Meal> {
   DateTime? repeatFromOtherWeek;
   int? repeatFromDay;
   DateTime? day;
+  bool? cookedFresh;
 
   Meal({
     this.id,
@@ -19,6 +21,7 @@ class Meal implements Comparable<Meal> {
     this.repeatFromOtherWeek,
     this.repeatFromDay,
     this.day,
+    this.cookedFresh,
   });
 
   Map<String, Object?> toMap() {
@@ -29,6 +32,7 @@ class Meal implements Comparable<Meal> {
       'repeatFromOtherWeek': repeatFromOtherWeek?.toIso8601String(),
       'repeatFromDay': repeatFromDay,
       'day': day?.toIso8601String(),
+      'coockedFresh': cookedFresh,
     };
   }
 
@@ -41,6 +45,7 @@ class Meal implements Comparable<Meal> {
       repeatFromOtherWeek: parseIso8601(json['repeatFromOtherWeek']),
       repeatFromDay: json['repeatFromDay'] as int?,
       day: parseIso8601(json['day']),
+      cookedFresh: json['cookedFresh'],
     );
   }
 
@@ -55,6 +60,24 @@ class Meal implements Comparable<Meal> {
   }
   bool isSingleDay() {
     return day != null;
+  }
+
+  MealRepetition repetitionType() {
+    if (isRepeatingWeek()) {
+      return MealRepetition.everyWeek;
+    } else if (isRepeatingOtherWeek()) {
+      return MealRepetition.everyOtherWeek;
+    } else if (isRepeatingDay()) {
+      return MealRepetition.everyDate;
+    }
+    return MealRepetition.never;
+  }
+
+  double cost() {
+    if (cookedFresh != null && !cookedFresh!) {
+      return 0;
+    }
+    return recipe.cost; 
   }
 
   @override

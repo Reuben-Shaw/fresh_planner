@@ -55,13 +55,15 @@ class _AddMealPageState extends State<AddMealPage> {
     }
   }
 
-  bool _isAddingMeal() {
-    return widget.currentMeal == null;
-  }
+  MealRepetition? repetitionHider;
+
+  late bool _isAddingMeal;
 
   @override
   void initState() {
     super.initState();
+    
+    _isAddingMeal = widget.currentMeal == null;
     if (widget.currentMeal == null) return;
 
     setState(() {
@@ -99,6 +101,7 @@ class _AddMealPageState extends State<AddMealPage> {
       repeatFromOtherWeek: _repetition == MealRepetition.everyOtherWeek ? widget.day : null,
       repeatFromDay: _repetition == MealRepetition.everyDate ? widget.day.day : null,
       day: _repetition == MealRepetition.never ? widget.day : null,
+      cookedFresh: _isFresh,
     );
     _isLoading = true;
 
@@ -111,6 +114,14 @@ class _AddMealPageState extends State<AddMealPage> {
     meal.id = response.$2;
 
     Navigator.pop(context, meal,); 
+  }
+
+  void _replaceMeal() {
+    setState(() {
+      _selectedRecipe = null;
+      repetitionHider = widget.currentMeal!.repetitionType();
+      _isAddingMeal = true;
+    });
   }
   
   @override
@@ -138,7 +149,7 @@ class _AddMealPageState extends State<AddMealPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            _isAddingMeal() ? "Adding a\nMeal" : "Viewing\nMeal",
+                            _isAddingMeal ? "Adding a\nMeal" : "Viewing\nMeal",
                             style: AppTextStyles.mainTitle,
                           ),
                           SizedBox(height: 5,),
@@ -157,7 +168,7 @@ class _AddMealPageState extends State<AddMealPage> {
                           ),
                           SizedBox(height: 10,),
                           Visibility(
-                            visible: _isAddingMeal(),
+                            visible: _isAddingMeal,
                             child: Row(
                               children: <Widget>[
                                 Expanded(
@@ -224,6 +235,10 @@ class _AddMealPageState extends State<AddMealPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
+                                    Visibility(
+                                      visible: _isAddingMeal || (widget.currentMeal?.isSingleDay() ?? false),
+                                      child: SizedBox(height: 16,)
+                                    ),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: <Widget>[
@@ -231,11 +246,14 @@ class _AddMealPageState extends State<AddMealPage> {
                                           _selectedRecipe?.name ?? "",
                                           style: AppTextStyles.innerTitle,
                                         ),
-                                        IconButton(
-                                          onPressed: (){}, 
-                                          icon: Icon(
-                                            Icons.edit_square,
-                                            color: Color(0xFF26693C),
+                                        Visibility(
+                                          visible: !_isAddingMeal && !(widget.currentMeal?.isSingleDay() ?? false),
+                                          child: IconButton(
+                                            onPressed: _replaceMeal, 
+                                            icon: Icon(
+                                              Icons.edit_square,
+                                              color: Color(0xFF26693C),
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -328,7 +346,7 @@ class _AddMealPageState extends State<AddMealPage> {
                           ),
                           SizedBox(height: 15,),
                           Visibility(
-                            visible: _isAddingMeal(),
+                            visible: _isAddingMeal,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
@@ -366,7 +384,7 @@ class _AddMealPageState extends State<AddMealPage> {
                             ),
                           ),
                           Visibility(
-                            visible: _isAddingMeal(),
+                            visible: _isAddingMeal,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
@@ -387,43 +405,52 @@ class _AddMealPageState extends State<AddMealPage> {
                                     },
                                   ),
                                 ),
-                                AppRadiobuttonStyle.tileDec(
-                                  context, 
-                                  "${MealRepetition.everyWeek.standardName}${DateFormat('EEE').format(widget.day)}",
-                                  Radio<MealRepetition>(
-                                    value: MealRepetition.everyWeek,
-                                    groupValue: _repetition,
-                                    onChanged: (MealRepetition? value) {
-                                      setState(() {
-                                        _repetition = value;
-                                      });
-                                    },
+                                Visibility(
+                                  visible: repetitionHider != MealRepetition.everyWeek && repetitionHider != MealRepetition.everyOtherWeek,
+                                  child: AppRadiobuttonStyle.tileDec(
+                                    context, 
+                                    "${MealRepetition.everyWeek.standardName}${DateFormat('EEE').format(widget.day)}",
+                                    Radio<MealRepetition>(
+                                      value: MealRepetition.everyWeek,
+                                      groupValue: _repetition,
+                                      onChanged: (MealRepetition? value) {
+                                        setState(() {
+                                          _repetition = value;
+                                        });
+                                      },
+                                    ),
                                   ),
                                 ),
-                                AppRadiobuttonStyle.tileDec(
-                                  context, 
-                                  "${MealRepetition.everyOtherWeek.standardName}${DateFormat('EEE').format(widget.day)}",
-                                  Radio<MealRepetition>(
-                                    value: MealRepetition.everyOtherWeek,
-                                    groupValue: _repetition,
-                                    onChanged: (MealRepetition? value) {
-                                      setState(() {
-                                        _repetition = value;
-                                      });
-                                    },
+                                Visibility(
+                                  visible: repetitionHider != MealRepetition.everyOtherWeek,
+                                  child: AppRadiobuttonStyle.tileDec(
+                                    context, 
+                                    "${MealRepetition.everyOtherWeek.standardName}${DateFormat('EEE').format(widget.day)}",
+                                    Radio<MealRepetition>(
+                                      value: MealRepetition.everyOtherWeek,
+                                      groupValue: _repetition,
+                                      onChanged: (MealRepetition? value) {
+                                        setState(() {
+                                          _repetition = value;
+                                        });
+                                      },
+                                    ),
                                   ),
                                 ),
-                                AppRadiobuttonStyle.tileDec(
-                                  context, 
-                                  "${MealRepetition.everyDate.standardName}${_dayWithSuffix(widget.day)}",
-                                  Radio<MealRepetition>(
-                                    value: MealRepetition.everyDate,
-                                    groupValue: _repetition,
-                                    onChanged: (MealRepetition? value) {
-                                      setState(() {
-                                        _repetition = value;
-                                      });
-                                    },
+                                Visibility(
+                                  visible: repetitionHider != MealRepetition.everyDate,
+                                  child: AppRadiobuttonStyle.tileDec(
+                                    context, 
+                                    "${MealRepetition.everyDate.standardName}${_dayWithSuffix(widget.day)}",
+                                    Radio<MealRepetition>(
+                                      value: MealRepetition.everyDate,
+                                      groupValue: _repetition,
+                                      onChanged: (MealRepetition? value) {
+                                        setState(() {
+                                          _repetition = value;
+                                        });
+                                      },
+                                    ),
                                   ),
                                 ),
                               ],
@@ -433,7 +460,7 @@ class _AddMealPageState extends State<AddMealPage> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: <Widget>[
                               Visibility(
-                                visible: _isAddingMeal(),
+                                visible: _isAddingMeal,
                                 child: Container(
                                   decoration: AppButtonStyles.circularShadow,
                                   child: ElevatedButton(
@@ -447,7 +474,7 @@ class _AddMealPageState extends State<AddMealPage> {
                                 ),
                               ),
                               Visibility(
-                                visible: !_isAddingMeal(),
+                                visible: !_isAddingMeal,
                                 child: IconButton(
                                   onPressed: () async {
                                     _isLoading = true;
@@ -488,7 +515,7 @@ class _AddMealPageState extends State<AddMealPage> {
   }
 
   Widget _ingredientListView(bool isExpanded) {
-    return (isExpanded || !_isAddingMeal())
+    return (isExpanded || !_isAddingMeal)
       ? _buildIngredientList()
       : ConstrainedBox(
         constraints: BoxConstraints(

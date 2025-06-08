@@ -42,6 +42,12 @@ class _CalendarPageState extends State<CalendarPage> {
   bool get _isLoading => __isLoading;
   set _isLoading(bool value) => setState(() => __isLoading = value);
 
+  double __upcomingCost = 0;
+  double get _upcomingCost => __upcomingCost;
+  set _upcomingCost(double value) => setState(() => __upcomingCost = value);
+
+  final GlobalKey<TooltipState> tooltipkey = GlobalKey<TooltipState>();
+
   @override
   void initState() {
     super.initState();
@@ -125,14 +131,14 @@ class _CalendarPageState extends State<CalendarPage> {
 
     for (Meal m in widget.meals[_timeOfDay]!) {
       if (m.isRepeatingWeek()) {
-        final startDate = getFirstInstanceOfDay(m.repeatFromWeek!, monthStartDay, priorYear, priorMonth, priorMonthLength); 
+        final startDate = getFirstInstanceOfDay(m.repeatFromWeek!, cellMap); 
         for(int i = 0; i < 6; i++) {
           final newDate = startDate.add(Duration(days: i * 7));
           cellMap[newDate] = CalendarCell(date: newDate, meal: m,);
         }
       }
       else if (m.isRepeatingOtherWeek()) {
-        final firstInstanceOfDay = getFirstInstanceOfDay(britishWeekday(m.repeatFromOtherWeek!), monthStartDay, priorYear, priorMonth, priorMonthLength);
+        final firstInstanceOfDay = getFirstInstanceOfDay(britishWeekday(m.repeatFromOtherWeek!), cellMap);
         debugPrint("${m.recipe.name} - First instace of day: $firstInstanceOfDay with ${britishWeekday(m.repeatFromOtherWeek!)}");
 
         debugPrint("${m.repeatFromOtherWeek!}.difference($firstInstanceOfDay).inDays.abs() = ${m.repeatFromOtherWeek!.difference(firstInstanceOfDay).inDays.abs()}");
@@ -186,6 +192,8 @@ class _CalendarPageState extends State<CalendarPage> {
       cells.length = cells.length - 7;
     }
 
+    setCostForNextSevenDays(cellMap);
+
     return cells;
   }
 
@@ -221,15 +229,21 @@ class _CalendarPageState extends State<CalendarPage> {
     }
   }
 
-  DateTime getFirstInstanceOfDay(int dayOfWeek, int monthStartDay, int priorYear, int priorMonth, int priorMonthLength) {
-    // return dayOfWeek >= monthStartDay ? 
-    //   DateTime(currentYear, currentMonth, (dayOfWeek - monthStartDay + 1)) : 
-    //   DateTime(priorYear, priorMonth, (priorMonthLength - dayOfWeek + 1));
+  DateTime getFirstInstanceOfDay(int dayOfWeek, Map<DateTime, CalendarCell?> cellMap) {
+    return cellMap.entries.elementAt(dayOfWeek).key;
+  }
 
-    if (dayOfWeek >= monthStartDay) {
-      return DateTime(currentYear, currentMonth, (dayOfWeek - monthStartDay + 1));
+  void setCostForNextSevenDays(Map<DateTime, CalendarCell?> cellMap) {
+    double upcomingCost = 0;
+    for (int i = 0; i < 7; i++) {
+      DateTime dateCheck = DateTime(currentDate.year, currentDate.month, currentDate.day + i);
+      if (cellMap.containsKey(dateCheck)) {
+        upcomingCost += cellMap[dateCheck]?.meal?.cost() ?? 0;
+      }
     }
-    return DateTime(priorYear, priorMonth, (priorMonthLength - (monthStartDay - 1)) + dayOfWeek);
+    setState(() {
+      _upcomingCost = upcomingCost;
+    });
   }
 
   DateTime addDays(DateTime startDate, int numberOfDays) {
@@ -339,9 +353,15 @@ class _CalendarPageState extends State<CalendarPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Text(
-                            "${DateFormat('MMMM').format(DateTime(currentYear, currentMonth))} ${currentYear == currentDate.year ? "" : "- $currentYear"}"
-                          , style: AppTextStyles.mainTitle,),
+                          Flexible(
+                            child: Text(
+                              currentYear == currentDate.year ?
+                              "${DateFormat('MMMM').format(DateTime(currentYear, currentMonth))}${currentYear == currentDate.year ? "" : " - $currentYear"}" :
+                                "${DateFormat('MMM').format(DateTime(currentYear, currentMonth))}${currentYear == currentDate.year ? "" : " - ${currentYear.toString().substring(2, 4)}"}", 
+                              style: AppTextStyles.mainTitle,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                           Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.all(Radius.circular(35)),
@@ -416,61 +436,75 @@ class _CalendarPageState extends State<CalendarPage> {
                   ],
                 ),
                 Expanded(
-                  child: NotificationListener<ScrollNotification>(
-                    onNotification: (ScrollNotification scrollInfo) {
-                      if (scrollInfo is ScrollUpdateNotification) {
-                        final minScroll = scrollInfo.metrics.minScrollExtent;
-                        final maxScroll = scrollInfo.metrics.maxScrollExtent;
-                        final currentScroll = scrollInfo.metrics.pixels;
-                        final overscrollDirection = scrollInfo.scrollDelta ?? 0;
-
-                        
-                        //debugPrint("$overscrollDirection");
-                        if (currentScroll >= maxScroll) {
-                          if (overscrollDirection > 0) {
-                            setState(() {
-                              if (currentMonth == 12) {
-                                currentMonth = 1;
-                                currentYear += 1;
-                              } else {
-                                currentMonth += 1;
-                              }
-                              debugPrint("Gone up a month");
-                              _createCalendar();
-                            });
-                          }
-                        } else if (currentScroll <= minScroll) {
-                          if (overscrollDirection < 0) {
-                            setState(() {
-                              if (currentMonth == 1) {
-                                currentMonth = 12;
-                                currentYear -= 1;
-                              } else {
-                                currentMonth -= 1;
-                              }
-                              debugPrint("Gone down a month");
-                              _createCalendar();
-                            });
-                          }
+                  child: GestureDetector(
+                    onHorizontalDragEnd: (DragEndDetails details) {
+                      if (details.primaryVelocity != null) {
+                        if (details.primaryVelocity! < 0) {
+                          setState(() {
+                            if (currentMonth == 12) {
+                              currentMonth = 1;
+                              currentYear += 1;
+                            } else {
+                              currentMonth += 1;
+                            }
+                            debugPrint("Swiped left → Next month");
+                            _createCalendar();
+                          });
+                        } else if (details.primaryVelocity! > 0) {
+                          setState(() {
+                            if (currentMonth == 1) {
+                              currentMonth = 12;
+                              currentYear -= 1;
+                            } else {
+                              currentMonth -= 1;
+                            }
+                            debugPrint("Swiped right → Previous month");
+                            _createCalendar();
+                          });
                         }
                       }
-                      return false;
                     },
                     child: GridView.count(
                       crossAxisCount: 7,
                       childAspectRatio: 0.5,
                       children: <Widget>[
-                        SizedBox(height: 32,),
-                        SizedBox(height: 32,),
-                        SizedBox(height: 32,),
-                        SizedBox(height: 32,),
-                        SizedBox(height: 32,),
-                        SizedBox(height: 32,),
-                        SizedBox(height: 32,),
                         ..._createCalendar(),
-                        SizedBox(height: 32,),
                       ],
                     ),
+                  ),
+                ),
+                Tooltip(
+                  key: tooltipkey,
+                  triggerMode: TooltipTriggerMode.manual,
+                  showDuration: const Duration(seconds: 1),
+                  message: "Price of ${_timeOfDay.standardName.toLowerCase()} for the next 7 days",
+                  child: Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4.0),
+                      ),
+                      Text(
+                        "Predicted Cost: ",
+                        style: AppTextStyles.largerBold,
+                      ),
+                      Text(
+                        NumberFormat.currency(locale: "en_UK", symbol: "£").format(_upcomingCost),
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.help,
+                          color: Color(0xFF26693C),
+                        ),
+                        onPressed: () {
+                          tooltipkey.currentState?.ensureTooltipVisible();
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ],

@@ -15,9 +15,9 @@ class DatabaseIngredientsTest extends DatabaseIngredients {
 
   @override
   Future<(bool, String?)> addIngredient(String uid, Ingredient ingredient) async {
-    debugPrint("Database adding test");
-    await Future.delayed(Duration(milliseconds: 10));
-    debugPrint("Ready to return");
-    return (true, "testID");
+    debugPrint('Database adding test');
+    await Future.delayed(const Duration(milliseconds: 10));
+    debugPrint('Ready to return');
+    return (true, 'testID');
   }
 } 

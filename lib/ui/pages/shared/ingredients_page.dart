@@ -141,11 +141,11 @@ class _IngredientsPageState extends State<IngredientsPage> {
                     _isLoading = true;
                     Navigator.of(context).pop();
                   },
-                  icon: Icon(Icons.arrow_back,),
+                  icon: const Icon(Icons.arrow_back,),
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 32.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,8 +153,8 @@ class _IngredientsPageState extends State<IngredientsPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text(
-                              "Ingredients",
+                            const Text(
+                              'Ingredients',
                               style: AppTextStyles.mainTitle,
                             ),
                             IconButton(
@@ -173,13 +173,13 @@ class _IngredientsPageState extends State<IngredientsPage> {
                                   _ingredientMap[result.type ?? IngredientType.misc]!.add(IngredientCard(ingredient: result, onRemove: () async => _removeIngredient(result), showAmount: false,));
                                   _ingredientMap[result.type ?? IngredientType.misc]!.sort();
                                   _searchController.clear();
-                                  _updateSearch("");
+                                  _updateSearch('');
                                 });
                               },
                               style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all<Color>(Color(0xFF399E5A)),
+                                backgroundColor: WidgetStateProperty.all<Color>(const Color(0xFF399E5A)),
                               ), 
-                              icon: Icon(
+                              icon: const Icon(
                                 Icons.add,
                                 color: Colors.white,
                               ),
@@ -196,7 +196,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                             onChanged: (text) {
                               _updateSearch(text);
                             },
-                            decoration: AppTextFieldStyles.primaryStyle("search", icon: Icon(Icons.search, color: Color(0xFF26693C))),
+                            decoration: AppTextFieldStyles.primaryStyle('search', icon: const Icon(Icons.search, color: Color(0xFF26693C))),
                           ),
                         ),
                         const SizedBox(height: 20,),
@@ -211,7 +211,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                                       final type = _ingredientMap.entries.elementAt(index).key;
                                       setState(() {
                                         _isOpen[type] = isExpanded;
-                                        debugPrint("Toggled $type -> ${_isOpen[type]}");
+                                        debugPrint('Toggled $type -> ${_isOpen[type]}');
                                       });
                                     },
                                     children: _ingredientMap.entries.map((entry) {
@@ -228,9 +228,9 @@ class _IngredientsPageState extends State<IngredientsPage> {
                                           );
                                         },
                                         body: ListView(
-                                          padding: EdgeInsets.symmetric(horizontal: 4.0),
+                                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
                                           shrinkWrap: true,
-                                          physics: ClampingScrollPhysics(),
+                                          physics: const ClampingScrollPhysics(),
                                           children: mapEntry.map((ingredientCard) {
                                             return _ingredientCardClick(ingredientCard);
                                           }).toList(),
@@ -263,7 +263,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                                   builder: (context) {
                                     String value = '';
                                     return AlertDialog(
-                                      title: Text('Enter the amount'),
+                                      title: const Text('Enter the amount'),
                                       content: TextField(
                                         keyboardType: TextInputType.number,
                                         onChanged: (val) => value = val,
@@ -272,11 +272,11 @@ class _IngredientsPageState extends State<IngredientsPage> {
                                       actions: [
                                         TextButton(
                                           onPressed: () => Navigator.pop(context),
-                                          child: Text('Cancel'),
+                                          child: const Text('Cancel'),
                                         ),
                                         TextButton(
                                           onPressed: () => Navigator.pop(context, value),
-                                          child: Text('Set'),
+                                          child: const Text('Set'),
                                         ),
                                       ],
                                     );
@@ -293,16 +293,16 @@ class _IngredientsPageState extends State<IngredientsPage> {
                               },
                               child: Row(
                                 children: <Widget>[
-                                  Text("Amount: ", style: AppTextStyles.largerBold,),
+                                  const Text('Amount: ', style: AppTextStyles.largerBold,),
                                   Text(
-                                    _selectedIngredient == null ? "0" : _selectedIngredient!.amount.toString(), 
-                                    style: TextStyle(
+                                    _selectedIngredient == null ? '0' : _selectedIngredient!.amount.toString(), 
+                                    style: const TextStyle(
                                       fontSize: 26,
                                       fontWeight: FontWeight.bold,
                                       color: Color(0xFF26693C),
                                     ),
                                   ),
-                                  Stack(
+                                  const Stack(
                                     children: <Widget>[
                                       Column(
                                         children: [
@@ -322,7 +322,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                                       ),
                                     ],
                                   ),
-                                  Text(_selectedIngredient == null ? "" : _selectedIngredient!.metric.metricSymbol, style: AppTextStyles.standardBold),
+                                  Text(_selectedIngredient == null ? '' : _selectedIngredient!.metric.metricSymbol, style: AppTextStyles.standardBold),
                                 ],
                               ),
                             ),
@@ -336,14 +336,14 @@ class _IngredientsPageState extends State<IngredientsPage> {
                                 }, 
                                 style: AppButtonStyles.mainBackStyle,
                                 child: Text(
-                                  " Select ",
+                                  ' Select ',
                                   style: AppButtonStyles.mainTextStyle,
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 15,),
+                        const SizedBox(height: 15,),
                       ],
                     ),
                   ),
@@ -352,7 +352,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
             ),
             Visibility(
               visible: _isLoading,
-              child: LoadingScreen(),
+              child: const LoadingScreen(),
             ),
           ],
         ),

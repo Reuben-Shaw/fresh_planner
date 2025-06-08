@@ -9,7 +9,7 @@ class DatabaseCalendar {
 
   Future<(bool, String?)> addRecipe(String uid, Recipe recipe) async {
     try {
-      debugPrint("Adding new recipe with ${recipe.ingredients.length} ingredients");
+      debugPrint('Adding new recipe with ${recipe.ingredients.length} ingredients');
       final response = await _database.addRecipeAPI(uid, recipe);
 
       bool success = response['success'] as bool? ?? false;
@@ -21,19 +21,19 @@ class DatabaseCalendar {
         return (false, null);
       }
     } catch (e) {
-      debugPrint("Adding new recipe caused a crash: $e");
+      debugPrint('Adding new recipe caused a crash: $e');
       return (false, null);
     }
   }
 
   Future<List<Recipe>?> getAllRecipes(String uid) async {
     try {
-      debugPrint("Getting recipes");
+      debugPrint('Getting recipes');
       final response = await _database.getAllRecipesAPI(uid);
 
       bool success = response['success'] as bool? ?? false;
       if (success) {
-        debugPrint("Got recipes");
+        debugPrint('Got recipes');
         final List<dynamic> recipesData = response['recipes'];
 
         return recipesData.map((ingredientJson) {
@@ -44,7 +44,7 @@ class DatabaseCalendar {
       }
       return [];
     } catch (e) {
-      debugPrint("Error fetching recipes: $e");
+      debugPrint('Error fetching recipes: $e');
       return null;
     }
   }
@@ -61,7 +61,7 @@ class DatabaseCalendar {
         return (false, null);
       }
     } catch (e) {
-      debugPrint("Crash in addMeal: $e");
+      debugPrint('Crash in addMeal: $e');
       return (false, null);
     }
   }
@@ -70,7 +70,7 @@ class DatabaseCalendar {
     try {
       final response = await _database.getAllMealsAPI(uid);
       if (response['success'] == true) {
-        debugPrint("Got meals");
+        debugPrint('Got meals');
         final List<dynamic> mealsData = response['meals'];
         final List<Meal> returnedMeals = mealsData.map((m) => Meal.fromJson(m)).toList();
 
@@ -88,7 +88,7 @@ class DatabaseCalendar {
       }
       return null;
     } catch (e) {
-      debugPrint("Error fetching meals: $e");
+      debugPrint('Error fetching meals: $e');
       return null;
     }
   }
@@ -99,14 +99,14 @@ class DatabaseCalendar {
       final response = await _database.deleteMealAPI(uid, meal.id!);
       bool success = response['success'] as bool? ?? false;
       if (success) {
-        debugPrint("Meal deleted with id ${meal.id!}");
+        debugPrint('Meal deleted with id ${meal.id!}');
         return true;
       } else {
         debugPrint("Deleting meal failed: ${response['error'] ?? response['message']}");
         return false;
       }
     } catch (e) {
-      debugPrint("Crash in deleteMeal: $e");
+      debugPrint('Crash in deleteMeal: $e');
       return false;
     }
   }

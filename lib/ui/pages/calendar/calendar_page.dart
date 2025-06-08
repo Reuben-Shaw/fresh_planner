@@ -64,17 +64,17 @@ class _CalendarPageState extends State<CalendarPage> {
       currentYear = date.year;  
     });
 
-    if (date.toLocal().add(Duration(hours: 14, minutes: 59)).isBefore(time)) {
-      debugPrint("Dinner time");
+    if (date.toLocal().add(const Duration(hours: 14, minutes: 59)).isBefore(time)) {
+      debugPrint('Dinner time');
       _timeOfDay = TimeOfDay.dinner;
-    } else if (date.toLocal().add(Duration(hours: 9, minutes: 59)).isBefore(time)) {
-      debugPrint("Lunch time");
+    } else if (date.toLocal().add(const Duration(hours: 9, minutes: 59)).isBefore(time)) {
+      debugPrint('Lunch time');
       _timeOfDay = TimeOfDay.lunch;
     } else {
-      debugPrint("Breakfast time");
+      debugPrint('Breakfast time');
       _timeOfDay = TimeOfDay.breakfast;
     }
-    debugPrint("Time Of Day is $_timeOfDay");
+    debugPrint('Time Of Day is $_timeOfDay');
 
     setState(() {
       _calendarCells = _createCalendar();
@@ -178,7 +178,7 @@ class _CalendarPageState extends State<CalendarPage> {
       }
     }
 
-    debugPrint("CELLMAP");
+    debugPrint('CELLMAP');
     cellMap.forEach((key, value) {
       final gestureCell = GestureDetector(
         onTap: () async {
@@ -229,7 +229,7 @@ class _CalendarPageState extends State<CalendarPage> {
         widget.meals[result.time]!.sort();
         _calendarCells = _createCalendar();
       });
-    } else if (result is String && result == "delete") {
+    } else if (result is String && result == 'delete') {
       setState(() {
         widget.meals[_timeOfDay]!.remove(cell!.meal!);
         widget.meals[_timeOfDay]!.sort();
@@ -263,23 +263,23 @@ class _CalendarPageState extends State<CalendarPage> {
       barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Delete Meal"),
+          title: const Text('Delete Meal'),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text("Deleting ${cell.meal?.recipe.name} will remove it from your calendar, and remove any repetition rules attached"),
+                Text('Deleting ${cell.meal?.recipe.name} will remove it from your calendar, and remove any repetition rules attached'),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text("Cancel"),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text("Delete", style: TextStyle(color: Colors.red,),),
+              child: const Text('Delete', style: TextStyle(color: Colors.red,),),
               onPressed: () async {
                 _isLoading = true;
                 final success = await widget.calendarDB.deleteMeal(widget.user.uid!, cell.meal!);
@@ -292,7 +292,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     _calendarCells = _createCalendar();
                   });
                 } 
-                Navigator.of(context).pop();
+                if (context.mounted) Navigator.of(context).pop();
               },
             ),
           ],
@@ -304,7 +304,7 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: Key("calendar_page"),
+      key: const Key('calendar_page'),
       body: SafeArea(
         child: Stack(
           children: <Widget>[
@@ -316,14 +316,14 @@ class _CalendarPageState extends State<CalendarPage> {
                     FocusManager.instance.primaryFocus?.unfocus();
                     Navigator.of(context).pop();
                   },
-                  icon: Icon(Icons.arrow_back,),
+                  icon: const Icon(Icons.arrow_back,),
                 ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
@@ -338,8 +338,8 @@ class _CalendarPageState extends State<CalendarPage> {
                           ),
                           Container(
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(35)),
-                              border: Border.all(color: Color(0xFF399E5A), width: 2),
+                              borderRadius: const BorderRadius.all(Radius.circular(35)),
+                              border: Border.all(color: const Color(0xFF399E5A), width: 2),
                             ),
                             child: Row(
                               spacing: 4,
@@ -347,31 +347,31 @@ class _CalendarPageState extends State<CalendarPage> {
                                 IconButton(
                                   icon: Icon(
                                     Icons.sunny_snowing,
-                                    color: _timeOfDay == TimeOfDay.breakfast ? Colors.white : Color(0xFF26693C),
+                                    color: _timeOfDay == TimeOfDay.breakfast ? Colors.white : const Color(0xFF26693C),
                                   ), 
                                   onPressed: () => { _timeOfDay = TimeOfDay.breakfast }, 
                                   style: ButtonStyle(
-                                    backgroundColor: _timeOfDay == TimeOfDay.breakfast ? WidgetStateProperty.all<Color>(Color(0xFF26693C)) : WidgetStateProperty.all<Color>(Colors.white),
+                                    backgroundColor: _timeOfDay == TimeOfDay.breakfast ? WidgetStateProperty.all<Color>(const Color(0xFF26693C)) : WidgetStateProperty.all<Color>(Colors.white),
                                   ),
                                 ),
                                 IconButton(
                                   icon: Icon(
                                     Icons.sunny,
-                                    color: _timeOfDay == TimeOfDay.lunch ? Colors.white : Color(0xFF26693C),
+                                    color: _timeOfDay == TimeOfDay.lunch ? Colors.white : const Color(0xFF26693C),
                                   ), 
                                   onPressed: () => { _timeOfDay = TimeOfDay.lunch }, 
                                   style: ButtonStyle(
-                                    backgroundColor: _timeOfDay == TimeOfDay.lunch ? WidgetStateProperty.all<Color>(Color(0xFF26693C)) : WidgetStateProperty.all<Color>(Colors.white),
+                                    backgroundColor: _timeOfDay == TimeOfDay.lunch ? WidgetStateProperty.all<Color>(const Color(0xFF26693C)) : WidgetStateProperty.all<Color>(Colors.white),
                                   ),
                                 ),
                                 IconButton(
                                   icon: Icon(
                                     Icons.nightlight,
-                                    color: _timeOfDay == TimeOfDay.dinner ? Colors.white : Color(0xFF26693C),
+                                    color: _timeOfDay == TimeOfDay.dinner ? Colors.white : const Color(0xFF26693C),
                                   ), 
                                   onPressed: () => { _timeOfDay = TimeOfDay.dinner }, 
                                   style: ButtonStyle(
-                                    backgroundColor: _timeOfDay == TimeOfDay.dinner ? WidgetStateProperty.all<Color>(Color(0xFF26693C)) : WidgetStateProperty.all<Color>(Colors.white),
+                                    backgroundColor: _timeOfDay == TimeOfDay.dinner ? WidgetStateProperty.all<Color>(const Color(0xFF26693C)) : WidgetStateProperty.all<Color>(Colors.white),
                                   ),
                                 ),
                               ],
@@ -380,8 +380,8 @@ class _CalendarPageState extends State<CalendarPage> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 10,),
-                    Row(
+                    const SizedBox(height: 10,),
+                    const Row(
                       children: <Widget> [
                         Expanded(
                           child: Text('M', textAlign: TextAlign.center, style: AppTextStyles.innerTitle,),
@@ -406,7 +406,7 @@ class _CalendarPageState extends State<CalendarPage> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 4,),
+                    const SizedBox(height: 4,),
                   ],
                 ),
                 Expanded(
@@ -451,26 +451,26 @@ class _CalendarPageState extends State<CalendarPage> {
                     key: tooltipkey,
                     triggerMode: TooltipTriggerMode.manual,
                     showDuration: const Duration(seconds: 1),
-                    message: "Predicted cost of ${_timeOfDay.standardName.toLowerCase()} for the next 7 days",
+                    message: 'Predicted cost of ${_timeOfDay.standardName.toLowerCase()} for the next 7 days',
                     child: Row(
                       children: <Widget>[
-                        Padding(
+                        const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 4.0),
                         ),
-                        Text(
-                          "Predicted Cost: ",
+                        const Text(
+                          'Predicted Cost: ',
                           style: AppTextStyles.largerBold,
                         ),
                         Text(
-                          NumberFormat.currency(locale: "en_UK", symbol: "£").format(_upcomingCost),
-                          style: TextStyle(
+                          NumberFormat.currency(locale: 'en_UK', symbol: '£').format(_upcomingCost),
+                          style: const TextStyle(
                             color: Color(0xFF26693C),
                             fontSize: 28,
                             fontWeight: FontWeight.bold
                           ),
                         ),
                         IconButton(
-                          icon: Icon(
+                          icon: const Icon(
                             Icons.help,
                             color: Color(0xFF26693C),
                           ),
@@ -486,7 +486,7 @@ class _CalendarPageState extends State<CalendarPage> {
             ),
             Visibility(
               visible: _isLoading,
-              child: LoadingScreen(),
+              child: const LoadingScreen(),
             ),
           ],
         ),

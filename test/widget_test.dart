@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart' hide TimeOfDay;
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:fresh_planner/main.dart';
 import 'package:fresh_planner/source/enums/time_of_day.dart';
 import 'package:fresh_planner/source/objects/meal.dart';
 import 'package:fresh_planner/source/objects/recipe.dart';
 
 void main() {
-  test("Check if meal sorting works", () {
-    final r1 = Recipe(name: "TestRecipe1", ingredients: [], colour: Colors.red);
-    final r2 = Recipe(name: "TestRecipe2", ingredients: [], colour: Colors.red);
-    final r3 = Recipe(name: "TestRecipe3", ingredients: [], colour: Colors.red);
-    final r4 = Recipe(name: "TestRecipe4", ingredients: [], colour: Colors.red);
-    final r5 = Recipe(name: "TestRecipe5", ingredients: [], colour: Colors.red);
+  test('Check if meal sorting works', () {
+    final r1 = Recipe(name: 'TestRecipe1', ingredients: [], colour: Colors.red);
+    final r2 = Recipe(name: 'TestRecipe2', ingredients: [], colour: Colors.red);
+    final r3 = Recipe(name: 'TestRecipe3', ingredients: [], colour: Colors.red);
+    final r4 = Recipe(name: 'TestRecipe4', ingredients: [], colour: Colors.red);
+    final r5 = Recipe(name: 'TestRecipe5', ingredients: [], colour: Colors.red);
 
     final m1 = Meal(recipe: r1, time: TimeOfDay.lunch, day: DateTime.utc(2025, 5, 7));
     final m2 = Meal(recipe: r2, time: TimeOfDay.lunch, repeatFromOtherWeek: DateTime.utc(2025, 3, 2));

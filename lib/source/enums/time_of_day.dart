@@ -1,7 +1,7 @@
 enum TimeOfDay {
-  breakfast("Breakfast"),
-  lunch("Lunchtime"),
-  dinner("Dinnertime");
+  breakfast('Breakfast'),
+  lunch('Lunchtime'),
+  dinner('Dinnertime');
 
   final String standardName;
 

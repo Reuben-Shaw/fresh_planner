@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/database/database_calendar.dart';
@@ -32,7 +31,7 @@ class _RecipePageState extends State<RecipePage> {
   bool get _isLoading => __isLoading;
   set _isLoading(bool value) => setState(() => __isLoading = value);
 
-  String _errorText = "";
+  String _errorText = '';
   String get errorText => _errorText;
   set errorText(String value) => setState(() => _errorText = value);
 
@@ -61,14 +60,14 @@ class _RecipePageState extends State<RecipePage> {
   void _addRecipe() async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    errorText = "";
-    if (_nameController.text == "") {
-      errorText = "Ensure all required values are filled";
+    errorText = '';
+    if (_nameController.text == '') {
+      errorText = 'Ensure all required values are filled';
       return;
     }
     for (Recipe r in widget.recipes) {
       if (r.name.toLowerCase() == _nameController.text.toLowerCase()) {
-        errorText = "Recipe with that name already exists";
+        errorText = 'Recipe with that name already exists';
         return;
       }
     }
@@ -83,7 +82,7 @@ class _RecipePageState extends State<RecipePage> {
     _isLoading = true;
     (bool, String?) response = await widget.calendarDB.addRecipe(widget.user.uid!, recipe);
     if (!response.$1 || !mounted) {
-      errorText = "Internal server error, please try again";
+      errorText = 'Internal server error, please try again';
       _isLoading = false;
       return;
     }
@@ -118,7 +117,7 @@ class _RecipePageState extends State<RecipePage> {
                     _isLoading = true;
                     Navigator.of(context).pop();
                   },
-                  icon: Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back),
                 ),
                 Expanded(
                   child: SingleChildScrollView(
@@ -126,68 +125,70 @@ class _RecipePageState extends State<RecipePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text("Create a\nRecipe", style: AppTextStyles.mainTitle),
-                        SizedBox(height: 5),
-                        Text("*must be included", style: AppTextStyles.subTitle),
-                        SizedBox(height: 20),
+                        const Text('Create a\nRecipe', style: AppTextStyles.mainTitle),
+                        const SizedBox(height: 5),
+                        const Text('*must be included', style: AppTextStyles.subTitle),
+                        const SizedBox(height: 20),
                         Container(
                           decoration: AppTextFieldStyles.dropShadow,
                           child: TextField(
-                            key: Key("name_textfield"),
+                            key: const Key('name_textfield'),
                             controller: _nameController,
-                            decoration: AppTextFieldStyles.primaryStyle("name*"),
+                            decoration: AppTextFieldStyles.primaryStyle('name*'),
                           ),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Container(
                           decoration: AppTextFieldStyles.dropShadow,
                           child: TextField(
                             controller: _linkController,
-                            decoration: AppTextFieldStyles.primaryStyle("link to recipe"),
+                            decoration: AppTextFieldStyles.primaryStyle('link to recipe'),
                           ),
                         ),
-                        SizedBox(height: 20),
-                        Text("Add Ingredients:", style: AppTextStyles.innerTitle),
-                        SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 5, right: 50),
+                        const SizedBox(height: 20),
+                        const Text('Add Ingredients:', style: AppTextStyles.innerTitle),
+                        const SizedBox(height: 10),
+                        const Padding(
+                          padding: EdgeInsets.only(left: 5, right: 50),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              Text("Ingredient*", style: AppTextStyles.standardBold),
-                              Text("Amount", style: AppTextStyles.standardBold),
+                              Text('Ingredient*', style: AppTextStyles.standardBold),
+                              Text('Amount', style: AppTextStyles.standardBold),
                             ],
                           ),
                         ),
-                        Divider(height: 5, thickness: 2, color: Colors.black),
-                        SizedBox(height: 10),
+                        const Divider(height: 5, thickness: 2, color: Colors.black),
+                        const SizedBox(height: 10),
                         ..._ingredientCards,
                         GestureDetector(
                           onTap: () async {
                             _isLoading = true;
-                            await Future.delayed(Duration(milliseconds: 50));
-                            final result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => IngredientsPage(user: widget.user, ingredients: widget.ingredients)),
-                            );
-                            _isLoading = false;
-                            if (result is! Ingredient) return;
-                            setState(() {
-                              _ingredientCards.add(IngredientCard(
-                                ingredient: result,
-                                showAmount: true,
-                                onRemove: () async => _removeIngredient(result),
-                              ));
-                              _ingredientCards.sort();
-                            });
+                            await Future.delayed(const Duration(milliseconds: 50));
+                            if (context.mounted) {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => IngredientsPage(user: widget.user, ingredients: widget.ingredients)),
+                              );
+                              _isLoading = false;
+                              if (result is! Ingredient) return;
+                              setState(() {
+                                _ingredientCards.add(IngredientCard(
+                                  ingredient: result,
+                                  showAmount: true,
+                                  onRemove: () async => _removeIngredient(result),
+                                ));
+                                _ingredientCards.sort();
+                              });
+                            }
                           },
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Row(
+                              const Row(
                                 children: <Widget>[
                                   Text(
-                                    "+ ", 
+                                    '+ ', 
                                     style: TextStyle(
                                       fontSize: 18, 
                                       fontWeight: FontWeight.bold,
@@ -195,24 +196,24 @@ class _RecipePageState extends State<RecipePage> {
                                       height: 1,
                                     ),
                                   ),
-                                  Text("Select Ingredient", style: AppTextStyles.largerBold),
+                                  Text('Select Ingredient', style: AppTextStyles.largerBold),
                                 ],
                               ),
                               Row(
                                 children: <Widget>[
-                                  Text("Cost of Recipe: ", style: AppTextStyles.largerBold),
+                                  const Text('Cost of Recipe: ', style: AppTextStyles.largerBold),
                                   Text(
-                                    NumberFormat.currency(locale: "en_UK", symbol: "£").format(
+                                    NumberFormat.currency(locale: 'en_UK', symbol: '£').format(
                                       Recipe.calcCost(_ingredientCards.map((card) => card.ingredient).toList())
                                     ),
-                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF26693C),),
+                                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF26693C),),
                                   ),
                                 ],
                               ),
                             ],
                           ),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
@@ -223,7 +224,7 @@ class _RecipePageState extends State<RecipePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(errorText, style: AppTextStyles.error),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -238,7 +239,7 @@ class _RecipePageState extends State<RecipePage> {
                                   color: _selectedColour ?? Colors.red,
                                 ),
                               ),
-                              SizedBox(width: 10),
+                              const SizedBox(width: 10),
                               Column(
                                 children: [
                                   Row(
@@ -260,22 +261,22 @@ class _RecipePageState extends State<RecipePage> {
                           Container(
                             decoration: AppButtonStyles.curvedShadow,
                             child: ElevatedButton(
-                              key: Key("create_button"),
+                              key: const Key('create_button'),
                               onPressed: _addRecipe,
                               style: AppButtonStyles.mainBackStyle,
-                              child: Text("   Create   ", style: AppButtonStyles.mainTextStyle),
+                              child: Text('   Create   ', style: AppButtonStyles.mainTextStyle),
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                     ],
                   ),
                 ),
               ],
             ),
 
-            if (_isLoading) LoadingScreen(),
+            if (_isLoading) const LoadingScreen(),
           ],
         ),
       ),

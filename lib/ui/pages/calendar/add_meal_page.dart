@@ -42,7 +42,7 @@ class _AddMealPageState extends State<AddMealPage> {
   bool? _isFresh = true;
   MealRepetition? _repetition = MealRepetition.never;
 
-  String errorText = "";
+  String errorText = '';
 
   Recipe? _selectedRecipe;
   Recipe? _recipeDropdownValue;
@@ -88,9 +88,9 @@ class _AddMealPageState extends State<AddMealPage> {
   }
 
   void addNewMeal() async {
-    errorText = "";
+    errorText = '';
     if (_selectedRecipe == null) {
-      errorText = "Please ensure a recipe is selected";
+      errorText = 'Please ensure a recipe is selected';
       return;
     }
 
@@ -107,7 +107,7 @@ class _AddMealPageState extends State<AddMealPage> {
 
     (bool, String?) response = await widget.calendarDB.addMeal(widget.user.uid!, meal);
     if (!response.$1 || !mounted) {
-      errorText = "Internal server error, please try again";
+      errorText = 'Internal server error, please try again';
       _isLoading = false;
       return;
     }
@@ -139,27 +139,27 @@ class _AddMealPageState extends State<AddMealPage> {
                     _isLoading = true;
                     Navigator.of(context).pop();
                   },
-                  icon: Icon(Icons.arrow_back,),
+                  icon: const Icon(Icons.arrow_back,),
                 ),
                 Expanded(
                   child: SingleChildScrollView(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            _isAddingMeal ? "Adding a\nMeal" : "Viewing\nMeal",
+                            _isAddingMeal ? 'Adding a\nMeal' : 'Viewing\nMeal',
                             style: AppTextStyles.mainTitle,
                           ),
-                          SizedBox(height: 5,),
+                          const SizedBox(height: 5,),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[
                               Icon(
                                 widget.time == TimeOfDay.breakfast ? Icons.sunny_snowing : widget.time == TimeOfDay.lunch ? Icons.sunny : Icons.nightlight,
-                                color: Color(0xFF979797),
+                                color: const Color(0xFF979797),
                               ),
                               Text(
                                 " - ${widget.time.standardName}: ${DateFormat("dd/MM/yy").format(widget.day)}",
@@ -167,7 +167,7 @@ class _AddMealPageState extends State<AddMealPage> {
                               ),
                             ],
                           ),
-                          SizedBox(height: 10,),
+                          const SizedBox(height: 10,),
                           Visibility(
                             visible: _isAddingMeal,
                             child: Row(
@@ -179,21 +179,21 @@ class _AddMealPageState extends State<AddMealPage> {
                                       items: widget.recipes.map((r) {
                                         return DropdownMenuItem<Recipe>(
                                           value: r,
-                                          child: Text("   ${r.name}"),
+                                          child: Text('   ${r.name}'),
                                         );
                                       }).toList(),
                                       value: _recipeDropdownValue,
                                       onChanged: _recipeDropdownCallback,
                                       isExpanded: true,
-                                      underline: Text(""),
-                                      hint: Text(
-                                        "   select a recipe",
+                                      underline: const Text(''),
+                                      hint: const Text(
+                                        '   select a recipe',
                                         style: AppTextStyles.hint,
                                       ),
                                     ),
                                   ),
                                 ),
-                                SizedBox(width: 5,),
+                                const SizedBox(width: 5,),
                                 IconButton(
                                   onPressed: () async {
                                     _isLoading = true;
@@ -211,9 +211,9 @@ class _AddMealPageState extends State<AddMealPage> {
                                     });
                                   },
                                   style: ButtonStyle(
-                                    backgroundColor: WidgetStateProperty.all<Color>(Color(0xFF399E5A)),
+                                    backgroundColor: WidgetStateProperty.all<Color>(const Color(0xFF399E5A)),
                                   ), 
-                                  icon: Icon(
+                                  icon: const Icon(
                                     Icons.add,
                                     color: Colors.white,
                                   ),
@@ -221,7 +221,7 @@ class _AddMealPageState extends State<AddMealPage> {
                               ],
                             ),
                           ),
-                          SizedBox(height: 15,),
+                          const SizedBox(height: 15,),
                           Container(
                             decoration: AppTextFieldStyles.dropShadow,
                             child: DecoratedBox(
@@ -229,7 +229,7 @@ class _AddMealPageState extends State<AddMealPage> {
                                 border: Border.all(
                                   color: Colors.transparent,
                                 ),
-                                color: Color(0xFFd7f1e0),
+                                color: const Color(0xFFd7f1e0),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Padding(
@@ -239,20 +239,20 @@ class _AddMealPageState extends State<AddMealPage> {
                                   children: <Widget>[
                                     Visibility(
                                       visible: _isAddingMeal || (widget.currentMeal?.isSingleDay() ?? false),
-                                      child: SizedBox(height: 16,)
+                                      child: const SizedBox(height: 16,)
                                     ),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: <Widget>[
                                         Text(
-                                          _selectedRecipe?.name ?? "",
+                                          _selectedRecipe?.name ?? '',
                                           style: AppTextStyles.innerTitle,
                                         ),
                                         Visibility(
                                           visible: !_isAddingMeal && !(widget.currentMeal?.isSingleDay() ?? false),
                                           child: IconButton(
                                             onPressed: _replaceMeal, 
-                                            icon: Icon(
+                                            icon: const Icon(
                                               Icons.edit_square,
                                               color: Color(0xFF26693C),
                                             ),
@@ -265,17 +265,17 @@ class _AddMealPageState extends State<AddMealPage> {
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: <Widget>[
-                                          Text(
-                                            "Link to Recipe:",
+                                          const Text(
+                                            'Link to Recipe:',
                                             style: AppTextStyles.largerBold,
                                           ),
-                                          SizedBox(height: 5,),
+                                          const SizedBox(height: 5,),
                                           Padding(
                                             padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                             child: InkWell(
                                               child: Text(
-                                                _selectedRecipe?.link ?? "",
-                                                style: TextStyle(
+                                                _selectedRecipe?.link ?? '',
+                                                style: const TextStyle(
                                                   color: Color(0xFF3873CD),
                                                   decoration: TextDecoration.underline,
                                                 ),
@@ -289,26 +289,26 @@ class _AddMealPageState extends State<AddMealPage> {
                                         ],
                                       ),
                                     ),
-                                    SizedBox(height: 10,),
+                                    const SizedBox(height: 10,),
                                     Visibility(
                                       visible: _selectedRecipe != null && _selectedRecipe!.cost > 0,
                                       child: Column(
                                         children: <Widget>[
                                           Text(
                                             _selectedRecipe == null ?
-                                            "" : "Cost:",
+                                            '' : 'Cost:',
                                             style: AppTextStyles.largerBold,
                                           ),
                                           Text(
-                                            _selectedRecipe == null ? "" :
-                                            NumberFormat.currency(locale: "en_UK", symbol: "£").format(
+                                            _selectedRecipe == null ? '' :
+                                            NumberFormat.currency(locale: 'en_UK', symbol: '£').format(
                                               _selectedRecipe!.cost
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                    SizedBox(height: 10,),
+                                    const SizedBox(height: 10,),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -318,10 +318,10 @@ class _AddMealPageState extends State<AddMealPage> {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: <Widget>[
                                               Text(
-                                                _selectedRecipe == null ? "" : "Ingredients:",
+                                                _selectedRecipe == null ? '' : 'Ingredients:',
                                                 style: AppTextStyles.largerBold,
                                               ),
-                                              SizedBox(height: 5,),
+                                              const SizedBox(height: 5,),
                                               _ingredientListView(_isExpanded)
                                             ],
                                           ),
@@ -334,7 +334,7 @@ class _AddMealPageState extends State<AddMealPage> {
                                               }, 
                                               icon: Icon(
                                                 _isExpanded ? Icons.fullscreen_exit : Icons.fullscreen,
-                                                color: Color(0xFF26693C),
+                                                color: const Color(0xFF26693C),
                                               ),
                                             ),
                                           ],
@@ -346,19 +346,19 @@ class _AddMealPageState extends State<AddMealPage> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 15,),
+                          const SizedBox(height: 15,),
                           Visibility(
                             visible: _isAddingMeal,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                Text(
-                                  "Meal Type:",
+                                const Text(
+                                  'Meal Type:',
                                   style: AppTextStyles.innerTitle,
                                 ),
                                 AppRadiobuttonStyle.tileDec(
                                   context, 
-                                  "Cooked Fresh",
+                                  'Cooked Fresh',
                                   Radio<bool>(
                                     value: true,
                                     groupValue: _isFresh,
@@ -371,7 +371,7 @@ class _AddMealPageState extends State<AddMealPage> {
                                 ),
                                 AppRadiobuttonStyle.tileDec(
                                   context, 
-                                  "Leftovers",
+                                  'Leftovers',
                                   Radio<bool>(
                                     value: false,
                                     groupValue: _isFresh,
@@ -390,8 +390,8 @@ class _AddMealPageState extends State<AddMealPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                Text(
-                                  "Repeat:",
+                                const Text(
+                                  'Repeat:',
                                   style: AppTextStyles.innerTitle,
                                 ),
                                 AppRadiobuttonStyle.tileDec(
@@ -443,7 +443,7 @@ class _AddMealPageState extends State<AddMealPage> {
                                   visible: repetitionHider != MealRepetition.everyDate,
                                   child: AppRadiobuttonStyle.tileDec(
                                     context, 
-                                    "${MealRepetition.everyDate.standardName}${_dayWithSuffix(widget.day)}",
+                                    '${MealRepetition.everyDate.standardName}${_dayWithSuffix(widget.day)}',
                                     Radio<MealRepetition>(
                                       value: MealRepetition.everyDate,
                                       groupValue: _repetition,
@@ -469,7 +469,7 @@ class _AddMealPageState extends State<AddMealPage> {
                                     onPressed: addNewMeal,
                                     style: AppButtonStyles.mainBackStyle,
                                     child: Text(
-                                      "    Add    ",
+                                      '    Add    ',
                                       style: AppButtonStyles.mainTextStyle,
                                     ),
                                   ),
@@ -482,12 +482,14 @@ class _AddMealPageState extends State<AddMealPage> {
                                     _isLoading = true;
                                     final success = await widget.calendarDB.deleteMeal(widget.user.uid!, widget.currentMeal!);
                                     _isLoading = false;
-                                    if (!success || !mounted) {
-                                      errorText = "Internal server error, please try again";
+                                    if (!success || !context.mounted) {
+                                      errorText = 'Internal server error, please try again';
+                                      return;
                                     }
-                                    Navigator.pop(context, "delete",); 
+
+                                    Navigator.pop(context, 'delete',); 
                                   }, 
-                                  icon: Icon(
+                                  icon: const Icon(
                                     Icons.delete_forever_rounded,
                                     color: Colors.white,
                                   ),
@@ -498,7 +500,7 @@ class _AddMealPageState extends State<AddMealPage> {
                               ),
                             ],
                           ),
-                          SizedBox(height: 15,),
+                          const SizedBox(height: 15,),
                         ],
                       ),
                     ),
@@ -508,7 +510,7 @@ class _AddMealPageState extends State<AddMealPage> {
             ),
             Visibility(
               visible: _isLoading,
-              child: LoadingScreen(),
+              child: const LoadingScreen(),
             ),
           ],
         ),
@@ -520,7 +522,7 @@ class _AddMealPageState extends State<AddMealPage> {
     return (isExpanded || !_isAddingMeal)
       ? _buildIngredientList()
       : ConstrainedBox(
-        constraints: BoxConstraints(
+        constraints: const BoxConstraints(
         maxHeight: 120,
       ),
       child: _buildIngredientList(),
@@ -536,7 +538,7 @@ class _AddMealPageState extends State<AddMealPage> {
           ..._selectedRecipe?.ingredients.map((i) => 
             Text("• ${i.name}${i.amount != 0 ? " - ${i.amount}${i.metric != IngredientMetric.item ? i.metric.metricSymbol : " ${i.metric.metricSymbol}"}" : ""}"),
           ).toList() ?? [],
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
         ],
       ),
     );

@@ -1,4 +1,4 @@
-package com.example.fresh_planner
+package com.reuben_shaw.fresh_planner
 
 import io.flutter.embedding.android.FlutterActivity
 

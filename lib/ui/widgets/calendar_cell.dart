@@ -14,6 +14,11 @@ class CalendarCell extends StatelessWidget {
   });
 
   @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return "Date is $date\nMeal is ${meal.toString()}";
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(

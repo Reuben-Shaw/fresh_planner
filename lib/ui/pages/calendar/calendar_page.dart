@@ -27,11 +27,14 @@ class _CalendarPageState extends State<CalendarPage> {
 	int currentMonth = 1;
 	int currentYear = 1970;
 
+  List<Widget> _calendarCells = [];
+
   TimeOfDay __timeOfDay = TimeOfDay.lunch;
   TimeOfDay get _timeOfDay => __timeOfDay;
   set _timeOfDay(TimeOfDay value) {
     setState(() {
       __timeOfDay = value;
+      _calendarCells = _createCalendar();
     });
   }
 
@@ -72,6 +75,10 @@ class _CalendarPageState extends State<CalendarPage> {
       _timeOfDay = TimeOfDay.breakfast;
     }
     debugPrint("Time Of Day is $_timeOfDay");
+
+    setState(() {
+      _calendarCells = _createCalendar();
+    });
   }
 
   List<GestureDetector> _createCalendar() {
@@ -126,6 +133,9 @@ class _CalendarPageState extends State<CalendarPage> {
 			}
 		}
 
+    DateTime firstDate = cellMap.entries.first.key;
+    DateTime lastDate = cellMap.entries.last.key;
+
     for (Meal m in widget.meals[_timeOfDay]!) {
       if (m.isRepeatingWeek()) {
         final startDate = getFirstInstanceOfDay(m.repeatFromWeek!, cellMap); 
@@ -158,11 +168,12 @@ class _CalendarPageState extends State<CalendarPage> {
         final nextDate = DateTime.utc(nextYear, nextMonth, m.repeatFromDay!);
         if (cellMap.containsKey(nextDate)) cellMap[nextDate] = CalendarCell(date: nextDate, meal: m,);
       }
-      else if (m.isSingleDay() && m.day!.month == currentMonth && m.day!.year == currentYear) {
+      else if (m.isSingleDay() && m.day!.isAfter(firstDate) && m.day!.isBefore(lastDate)) {
         cellMap[m.day!] = CalendarCell(date: m.day!, meal: m,);
       }
     }
 
+    debugPrint("CELLMAP");
     cellMap.forEach((key, value) {
       final gestureCell = GestureDetector(
         onTap: () async {
@@ -174,6 +185,7 @@ class _CalendarPageState extends State<CalendarPage> {
         child: value
       );
       cells.add(gestureCell);
+      debugPrint(value.toString());
     });
 
     if (numberAfterAdded > 6) {
@@ -208,12 +220,14 @@ class _CalendarPageState extends State<CalendarPage> {
       setState(() {
         widget.meals[result.time]!.add(result);
         widget.meals[result.time]!.sort();
-        _createCalendar();
+        _calendarCells = _createCalendar();
       });
     } else if (result is String && result == "delete") {
-      widget.meals[_timeOfDay]!.remove(cell!.meal!);
-      widget.meals[_timeOfDay]!.sort();
-      _createCalendar();
+      setState(() {
+        widget.meals[_timeOfDay]!.remove(cell!.meal!);
+        widget.meals[_timeOfDay]!.sort();
+        _calendarCells = _createCalendar();
+      });
     }
   }
 
@@ -264,16 +278,14 @@ class _CalendarPageState extends State<CalendarPage> {
                 final success = await widget.calendarDB.deleteMeal(widget.user.uid!, cell.meal!);
                 _isLoading = false;
 
-                if (!mounted) return;
                 if (success) {
                   setState(() {
                     widget.meals[_timeOfDay]!.remove(cell.meal!);
                     widget.meals[_timeOfDay]!.sort();
-                    _createCalendar();
+                    _calendarCells = _createCalendar();
                   });
-                } else {
-                  Navigator.of(context).pop();
-                }
+                } 
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -401,8 +413,7 @@ class _CalendarPageState extends State<CalendarPage> {
                             } else {
                               currentMonth += 1;
                             }
-                            debugPrint("Swiped left → Next month");
-                            _createCalendar();
+                            _calendarCells = _createCalendar();
                           });
                         } else if (details.primaryVelocity! > 0) {
                           setState(() {
@@ -412,8 +423,7 @@ class _CalendarPageState extends State<CalendarPage> {
                             } else {
                               currentMonth -= 1;
                             }
-                            debugPrint("Swiped right → Previous month");
-                            _createCalendar();
+                            _calendarCells = _createCalendar();
                           });
                         }
                       }
@@ -422,7 +432,7 @@ class _CalendarPageState extends State<CalendarPage> {
                       crossAxisCount: 7,
                       childAspectRatio: 0.5,
                       children: <Widget>[
-                        ..._createCalendar(),
+                        ..._calendarCells,
                       ],
                     ),
                   ),

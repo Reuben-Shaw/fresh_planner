@@ -14,9 +14,9 @@ void main() {
     final r4 = Recipe(name: "TestRecipe4", ingredients: [], colour: Colors.red);
     final r5 = Recipe(name: "TestRecipe5", ingredients: [], colour: Colors.red);
 
-    final m1 = Meal(recipe: r1, time: TimeOfDay.lunch, day: DateTime(2025, 5, 7));
-    final m2 = Meal(recipe: r2, time: TimeOfDay.lunch, repeatFromOtherWeek: DateTime(2025, 3, 2));
-    final m3 = Meal(recipe: r3, time: TimeOfDay.lunch, day: DateTime(2025, 5, 3));
+    final m1 = Meal(recipe: r1, time: TimeOfDay.lunch, day: DateTime.utc(2025, 5, 7));
+    final m2 = Meal(recipe: r2, time: TimeOfDay.lunch, repeatFromOtherWeek: DateTime.utc(2025, 3, 2));
+    final m3 = Meal(recipe: r3, time: TimeOfDay.lunch, day: DateTime.utc(2025, 5, 3));
     final m4 = Meal(recipe: r4, time: TimeOfDay.lunch, repeatFromWeek: 6);
     final m5 = Meal(recipe: r5, time: TimeOfDay.lunch, repeatFromDay: 27);
     final List<Meal> meals = [m1, m2, m3, m4, m5,];

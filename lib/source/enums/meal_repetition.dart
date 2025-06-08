@@ -1,8 +1,8 @@
 enum MealRepetition {
-  everyWeek("Every "),
-  everyOtherWeek("Every Other "),
-  everyDate("Every "),
-  never("Never");
+  everyWeek('Every '),
+  everyOtherWeek('Every Other '),
+  everyDate('Every '),
+  never('Never');
 
   final String standardName;
 

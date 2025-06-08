@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
   bool get isRegister => _isRegister;
   set isRegister(bool value) => setState(() => _isRegister = value);
 
-  String _errorText = "";
+  String _errorText = '';
   String get errorText => _errorText;
   set errorText(String value) => setState(() => _errorText = value);
 
@@ -42,10 +42,10 @@ class _LoginPageState extends State<LoginPage> {
 
     FocusManager.instance.primaryFocus?.unfocus();
 
-    errorText = "";
+    errorText = '';
 
     if (email.isEmpty || password.isEmpty) {
-      errorText = "Please ensure all data is filled";
+      errorText = 'Please ensure all data is filled';
       return;
     }
 
@@ -53,12 +53,12 @@ class _LoginPageState extends State<LoginPage> {
 
     final userData = await widget.userDB.loginUser(email, password);
     if (!userData.$1) {
-      errorText = "Email or password is incorrect";
+      errorText = 'Email or password is incorrect';
       _isLoading = false;
       return;
     }
     else if (userData.$2 == null) {
-      errorText = "Internal server error, please try again";
+      errorText = 'Internal server error, please try again';
       _isLoading = false;
       return;
     }
@@ -72,7 +72,7 @@ class _LoginPageState extends State<LoginPage> {
     final mealData = await mealTask;
 
     if (ingredientData == null || recipeData == null || mealData == null || !mounted) {
-      errorText = "Internal server error, please try again";
+      errorText = 'Internal server error, please try again';
       _isLoading = false;
       return;
     }
@@ -112,20 +112,20 @@ class _LoginPageState extends State<LoginPage> {
 
     FocusManager.instance.primaryFocus?.unfocus();
 
-    errorText = "";
+    errorText = '';
 
     if (email.isEmpty || username.isEmpty || firstPassword.isEmpty || secondPassword.isEmpty) {
-      errorText = "Please ensure all data is filled";
+      errorText = 'Please ensure all data is filled';
       return;
     }
 
     if (!suitableEmail(email)) {
-      errorText = "Please enter a suitable email";
+      errorText = 'Please enter a suitable email';
       return;
     }
 
     if (firstPassword != secondPassword) {
-      errorText = "Please ensure passwords match";
+      errorText = 'Please ensure passwords match';
       return;
     }
 
@@ -133,11 +133,11 @@ class _LoginPageState extends State<LoginPage> {
     
     final emailCheck = await checkEmailExists();
     if (emailCheck == null) {
-      errorText = "Internal server error, please try again";
+      errorText = 'Internal server error, please try again';
     _isLoading = false;
       return;
     } else if (emailCheck) {
-      errorText = "This email has already been registered";
+      errorText = 'This email has already been registered';
     _isLoading = false;
       return;
     }
@@ -147,7 +147,7 @@ class _LoginPageState extends State<LoginPage> {
       await widget.userDB.addDefaultIngredients(addingNewUser.$2!);
       isRegister = false;
     } else {
-      errorText = "Internal server error, please try again";
+      errorText = 'Internal server error, please try again';
     }
     _isLoading = false;
   }
@@ -165,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                 Expanded(
                   child: SingleChildScrollView(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 32.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 32.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,15 +176,15 @@ class _LoginPageState extends State<LoginPage> {
                                 transform: Matrix4.translationValues(
                                   MediaQuery.of(context).size.width * .3, -35.0, 0.0,
                                 ),
-                                child: RotationTransition(
+                                child: const RotationTransition(
                                   turns: AlwaysStoppedAnimation(30 / 360),
                                   child: Image(
-                                    image: AssetImage("assets/images/LogoHeart1.png"),
+                                    image: AssetImage('assets/images/LogoHeart1.png'),
                                     fit: BoxFit.scaleDown,
                                   ),
                                 ),
                               ),
-                              Positioned(
+                              const Positioned(
                                 bottom: 5,
                                 left: 0,
                                 right: 0,
@@ -192,12 +192,12 @@ class _LoginPageState extends State<LoginPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "Login",
+                                      'Login',
                                       style: AppTextStyles.mainTitle,
                                     ),
                                     SizedBox(height: 5,),
                                     Text(
-                                      "Welcome to Fresh Planning",
+                                      'Welcome to Fresh Planning',
                                       style: AppTextStyles.subTitle,
                                     ),
                                   ],
@@ -205,7 +205,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ],
                           ),
-                          SizedBox(height: 40,),
+                          const SizedBox(height: 40,),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
@@ -214,57 +214,57 @@ class _LoginPageState extends State<LoginPage> {
                                   Container(
                                     decoration: AppTextFieldStyles.dropShadow,
                                     child: TextField(
-                                      key: Key("email_textfield"),
+                                      key: const Key('email_textfield'),
                                       controller: emailController,
                                       enableSuggestions: false,
                                       autocorrect: false,
-                                      decoration: AppTextFieldStyles.primaryStyle("email"),
+                                      decoration: AppTextFieldStyles.primaryStyle('email'),
                                     ),
                                   ),
                                   Visibility(
                                     visible: isRegister,
                                     child: Column(
                                       children: [
-                                        SizedBox(height: 20,),
+                                        const SizedBox(height: 20,),
                                         Container(
                                           decoration: AppTextFieldStyles.dropShadow,
                                           child: TextField(
-                                            key: Key("username_textfield"),
+                                            key: const Key('username_textfield'),
                                             controller: usernameController,
                                             enableSuggestions: false,
                                             autocorrect: false,
-                                            decoration: AppTextFieldStyles.primaryStyle("username"),
+                                            decoration: AppTextFieldStyles.primaryStyle('username'),
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  SizedBox(height: 20,),
+                                  const SizedBox(height: 20,),
                                   Container(
                                     decoration: AppTextFieldStyles.dropShadow,
                                     child: TextField(
-                                      key: Key("password_textfield"),
+                                      key: const Key('password_textfield'),
                                       controller: passwordController,
                                       obscureText: true,
                                       enableSuggestions: false,
                                       autocorrect: false,
-                                      decoration: AppTextFieldStyles.primaryStyle("password"),
+                                      decoration: AppTextFieldStyles.primaryStyle('password'),
                                     ),
                                   ),
                                   Visibility(
                                     visible: isRegister,
                                     child: Column(
                                       children: [
-                                        SizedBox(height: 20,),
+                                        const SizedBox(height: 20,),
                                         Container(
                                           decoration: AppTextFieldStyles.dropShadow,
                                           child: TextField(
-                                            key: Key("reenter_password_textfield"),
+                                            key: const Key('reenter_password_textfield'),
                                             controller: secondPasswordController,
                                             obscureText: true,
                                             enableSuggestions: false,
                                             autocorrect: false,
-                                            decoration: AppTextFieldStyles.primaryStyle("re-enter password"),
+                                            decoration: AppTextFieldStyles.primaryStyle('re-enter password'),
                                           ),
                                         ),
                                       ],
@@ -272,13 +272,13 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 10,),
+                              const SizedBox(height: 10,),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[
                                   Text(
                                     errorText,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 14, 
                                       color: Colors.red,
                                       fontWeight: FontWeight.bold,
@@ -286,14 +286,14 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 20,),
+                              const SizedBox(height: 20,),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: <Widget>[
                                   Container(
                                     decoration: AppButtonStyles.curvedShadow,
                                     child: ElevatedButton(
-                                      key: Key('login_button'),
+                                      key: const Key('login_button'),
                                       onPressed:
                                         isRegister ? registerAccount : checkPassword,
                                       style: AppButtonStyles.mainBackStyle,
@@ -307,14 +307,14 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ],
                           ),
-                          SizedBox(height: 20,),
+                          const SizedBox(height: 20,),
                         ],
                       ),
                     ),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 32.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
                   child: Column(
                     children: <Widget>[
                       Row(
@@ -322,7 +322,7 @@ class _LoginPageState extends State<LoginPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            isRegister ? "Already a user? " : "New user? ",
+                            isRegister ? 'Already a user? ' : 'New user? ',
                             style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -334,8 +334,8 @@ class _LoginPageState extends State<LoginPage> {
                               isRegister = !isRegister;
                             },
                             child: Text(
-                              key: Key("register_text"),
-                              isRegister ? "Login here" : "Register here",
+                              key: const Key('register_text'),
+                              isRegister ? 'Login here' : 'Register here',
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -345,7 +345,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 10,)
+                      const SizedBox(height: 10,)
                     ],
                   ),
                 ),
@@ -353,7 +353,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             Visibility(
               visible: _isLoading,
-              child: LoadingScreen(),
+              child: const LoadingScreen(),
             ),
           ],
         ),

@@ -19,19 +19,19 @@ class CalendarCell extends StatelessWidget {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return "Date is $date\nMeal is ${meal.toString()}";
+    return 'Date is $date\nMeal is ${meal.toString()}';
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: Color(0xFF26693C))
+        border: Border.all(color: const Color(0xFF26693C))
       ),
       child: Opacity(
         opacity: isFaded ? 0.33 : 1,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 2.0),
+          padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 2.0),
           child: Column(
             mainAxisAlignment: meal == null ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
             children: <Widget>[
@@ -46,7 +46,7 @@ class CalendarCell extends StatelessWidget {
                         child: Container(
                           width: 28,
                           height: 28,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             shape: BoxShape.circle,
                             color: Color(0xFF26693C),
                           ),
@@ -56,7 +56,7 @@ class CalendarCell extends StatelessWidget {
                         date.day.toString(),
                         style: TextStyle(
                           fontSize: 20,
-                          color: isCurrentDay ? Colors.white : Color(0xFF26693C), 
+                          color: isCurrentDay ? Colors.white : const Color(0xFF26693C), 
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -77,9 +77,9 @@ class CalendarCell extends StatelessWidget {
                   Visibility(
                     visible: meal != null,
                     child: Text(
-                      meal == null ? "" : (meal?.recipe.name)!,
+                      meal == null ? '' : (meal?.recipe.name)!,
                       textAlign: TextAlign.right,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 11,
                       ),
                     ),
@@ -93,11 +93,11 @@ class CalendarCell extends StatelessWidget {
                           child: Container(
                             width: 42,
                             height: 42,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.green,
                             ),
-                            child: Center(
+                            child: const Center(
                               child: Icon(
                                 Icons.add,
                                 color: Colors.white,

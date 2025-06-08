@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart' hide TimeOfDay;
 import 'package:fresh_planner/source/enums/meal_repetition.dart';
 import 'package:fresh_planner/source/enums/time_of_day.dart';
 import 'package:fresh_planner/source/objects/recipe.dart';
@@ -143,20 +142,20 @@ class Meal implements Comparable<Meal> {
 
   @override
   String toString() {
-    String repetition = "";
+    String repetition = '';
     if (repeatFromWeek != null) {
-      repetition += "every week on a $repeatFromWeek";
+      repetition += 'every week on a $repeatFromWeek';
     } 
     if (repeatFromOtherWeek != null) {
-      repetition += "every other week";
+      repetition += 'every other week';
     } 
     if (repeatFromDay != null) {
-      repetition += "every month on the $repeatFromDay";
+      repetition += 'every month on the $repeatFromDay';
     }
     if (day != null) {
-      repetition += "never, only on the ${day!.day}/${day!.month}/${day!.year}";
+      repetition += 'never, only on the ${day!.day}/${day!.month}/${day!.year}';
     }
-    return ("Cooking ${recipe.name} at ${time.standardName}, repeating $repetition");
+    return ('Cooking ${recipe.name} at ${time.standardName}, repeating $repetition');
   }
 }
 

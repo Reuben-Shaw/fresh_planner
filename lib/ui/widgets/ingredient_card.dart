@@ -44,12 +44,12 @@ class IngredientCard extends StatelessWidget implements Comparable<IngredientCar
                       Visibility(
                         visible: showAmount,
                         child: Text(
-                          ingredient.amount == 0 ? "" : ingredient.amount.toString(),
+                          ingredient.amount == 0 ? '' : ingredient.amount.toString(),
                         ),
                       ),
-                      SizedBox(width: 5,),
+                      const SizedBox(width: 5,),
                       Text(
-                        (showAmount && (ingredient.metric == IngredientMetric.item || ingredient.amount == 0)) ? "" : 
+                        (showAmount && (ingredient.metric == IngredientMetric.item || ingredient.amount == 0)) ? '' : 
                         showAmount ? ingredient.metric.metricSymbol : ingredient.metric.standardName, 
                         style: AppTextStyles.standardBold,
                       ),
@@ -64,7 +64,7 @@ class IngredientCard extends StatelessWidget implements Comparable<IngredientCar
           onPressed: onRemove, 
           icon: Icon(
             showAmount ? Icons.cancel : Icons.delete_forever_rounded, 
-            color: Color(0xFF26693C),
+            color: const Color(0xFF26693C),
           ),
         ),
       ],

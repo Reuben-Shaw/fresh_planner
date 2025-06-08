@@ -9,9 +9,9 @@ class AppRadiobuttonStyle {
             radioTheme: RadioThemeData(
               fillColor: WidgetStateProperty.resolveWith<Color>((states) {
                 if (states.contains(WidgetState.selected)) {
-                  return Color(0xFF26693C);
+                  return const Color(0xFF26693C);
                 }
-                return Color(0xFF26693C);
+                return const Color(0xFF26693C);
               }),
               visualDensity: VisualDensity.compact,
             ),

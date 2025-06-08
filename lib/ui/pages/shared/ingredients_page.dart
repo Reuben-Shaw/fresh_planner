@@ -137,6 +137,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
               children: <Widget>[
                 IconButton(
                   onPressed: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
                     _isLoading = true;
                     Navigator.of(context).pop();
                   },
@@ -156,33 +157,31 @@ class _IngredientsPageState extends State<IngredientsPage> {
                               "Ingredients",
                               style: AppTextStyles.mainTitle,
                             ),
-                            Container(
-                              decoration: AppButtonStyles.circularShadow,
-                              child: IconButton(
-                                onPressed: () async {
-                                  _isLoading = true;
-                                  final result = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => AddIngredientPage(user: widget.user, ingredients: widget.ingredients, ingredientDB: _ingredientDB,)),
-                                  );
-                                  _isLoading = false;
-                                  if (result is! Ingredient) return;
-                                  setState(() {
-                                    widget.ingredients.add(result);
-                                    widget.ingredients.sort();
-                                    _ingredientMap[result.type ?? IngredientType.misc]!.add(IngredientCard(ingredient: result, onRemove: () async => _removeIngredient(result), showAmount: false,));
-                                    _ingredientMap[result.type ?? IngredientType.misc]!.sort();
-                                    _searchController.clear();
-                                    _updateSearch("");
-                                  });
-                                },
-                                style: ButtonStyle(
-                                  backgroundColor: WidgetStateProperty.all<Color>(Color(0xFF399E5A)),
-                                ), 
-                                icon: Icon(
-                                  Icons.add,
-                                  color: Colors.white,
-                                ),
+                            IconButton(
+                              onPressed: () async {
+                                FocusManager.instance.primaryFocus?.unfocus();
+                                _isLoading = true;
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => AddIngredientPage(user: widget.user, ingredients: widget.ingredients, ingredientDB: _ingredientDB,)),
+                                );
+                                _isLoading = false;
+                                if (result is! Ingredient) return;
+                                setState(() {
+                                  widget.ingredients.add(result);
+                                  widget.ingredients.sort();
+                                  _ingredientMap[result.type ?? IngredientType.misc]!.add(IngredientCard(ingredient: result, onRemove: () async => _removeIngredient(result), showAmount: false,));
+                                  _ingredientMap[result.type ?? IngredientType.misc]!.sort();
+                                  _searchController.clear();
+                                  _updateSearch("");
+                                });
+                              },
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStateProperty.all<Color>(Color(0xFF399E5A)),
+                              ), 
+                              icon: Icon(
+                                Icons.add,
+                                color: Colors.white,
                               ),
                             ),
                           ],
@@ -331,6 +330,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                               decoration: AppButtonStyles.curvedShadow,
                               child: ElevatedButton(
                                 onPressed: () {
+                                  FocusManager.instance.primaryFocus?.unfocus();
                                   Navigator.pop(context, _selectedIngredient,); 
                                 }, 
                                 style: AppButtonStyles.mainBackStyle,

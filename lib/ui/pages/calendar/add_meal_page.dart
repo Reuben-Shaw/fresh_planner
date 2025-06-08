@@ -135,6 +135,7 @@ class _AddMealPageState extends State<AddMealPage> {
               children: <Widget>[
                 IconButton(
                   onPressed: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
                     _isLoading = true;
                     Navigator.of(context).pop();
                   },

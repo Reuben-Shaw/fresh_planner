@@ -59,6 +59,8 @@ class _RecipePageState extends State<RecipePage> {
   }
 
   void _addRecipe() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+
     errorText = "";
     if (_nameController.text == "") {
       errorText = "Ensure all required values are filled";
@@ -112,6 +114,7 @@ class _RecipePageState extends State<RecipePage> {
               children: <Widget>[
                 IconButton(
                   onPressed: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
                     _isLoading = true;
                     Navigator.of(context).pop();
                   },

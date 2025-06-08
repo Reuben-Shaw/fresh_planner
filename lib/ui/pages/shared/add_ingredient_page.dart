@@ -79,6 +79,8 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
   }
 
   void addIngredient() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+
     if (_nameController.text == "" || _metricDropdownValue == null) {
       errorText = "Ensure all required values are filled";
       return;
@@ -141,6 +143,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
               children: <Widget>[
                 IconButton(
                   onPressed: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
                     _isLoading = true;
                     Navigator.of(context).pop();
                   },

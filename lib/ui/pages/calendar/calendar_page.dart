@@ -306,6 +306,7 @@ class _CalendarPageState extends State<CalendarPage> {
               children: <Widget>[
                 IconButton(
                   onPressed: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
                     Navigator.of(context).pop();
                   },
                   icon: Icon(Icons.arrow_back,),

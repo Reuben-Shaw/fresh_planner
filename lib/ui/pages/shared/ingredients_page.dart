@@ -284,7 +284,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                                 );
                                 if (result == null) return;
                                 final parsedValue = int.tryParse(result);
-                                if (parsedValue == null) return;
+                                if (parsedValue == null || parsedValue < 0) return;
                   
                                 setState(() {
                                   _selectedIngredient!.amount = parsedValue;
@@ -331,6 +331,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   FocusManager.instance.primaryFocus?.unfocus();
+                                  if (_selectedIngredient != null && _selectedIngredient!.amount < 0) _selectedIngredient!.amount = 0;
                                   Navigator.pop(context, _selectedIngredient,); 
                                 }, 
                                 style: AppButtonStyles.mainBackStyle,

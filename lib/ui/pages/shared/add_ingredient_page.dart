@@ -103,6 +103,10 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
         errorText = "Amount per cost is not numeric";
         return;
       }
+      if (costParsed < 0 || costAmountParsed < 0) {
+        errorText = "Pricing cannot use negative numbers";
+        return;
+      }
     }
     if (widget.ingredients.any((i) => i.name == _nameController.text.toLowerCase())) {
       errorText = "Ingredient with the same name already exists";

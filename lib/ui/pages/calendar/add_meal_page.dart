@@ -74,7 +74,6 @@ class _AddMealPageState extends State<AddMealPage> {
     setState(() {
       _selectedRecipe = widget.currentMeal!.recipe;
     });
-    debugPrint('HEY HERE ${widget.currentMeal?.toString()}');
   }
 
   /// Small function used for improved UX on a radio button
@@ -112,7 +111,6 @@ class _AddMealPageState extends State<AddMealPage> {
       day: _repetition == MealRepetition.never ? widget.day : null,
       cookedFresh: _isFresh,
     );
-    debugPrint('IS FRESH $_isFresh');
     _isLoading = true;
 
     (bool, String?) response = await widget.calendarDB.addMeal(widget.user.uid!, meal);

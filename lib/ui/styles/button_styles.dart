@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+/// Style collection for buttons in the program, contains buttons themselves and boxes used to contain them for shadows
 class AppButtonStyles {
   static BoxDecoration curvedShadow = BoxDecoration(
     borderRadius: const BorderRadius.all(Radius.circular(35)),
@@ -11,6 +13,7 @@ class AppButtonStyles {
       ),
     ],
   );
+
   static BoxDecoration circularShadow = BoxDecoration(
     borderRadius: const BorderRadius.all(Radius.circular(360)),
     boxShadow: [

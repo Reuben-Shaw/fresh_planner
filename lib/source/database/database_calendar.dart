@@ -14,10 +14,10 @@ class DatabaseCalendar {
 
       bool success = response['success'] as bool? ?? false;
       if (success) {
-        debugPrint("New recipe added successfully with id ${response['id'] as String}");
+        debugPrint('New recipe added successfully with id ${response['id'] as String}');
         return (true, response['id'] as String);
       } else {
-        debugPrint("Adding new recipe failed: ${response['message'] ?? response['error'] ?? "!!NO ERROR OR MESSAGE!!"}");
+        debugPrint('Adding new recipe failed: ${response['message'] ?? response['error'] ?? '!!NO ERROR OR MESSAGE!!'}');
         return (false, null);
       }
     } catch (e) {
@@ -40,7 +40,7 @@ class DatabaseCalendar {
           return Recipe.fromJson(ingredientJson);
         }).toList();
       } else {
-        debugPrint("Failed to get recipes: ${response['message'] ?? response['error'] ?? "!!NO ERROR OR MESSAGE!!"}");
+        debugPrint('Failed to get recipes: ${response['message'] ?? response['error'] ?? '!!NO ERROR OR MESSAGE!!'}');
       }
       return [];
     } catch (e) {
@@ -54,10 +54,10 @@ class DatabaseCalendar {
       final response = await _database.addMealAPI(uid, meal);
       bool success = response['success'] as bool? ?? false;
       if (success) {
-        debugPrint("Meal added with id ${response['id']}");
+        debugPrint('Meal added with id ${response['id']}');
         return (true, response['id'] as String?);
       } else {
-        debugPrint("Add meal failed: ${response['error'] ?? response['message']}");
+        debugPrint('Add meal failed: ${response['error'] ?? response['message']}');
         return (false, null);
       }
     } catch (e) {
@@ -84,7 +84,7 @@ class DatabaseCalendar {
         }
         return mealsByTime;
       } else {
-        debugPrint("Get meals failed: ${response['error'] ?? response['message']}");
+        debugPrint('Get meals failed: ${response['error'] ?? response['message']}');
       }
       return null;
     } catch (e) {
@@ -102,7 +102,7 @@ class DatabaseCalendar {
         debugPrint('Meal deleted with id ${meal.id!}');
         return true;
       } else {
-        debugPrint("Deleting meal failed: ${response['error'] ?? response['message']}");
+        debugPrint('Deleting meal failed: ${response['error'] ?? response['message']}');
         return false;
       }
     } catch (e) {

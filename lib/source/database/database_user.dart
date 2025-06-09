@@ -12,13 +12,13 @@ class DatabaseUser {
 
       bool success = response['success'] as bool? ?? false;
       if (success) {
-        debugPrint("Login successful: ${response['message']}");
+        debugPrint('Login successful: ${response['message']}');
 
         final userData = response['user'];
         final User user = User.fromJson(userData);
         return (success, user);
       } else {
-        debugPrint("Login failed: ${response['message'] ?? response['error'] ?? "!!NO ERROR OR MESSAGE!!"}");
+        debugPrint('Login failed: ${response['message'] ?? response['error'] ?? '!!NO ERROR OR MESSAGE!!'}');
       }
       return (success, null);
     } catch (e) {
@@ -34,10 +34,10 @@ class DatabaseUser {
 
       bool success = response['success'] as bool? ?? false;
       if (success) {
-        debugPrint("Check was successful: ${response['message']}");
+        debugPrint('Check was successful: ${response['message']}');
         return (success, response['exists'] as bool);
       } else {
-        debugPrint("Check failed: ${response['message'] ?? response['error'] ?? "!!NO ERROR OR MESSAGE!!"}");
+        debugPrint('Check failed: ${response['message'] ?? response['error'] ?? '!!NO ERROR OR MESSAGE!!'}');
       }
       return (success, false);
     } catch (e) {
@@ -53,10 +53,10 @@ class DatabaseUser {
       
       bool success = response['success'] as bool? ?? false;
       if (success) {
-        debugPrint("User added successfully: ${response['message']}");
+        debugPrint('User added successfully: ${response['message']}');
         return (true, response['uid'] as String?);
       } else {
-        debugPrint("User addition failed: ${response['message'] ?? response['error'] ?? "!!NO ERROR OR MESSAGE!!"}");
+        debugPrint('User addition failed: ${response['message'] ?? response['error'] ?? '!!NO ERROR OR MESSAGE!!'}');
       }
 
       return (false, null);
@@ -79,7 +79,7 @@ class DatabaseUser {
         debugPrint('Default ingredients added successfully');
         return true;
       } else {
-        debugPrint("Adding default ingredients failed: ${response['message'] ?? response['error'] ?? "!!NO ERROR OR MESSAGE!!"}");
+        debugPrint('Adding default ingredients failed: ${response['message'] ?? response['error'] ?? '!!NO ERROR OR MESSAGE!!'}');
         return false;
       }
     } catch (e) {

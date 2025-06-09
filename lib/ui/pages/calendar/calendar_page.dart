@@ -22,11 +22,13 @@ class CalendarPage extends ParentPage {
 }
 
 class _CalendarPageState extends State<CalendarPage> { 
-  DateTime currentDate = DateTime.now().toUtc();
-	int currentDay = 1;
-	int currentMonth = 1;
-	int currentYear = 1970;
+  /// Current local datetime
+  DateTime _currentDate = DateTime.now();
+  // Month and year that the calendar is currently displaying, seperate from local time
+	int _displayedMonth = 1;
+	int _displayedYear = 1970;
 
+  // Contains all the days of the month used in display
   List<Widget> _calendarCells = [];
 
   TimeOfDay __timeOfDay = TimeOfDay.lunch;
@@ -46,10 +48,12 @@ class _CalendarPageState extends State<CalendarPage> {
   double get _upcomingCost => __upcomingCost;
   set _upcomingCost(double value) => setState(() => __upcomingCost = value);
 
-  final GlobalKey<TooltipState> tooltipkey = GlobalKey<TooltipState>();
+  final GlobalKey<TooltipState> _tooltipKey = GlobalKey<TooltipState>();
 
+  /// Used for creation of display cells
   CalendarCell _cloneCell(CalendarCell? c, Meal m, DateTime d) => CalendarCell(date: d, meal: m, isCurrentDay: c!.isCurrentDay, isPassed: c.isPassed, isFaded: c.isFaded,);
   
+  /// Responsible for setting the current time of day based on the local time
   @override
   void initState() {
     super.initState();
@@ -58,10 +62,9 @@ class _CalendarPageState extends State<CalendarPage> {
     DateTime date = DateTime.utc(time.year, time.month, time.day, 0, 0, 0);
 
     setState(() {
-      currentDate = date;
-      currentDay = date.day;
-      currentMonth = date.month;
-      currentYear = date.year;  
+      _currentDate = date;
+      _displayedMonth = date.month;
+      _displayedYear = date.year;  
     });
 
     if (date.toLocal().add(const Duration(hours: 14, minutes: 59)).isBefore(time)) {
@@ -81,35 +84,40 @@ class _CalendarPageState extends State<CalendarPage> {
     });
   }
 
+  /// Very long function that creates the entire calendar
   List<GestureDetector> _createCalendar() {
     final List<GestureDetector> cells = [];
 
+    // Key variable intitialisation for values that are used for calculations throughout the function
     final int monthStartDay;
 		final int monthLength;
 
-		int priorMonth = currentMonth - 1;
-		int priorYear = currentYear;
-		int nextMonth = currentMonth + 1;
-		int nextYear = currentYear;
+		int priorMonth = _displayedMonth - 1;
+		int priorYear = _displayedYear;
+		int nextMonth = _displayedMonth + 1;
+		int nextYear = _displayedYear;
 		final int priorMonthLength;
 
-    monthStartDay = britishWeekday(DateTime.utc(currentYear, currentMonth, 1));
-    monthLength = getDaysInMonth(currentYear, currentMonth);
+    monthStartDay = _britishWeekday(DateTime.utc(_displayedYear, _displayedMonth, 1));
+    monthLength = _getDaysInMonth(_displayedYear, _displayedMonth);
 
-    if (currentMonth == 1) {
+    // Logic for handling overflow and underflow of the current year when display previous/next month run offs
+    if (_displayedMonth == 1) {
 			priorMonth = 12;
-			priorYear = currentYear - 1;
+			priorYear = _displayedYear - 1;
 		}
-		else if (currentMonth == 12) {
+		else if (_displayedMonth == 12) {
 			nextMonth = 1;
-			nextYear = currentYear + 1;
+			nextYear = _displayedYear + 1;
 		}
 
-    priorMonthLength = getDaysInMonth(priorYear, priorMonth);
+    priorMonthLength = _getDaysInMonth(priorYear, priorMonth);
 
+    // numberAfterAdded is used to cut the list if it exceeds 6, as it means an entire extra week for the next month has been added without reason
     int numberAfterAdded = 0;
     Map<DateTime, CalendarCell?> cellMap = {};
 
+    // Nested for loops create the calendar cells and assigns dates but doesn't populate them with meals
     for (int week = 0; week < 6; week++) {
 			for (int day = 0; day < 7; day++) {
 				final int offsetIndex = (week * 7) + day + 1;
@@ -117,22 +125,23 @@ class _CalendarPageState extends State<CalendarPage> {
 				// Logic for adding the days before the start of the month
 				if (offsetIndex < monthStartDay + 1) {
           final day = DateTime.utc(priorYear, priorMonth, priorMonthLength - monthStartDay + offsetIndex);
-					cellMap[day] = CalendarCell(date: day, isPassed: day.isBefore(currentDate), isFaded: true,);
+					cellMap[day] = CalendarCell(date: day, isPassed: day.isBefore(_currentDate), isFaded: true,);
 				}
 				// Logic for adding the days after the end of the month
 				else if (offsetIndex > monthLength + monthStartDay) {
           final day = DateTime.utc(nextYear, nextMonth, offsetIndex - (monthLength + monthStartDay));
-					cellMap[day] = CalendarCell(date: day, isPassed: day.isBefore(currentDate), isFaded: true);
+					cellMap[day] = CalendarCell(date: day, isPassed: day.isBefore(_currentDate), isFaded: true);
           numberAfterAdded++;
 				}
 				// Logic for adding days in the month
 				else {
-          final day = DateTime.utc(currentYear, currentMonth, offsetIndex - monthStartDay);
+          final day = DateTime.utc(_displayedYear, _displayedMonth, offsetIndex - monthStartDay);
 					cellMap[day] = CalendarCell(
             date: day, 
-            isCurrentDay: day == currentDate, 
-            isPassed: day.isBefore(currentDate), 
-            isFaded: currentMonth == currentDate.month ? day.isBefore(currentDate) : false,
+            isCurrentDay: day == _currentDate, 
+            isPassed: day.isBefore(_currentDate), 
+            // Days in the current month are faded if they are passed, to assist with clarity for upcoming vs passed days
+            isFaded: _displayedMonth == _currentDate.month ? day.isBefore(_currentDate) : false,
           );
 				}
 			}
@@ -141,19 +150,22 @@ class _CalendarPageState extends State<CalendarPage> {
     DateTime firstDate = cellMap.entries.first.key;
     DateTime lastDate = cellMap.entries.last.key;
 
+    // For loop populates all the created calendar cells with meals
+    // Meals are kept in an ordered list with the intention that they override each other, see `Meal.dart` for more information
+    // It's likely that calendar cells are assigned multiple meals in the run of this loop
     for (Meal m in widget.meals[_timeOfDay]!) {
+      // Every week
       if (m.isRepeatingWeek()) {
-        final startDate = getFirstInstanceOfDay(m.repeatFromWeek!, cellMap); 
+        final startDate = _getFirstInstanceOfDay(m.repeatFromWeek!, cellMap); 
         for(int i = 0; i < 6; i++) {
           final newDate = startDate.add(Duration(days: i * 7));
           cellMap[newDate] = _cloneCell(cellMap[newDate], m, newDate,);
         }
       }
+      // Every other week
       else if (m.isRepeatingOtherWeek()) {
-        final firstInstanceOfDay = getFirstInstanceOfDay(britishWeekday(m.repeatFromOtherWeek!), cellMap);
+        final firstInstanceOfDay = _getFirstInstanceOfDay(_britishWeekday(m.repeatFromOtherWeek!), cellMap);
         int difference = m.repeatFromOtherWeek!.difference(firstInstanceOfDay).inDays.abs();
-        // Adding 1 to account for passing through daylight savings
-        if (difference % 7 != 0) difference++;
         final offset = difference % 14;
 
         for(int i = 0; i < 3; i++)
@@ -163,22 +175,19 @@ class _CalendarPageState extends State<CalendarPage> {
           cellMap[newDate] = _cloneCell(cellMap[newDate], m, newDate,);
         }
       }
+      // Specific date
       else if (m.isRepeatingDay()) {
-        final currentDate = DateTime.utc(currentYear, currentMonth, m.repeatFromDay!);
-        cellMap[currentDate] = _cloneCell(cellMap[currentDate], m, currentDate,);
-        
-        final priorDate = DateTime.utc(priorYear, priorMonth, m.repeatFromDay!);
-        if (cellMap.containsKey(priorDate)) cellMap[priorDate] = _cloneCell(cellMap[priorDate], m, priorDate,);
-
-        final nextDate = DateTime.utc(nextYear, nextMonth, m.repeatFromDay!);
-        if (cellMap.containsKey(nextDate)) cellMap[nextDate] = _cloneCell(cellMap[nextDate], m, nextDate,);
+        cellMap = _addRepeatingDay('$priorYear-${priorMonth.toString().padLeft(2, '0')}-${m.repeatFromDay!.toString().padLeft(2, '0')} 00:00:00.000Z', cellMap, m);
+        cellMap = _addRepeatingDay('$_displayedYear-${_displayedMonth.toString().padLeft(2, '0')}-${m.repeatFromDay!.toString().padLeft(2, '0')} 00:00:00.000Z', cellMap, m);
+        cellMap = _addRepeatingDay('$nextYear-${nextMonth.toString().padLeft(2, '0')}-${m.repeatFromDay!.toString().padLeft(2, '0')} 00:00:00.000Z', cellMap, m);
       }
+      // Never repeats
       else if (m.isSingleDay() && m.day!.isAfter(firstDate) && m.day!.isBefore(lastDate)) {
         cellMap[m.day!] = _cloneCell(cellMap[m.day!], m, m.day!,);
       }
     }
 
-    debugPrint('CELLMAP');
+    // Final for loop to assign interaction states to each day
     cellMap.forEach((key, value) {
       final gestureCell = GestureDetector(
         onTap: () async {
@@ -190,29 +199,55 @@ class _CalendarPageState extends State<CalendarPage> {
         child: value
       );
       cells.add(gestureCell);
-      debugPrint(value.toString());
     });
 
+    // Cuts the displayed cells if the end of the month is short enough that an entire extra week is displayed from the upcoming month
     if (numberAfterAdded > 6) {
       cells.length = cells.length - 7;
     }
 
-    setCostForNextSevenDays(cellMap);
+    _setCostForNextSevenDays(cellMap);
 
     return cells;
   }
 
-  int getDaysInMonth(int year, int month) {
+
+  int _getDaysInMonth(int year, int month) {
     final firstDayOfNextMonth = (month < 12)
         ? DateTime.utc(year, month + 1, 1)
         : DateTime.utc(year + 1, 1, 1);
     return firstDayOfNextMonth.subtract(const Duration(days: 1)).day;
   }
 
-  int britishWeekday(DateTime date) {
+  /// Changes the default American logic to reflect the British display (American: Sunday = 0, Saturday = 6 - British: Monday = 0, Sunday = 6)
+  int _britishWeekday(DateTime date) {
     return (date.weekday + 6) % 7;
   }
 
+  /// Used for ensuring that repetition on an exact date works for days that aren't present every month (29th-31st)
+  bool _validateDateTime(String input) {
+    try {
+      DateFormat('yyyy-MM-dd').parseStrict(input);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Condensed repeated logic for adding days that repeat once a month on a specific day
+  Map<DateTime, CalendarCell?> _addRepeatingDay(String currentTimeStr, Map<DateTime, CalendarCell?> cellMap, Meal m) {
+    final isDate = _validateDateTime(currentTimeStr.split(' ')[0]);
+    if (!isDate) return cellMap;
+
+    final date = DateTime.parse(currentTimeStr);
+
+    if (cellMap.containsKey(date)) {
+      cellMap[date] = _cloneCell(cellMap[date], m, date,);
+    }
+    return cellMap;
+  }
+
+  /// Handles logic for navigating to the `add_meal_page` when the cell is clicked, if it is empty it navigates to add a new meal, if not it's just a display screen
   Future<void> _onCellClick(DateTime day, CalendarCell? cell) async {
     if (cell?.isPassed ?? true) return;
     
@@ -238,14 +273,16 @@ class _CalendarPageState extends State<CalendarPage> {
     }
   }
 
-  DateTime getFirstInstanceOfDay(int dayOfWeek, Map<DateTime, CalendarCell?> cellMap) {
+  /// Gets the first instance of a day of the week from the cellMap
+  DateTime _getFirstInstanceOfDay(int dayOfWeek, Map<DateTime, CalendarCell?> cellMap) {
     return cellMap.entries.elementAt(dayOfWeek).key;
   }
 
-  void setCostForNextSevenDays(Map<DateTime, CalendarCell?> cellMap) {
+  /// Calculates the expected cost for the next seven days, only works on the current month
+  void _setCostForNextSevenDays(Map<DateTime, CalendarCell?> cellMap) {
     double upcomingCost = 0;
     for (int i = 0; i < 7; i++) {
-      DateTime dateCheck = DateTime.utc(currentDate.year, currentDate.month, currentDate.day + i);
+      DateTime dateCheck = DateTime.utc(_currentDate.year, _currentDate.month, _currentDate.day + i);
       if (cellMap.containsKey(dateCheck)) {
         upcomingCost += cellMap[dateCheck]?.meal?.cost() ?? 0;
       }
@@ -255,6 +292,7 @@ class _CalendarPageState extends State<CalendarPage> {
     });
   }
 
+  /// Delete popup from holding down on a day, deleting meals can also be done in `add_meal_page` when viewing a meal
   Future<void> _showDeleteDialog(CalendarCell? cell) async {
     if (cell == null || cell.meal == null) return;
 
@@ -328,10 +366,11 @@ class _CalendarPageState extends State<CalendarPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Flexible(
+                            // Handles the title, which only displays the year if the year is not the one that's local to the user, if the year is displayed month is shortened to fit
                             child: Text(
-                              currentYear == currentDate.year ?
-                              "${DateFormat('MMMM').format(DateTime(currentYear, currentMonth))}${currentYear == currentDate.year ? "" : " - $currentYear"}" :
-                                "${DateFormat('MMM').format(DateTime(currentYear, currentMonth))}${currentYear == currentDate.year ? "" : " - ${currentYear.toString().substring(2, 4)}"}", 
+                              _displayedYear == _currentDate.year ?
+                                DateFormat('MMMM').format(DateTime(_displayedYear, _displayedMonth)) :
+                                '${DateFormat('MMM').format(DateTime(_displayedYear, _displayedMonth))}${_displayedYear == _currentDate.year ? '' : ' - ${_displayedYear.toString().substring(2, 4)}'}', 
                               style: AppTextStyles.mainTitle,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -410,26 +449,27 @@ class _CalendarPageState extends State<CalendarPage> {
                   ],
                 ),
                 Expanded(
+                  // Handles navigation between months by swiping to the left and right
                   child: GestureDetector(
                     onHorizontalDragEnd: (DragEndDetails details) {
                       if (details.primaryVelocity != null) {
                         if (details.primaryVelocity! < 0) {
                           setState(() {
-                            if (currentMonth == 12) {
-                              currentMonth = 1;
-                              currentYear += 1;
+                            if (_displayedMonth == 12) {
+                              _displayedMonth = 1;
+                              _displayedYear += 1;
                             } else {
-                              currentMonth += 1;
+                              _displayedMonth += 1;
                             }
                             _calendarCells = _createCalendar();
                           });
                         } else if (details.primaryVelocity! > 0) {
                           setState(() {
-                            if (currentMonth == 1) {
-                              currentMonth = 12;
-                              currentYear -= 1;
+                            if (_displayedMonth == 1) {
+                              _displayedMonth = 12;
+                              _displayedYear -= 1;
                             } else {
-                              currentMonth -= 1;
+                              _displayedMonth -= 1;
                             }
                             _calendarCells = _createCalendar();
                           });
@@ -446,9 +486,9 @@ class _CalendarPageState extends State<CalendarPage> {
                   ),
                 ),
                 Visibility(
-                  visible: currentMonth == currentDate.month,
+                  visible: _displayedMonth == _currentDate.month,
                   child: Tooltip(
-                    key: tooltipkey,
+                    key: _tooltipKey,
                     triggerMode: TooltipTriggerMode.manual,
                     showDuration: const Duration(seconds: 1),
                     message: 'Predicted cost of ${_timeOfDay.standardName.toLowerCase()} for the next 7 days',
@@ -475,7 +515,7 @@ class _CalendarPageState extends State<CalendarPage> {
                             color: Color(0xFF26693C),
                           ),
                           onPressed: () {
-                            tooltipkey.currentState?.ensureTooltipVisible();
+                            _tooltipKey.currentState?.ensureTooltipVisible();
                           },
                         ),
                       ],

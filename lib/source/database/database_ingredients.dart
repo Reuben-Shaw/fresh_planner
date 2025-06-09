@@ -19,7 +19,7 @@ class DatabaseIngredients {
           return Ingredient.fromJson(ingredientJson);
         }).toList();
       } else {
-        debugPrint("Failed to get ingredients: ${response['message'] ?? response['error'] ?? "!!NO ERROR OR MESSAGE!!"}");
+        debugPrint('Failed to get ingredients: ${response['message'] ?? response['error'] ?? '!!NO ERROR OR MESSAGE!!'}');
       }
       return [];
     } catch (e) {
@@ -38,7 +38,7 @@ class DatabaseIngredients {
         debugPrint('Ingredient removed successfully');
         return true;
       } else {
-        debugPrint("Ingredient removal failed: ${response['message'] ?? response['error'] ?? "!!NO ERROR OR MESSAGE!!"}");
+        debugPrint('Ingredient removal failed: ${response['message'] ?? response['error'] ?? '!!NO ERROR OR MESSAGE!!'}');
       }
       return false;
     } catch (e) {
@@ -54,10 +54,10 @@ class DatabaseIngredients {
 
       bool success = response['success'] as bool? ?? false;
       if (success) {
-        debugPrint("New ingredient added successfully with id ${response['id'] as String}");
+        debugPrint('New ingredient added successfully with id ${response['id'] as String}');
         return (true, response['id'] as String);
       } else {
-        debugPrint("Adding new ingredient failed: ${response['message'] ?? response['error'] ?? "!!NO ERROR OR MESSAGE!!"}");
+        debugPrint('Adding new ingredient failed: ${response['message'] ?? response['error'] ?? '!!NO ERROR OR MESSAGE!!'}');
         return (false, null);
       }
     } catch (e) {

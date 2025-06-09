@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fresh_planner/ui/styles/text_styles.dart';
+
+/// Styles for text entry in the program, contains the boxes that hold them with shadows as well as the entries themselves
 class AppTextFieldStyles {
   static InputDecoration primaryStyle(String hint, {Icon? icon}) { 
     return InputDecoration(filled: true,

@@ -2,6 +2,7 @@ import 'package:fresh_planner/source/enums/meal_repetition.dart';
 import 'package:fresh_planner/source/enums/time_of_day.dart';
 import 'package:fresh_planner/source/objects/recipe.dart';
 
+/// Stores meals, which are in effect a recipe with a date of some kind
 class Meal implements Comparable<Meal> {
   String? id;
   Recipe recipe;
@@ -12,6 +13,17 @@ class Meal implements Comparable<Meal> {
   DateTime? day;
   bool? cookedFresh;
 
+  /// `repeatFromWeek`, `repeatFromOtherWeek`, `repeatFromDay`, and `day` are all used for discerning repetition:
+  /// 
+  /// `repeatFromWeek` -> repeats every given i day, where i is an int ranged 0-6 - 0 = Monday, 6 = Sunday
+  /// 
+  /// `repeatFromOtherWeek` -> repeats every 14 days on and behind the given date
+  /// 
+  /// `repeatFromDay` -> repeats every i day, where i is a day of the month
+  /// 
+  /// `day` -> never repeats, only displays on the given day
+  /// 
+  /// `cookedFresh` is needed for calcualating cost, if it's not cooked fresh it's considered free
   Meal({
     this.id,
     required this.recipe,
@@ -23,6 +35,7 @@ class Meal implements Comparable<Meal> {
     this.cookedFresh,
   });
 
+  /// Mapping uses `timeOfDayToJson` and `.toIso8601String` to parse data in a way serialisable by JSON 
   Map<String, Object?> toMap() {
     return {
       'recipe': recipe.id,
@@ -31,7 +44,7 @@ class Meal implements Comparable<Meal> {
       'repeatFromOtherWeek': repeatFromOtherWeek?.toIso8601String(),
       'repeatFromDay': repeatFromDay,
       'day': day?.toIso8601String(),
-      'coockedFresh': cookedFresh,
+      'cookedFresh': cookedFresh,
     };
   }
 
@@ -44,7 +57,7 @@ class Meal implements Comparable<Meal> {
       repeatFromOtherWeek: parseIso8601(json['repeatFromOtherWeek']),
       repeatFromDay: json['repeatFromDay'] as int?,
       day: parseIso8601(json['day']),
-      cookedFresh: json['cookedFresh'],
+      cookedFresh: json['cookedFresh'] as bool?,
     );
   }
 
@@ -79,6 +92,13 @@ class Meal implements Comparable<Meal> {
     return recipe.cost; 
   }
 
+  /// Meals are ordered in this order from last -> first:
+  /// 
+  /// Repeat never -> repeat on a set date -> repeat every other week -> repeat every week
+  /// 
+  /// This order is essential as it ensures that in runtime meals can overwrite each other, if they would happen to fall on the same day,
+  /// e.g. a meal that repeats every week on a monday is sorted first so that a meal that repeats never, but happens to fall on a monday, 
+  /// will be read by the program and overwrite the previously read and loaded every week
   @override
   int compareTo(Meal other) {
     final bool repeatingWeek = other.repeatFromWeek != null;
@@ -86,54 +106,38 @@ class Meal implements Comparable<Meal> {
     final bool repeatingDay = other.repeatFromDay != null;
     final bool repeatingNever = other.day != null;
 
-    //debugPrint("Comparing ${toString()} with ${other.toString()}");
-
     if (repeatFromWeek != null) {
-      //debugPrint("Repeating from Week");
       if (repeatingWeek) { 
-        //debugPrint("Other is also repeating from Week");
         return repeatFromWeek!.compareTo(other.repeatFromWeek!); 
       } else {
-        //debugPrint("Sorted before");
         return -1;
       }
     }
 
     if (repeatFromOtherWeek != null) {
-      //debugPrint("Repeating from Other Week");
       if (repeatingOtherWeek) {
-        //debugPrint("Other is also repeating from Other Week");
         return repeatFromOtherWeek!.compareTo(other.repeatFromOtherWeek!);
       } else if (!repeatingWeek) {
-        //debugPrint("Sorted before");
         return -1;
       } else {
-        //debugPrint("Sorted after");
         return 1;
       }
     }
 
     if (repeatFromDay != null) {
-      //debugPrint("Repeating from Day");
       if (repeatingDay) {
-        //debugPrint("Other is also repeating from Day");
         return repeatFromDay!.compareTo(other.repeatFromDay!);
       } else if (!repeatingWeek && !repeatingOtherWeek) {
-        //debugPrint("Sorted before");
         return -1;
       } else {
-        //debugPrint("Sorted after");
         return 1;
       }
     }
 
     if (day != null) {
-      //debugPrint("Not repeating");
       if (repeatingNever) {
-        //debugPrint("Other is also Not repeating");
         return day!.compareTo(other.day!);
       } else {
-        //debugPrint("Sorted after");
         return 1;
       }
     }
@@ -155,7 +159,7 @@ class Meal implements Comparable<Meal> {
     if (day != null) {
       repetition += 'never, only on the ${day!.day}/${day!.month}/${day!.year}';
     }
-    return ('Cooking ${recipe.name} at ${time.standardName}, repeating $repetition');
+    return ('Cooking ${recipe.name} at ${time.standardName}, repeating $repetition, is fresh $cookedFresh');
   }
 }
 

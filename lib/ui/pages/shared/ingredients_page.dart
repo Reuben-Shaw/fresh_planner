@@ -8,6 +8,7 @@ import 'package:fresh_planner/ui/styles.dart';
 import 'package:fresh_planner/ui/widgets/ingredient_card.dart';
 import 'package:fresh_planner/ui/widgets/loading_screen.dart';
 
+// Used to display a list of all ingredients that the user currently has
 class IngredientsPage extends StatefulWidget {
   const IngredientsPage({super.key, required this.user, required this.ingredients});
 
@@ -26,6 +27,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
   bool get _isLoading => __isLoading;
   set _isLoading(bool value) => setState(() => __isLoading = value);
 
+  // _isOpen is needed as dart will unload sufficiently long lists, and this prevents data from being lost
   final Map<IngredientType, bool> _isOpen = {
     for (var type in IngredientType.values) type: false,
   };
@@ -82,12 +84,14 @@ class _IngredientsPageState extends State<IngredientsPage> {
     setState(() {
         _selectedIngredient = null;
 
+      // If search text is empty the list headers need to be displayed
       if (searchedText.isEmpty) {
         _searchedIngredients.clear();
         _displaySearchList = false;
         return;
       }
 
+      // If search has text the list headers need to be hidden
       _displaySearchList = true;
 
       if (_searchedIngredients.isEmpty) {
@@ -114,6 +118,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
     });
   }
 
+  // TODO: Change this to use some form of voidcallback so the back colour changes in the card itself
   GestureDetector _ingredientCardClick(IngredientCard ingredientCard) {
     Ingredient ingredient = ingredientCard.ingredient;
     return GestureDetector(onTap: () => _selectIngredient(ingredient),
@@ -206,6 +211,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                               Visibility(
                                 visible: !_displaySearchList,
                                 child: SingleChildScrollView(
+                                  // This is the parent for containing all the grouped lists on display
                                   child: ExpansionPanelList(
                                     expansionCallback: (index, isExpanded) {
                                       final type = _ingredientMap.entries.elementAt(index).key;
@@ -241,6 +247,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                                   ),
                                 ),
                               ),
+                              // Displays the single scrollable list, if searching
                               Visibility(
                                 visible: _displaySearchList,
                                 child: ListView(
@@ -258,6 +265,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                             GestureDetector(
                               onTap: () async {
                                 if (_selectedIngredient == null) return;
+                                // Popup for setting amount
                                 final result = await showDialog<String>(
                                   context: context,
                                   builder: (context) {

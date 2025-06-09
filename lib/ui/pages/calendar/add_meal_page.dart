@@ -13,7 +13,9 @@ import 'package:fresh_planner/ui/widgets/loading_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// Contains all logic for adding new meals to the `calendar_page`
 class AddMealPage extends StatefulWidget {
+  /// currentMeal is used for viewing the meal's information, editing meals is not included in this version of the application
   const AddMealPage({super.key, required this.user, required this.ingredients, required this.recipes, required this.calendarDB, required this.day, required this.time, this.currentMeal});
 
   final User user;
@@ -55,8 +57,11 @@ class _AddMealPageState extends State<AddMealPage> {
     }
   }
 
-  MealRepetition? repetitionHider;
+  // Used to hide radiobuttons when a meal is being overriden with another, to prevent a new rule from completely superseding the original one
+  // e.g. overidding an every other week repetition pattern with an every week would invalidate the original rule, so it isn't allowed
+  MealRepetition? _repetitionHider;
 
+  // Used to control what widgets are visible, and if the page is just being used to view the meal's details
   late bool _isAddingMeal;
 
   @override
@@ -71,23 +76,26 @@ class _AddMealPageState extends State<AddMealPage> {
     });
   }
 
+  /// Small function used for improved UX on a radio button
   String _dayWithSuffix(DateTime date) {
     final day = date.day;
 
-    if (day >= 11 && day <= 13) return ("${DateFormat('d').format(date)}th");
-    return "${DateFormat('d').format(date)}${switch(day % 10) {
-      1 => "st",
-      2 => "nd",
-      3 => "rd",
-      _ => "th",
-    }}";
+    if (day >= 11 && day <= 13) return ('${DateFormat('d').format(date)}th');
+    return '${DateFormat('d').format(date)}${switch(day % 10) {
+      1 => 'st',
+      2 => 'nd',
+      3 => 'rd',
+      _ => 'th',
+    }}';
   }
 
-  int britishWeekday(DateTime date) {
+  /// Changes the default American logic to reflect the British display (American: Sunday = 0, Saturday = 6 - British: Monday = 0, Sunday = 6)
+  int _britishWeekday(DateTime date) {
     return (date.weekday + 6) % 7;
   }
 
-  void addNewMeal() async {
+  /// Handles logic and error trapping for adding a new meal to the calendar
+  void _addNewMeal() async {
     errorText = '';
     if (_selectedRecipe == null) {
       errorText = 'Please ensure a recipe is selected';
@@ -97,7 +105,7 @@ class _AddMealPageState extends State<AddMealPage> {
     final meal = Meal(
       recipe: _selectedRecipe!,
       time: widget.time,
-      repeatFromWeek: _repetition == MealRepetition.everyWeek ? britishWeekday(widget.day) : null,
+      repeatFromWeek: _repetition == MealRepetition.everyWeek ? _britishWeekday(widget.day) : null,
       repeatFromOtherWeek: _repetition == MealRepetition.everyOtherWeek ? widget.day : null,
       repeatFromDay: _repetition == MealRepetition.everyDate ? widget.day.day : null,
       day: _repetition == MealRepetition.never ? widget.day : null,
@@ -116,10 +124,11 @@ class _AddMealPageState extends State<AddMealPage> {
     Navigator.pop(context, meal,); 
   }
 
+  /// Logic for restructuring the page for overriding a meal if initially entered viewing an existing meal
   void _replaceMeal() {
     setState(() {
       _selectedRecipe = null;
-      repetitionHider = widget.currentMeal!.repetitionType();
+      _repetitionHider = widget.currentMeal!.repetitionType();
       _isAddingMeal = true;
     });
   }
@@ -162,7 +171,7 @@ class _AddMealPageState extends State<AddMealPage> {
                                 color: const Color(0xFF979797),
                               ),
                               Text(
-                                " - ${widget.time.standardName}: ${DateFormat("dd/MM/yy").format(widget.day)}",
+                                ' - ${widget.time.standardName}: ${DateFormat('dd/MM/yy').format(widget.day)}',
                                 style: AppTextStyles.subTitle,
                               ),
                             ],
@@ -194,6 +203,7 @@ class _AddMealPageState extends State<AddMealPage> {
                                   ),
                                 ),
                                 const SizedBox(width: 5,),
+                                // Icon button used to navigate the recipe page for creating a new recipe, returns and auto selects the recipe once done
                                 IconButton(
                                   onPressed: () async {
                                     _isLoading = true;
@@ -308,6 +318,14 @@ class _AddMealPageState extends State<AddMealPage> {
                                         ],
                                       ),
                                     ),
+                                    Visibility(
+                                      visible: !_isAddingMeal,
+                                      child: Text(
+                                        widget.currentMeal == null ? '' : 
+                                          widget.currentMeal!.cookedFresh == null ? '' : 
+                                            widget.currentMeal!.cookedFresh! ? 'Cooked Fresh' : 'Leftovers',
+                                      ), 
+                                    ),
                                     const SizedBox(height: 10,),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -347,6 +365,7 @@ class _AddMealPageState extends State<AddMealPage> {
                             ),
                           ),
                           const SizedBox(height: 15,),
+                          // Visibility contains all the radio buttons in the page, much of the code here is just repeated boilerplate stuff
                           Visibility(
                             visible: _isAddingMeal,
                             child: Column(
@@ -408,10 +427,10 @@ class _AddMealPageState extends State<AddMealPage> {
                                   ),
                                 ),
                                 Visibility(
-                                  visible: repetitionHider != MealRepetition.everyWeek && repetitionHider != MealRepetition.everyOtherWeek,
+                                  visible: _repetitionHider != MealRepetition.everyWeek && _repetitionHider != MealRepetition.everyOtherWeek,
                                   child: AppRadiobuttonStyle.tileDec(
                                     context, 
-                                    "${MealRepetition.everyWeek.standardName}${DateFormat('EEE').format(widget.day)}",
+                                    '${MealRepetition.everyWeek.standardName}${DateFormat('EEE').format(widget.day)}',
                                     Radio<MealRepetition>(
                                       value: MealRepetition.everyWeek,
                                       groupValue: _repetition,
@@ -424,10 +443,10 @@ class _AddMealPageState extends State<AddMealPage> {
                                   ),
                                 ),
                                 Visibility(
-                                  visible: repetitionHider != MealRepetition.everyOtherWeek,
+                                  visible: _repetitionHider != MealRepetition.everyOtherWeek,
                                   child: AppRadiobuttonStyle.tileDec(
                                     context, 
-                                    "${MealRepetition.everyOtherWeek.standardName}${DateFormat('EEE').format(widget.day)}",
+                                    '${MealRepetition.everyOtherWeek.standardName}${DateFormat('EEE').format(widget.day)}',
                                     Radio<MealRepetition>(
                                       value: MealRepetition.everyOtherWeek,
                                       groupValue: _repetition,
@@ -440,7 +459,7 @@ class _AddMealPageState extends State<AddMealPage> {
                                   ),
                                 ),
                                 Visibility(
-                                  visible: repetitionHider != MealRepetition.everyDate,
+                                  visible: _repetitionHider != MealRepetition.everyDate,
                                   child: AppRadiobuttonStyle.tileDec(
                                     context, 
                                     '${MealRepetition.everyDate.standardName}${_dayWithSuffix(widget.day)}',
@@ -466,7 +485,7 @@ class _AddMealPageState extends State<AddMealPage> {
                                 child: Container(
                                   decoration: AppButtonStyles.circularShadow,
                                   child: ElevatedButton(
-                                    onPressed: addNewMeal,
+                                    onPressed: _addNewMeal,
                                     style: AppButtonStyles.mainBackStyle,
                                     child: Text(
                                       '    Add    ',
@@ -477,6 +496,7 @@ class _AddMealPageState extends State<AddMealPage> {
                               ),
                               Visibility(
                                 visible: !_isAddingMeal,
+                                /// Logic for deleting a meal from the calendar
                                 child: IconButton(
                                   onPressed: () async {
                                     _isLoading = true;
@@ -518,6 +538,8 @@ class _AddMealPageState extends State<AddMealPage> {
     );
   }
 
+  /// Seperate widget used for the container box for information, this is needed as you want the container to shrink to fit the contents
+  /// if the contents aren't sufficiently long but cut off the content if it is, and not wrap itself to it.
   Widget _ingredientListView(bool isExpanded) {
     return (isExpanded || !_isAddingMeal)
       ? _buildIngredientList()
@@ -529,6 +551,7 @@ class _AddMealPageState extends State<AddMealPage> {
     );
   }
 
+  /// Widget that contains a bullet list of all the ingredients in the recipe
   Widget _buildIngredientList() {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -536,7 +559,7 @@ class _AddMealPageState extends State<AddMealPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           ..._selectedRecipe?.ingredients.map((i) => 
-            Text("• ${i.name}${i.amount != 0 ? " - ${i.amount}${i.metric != IngredientMetric.item ? i.metric.metricSymbol : " ${i.metric.metricSymbol}"}" : ""}"),
+            Text('• ${i.name}${i.amount != 0 ? ' - ${i.amount}${i.metric != IngredientMetric.item ? i.metric.metricSymbol : ' ${i.metric.metricSymbol}'}' : ''}'),
           ).toList() ?? [],
           const SizedBox(height: 10),
         ],

@@ -6,6 +6,7 @@ import 'package:fresh_planner/ui/pages/calendar/calendar_page.dart';
 import 'package:fresh_planner/ui/styles.dart';
 import 'package:fresh_planner/ui/widgets/loading_screen.dart';
 
+/// Initial page shown by the program, manages loading all user data as well as validating login information
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key, required this.title, required this.userDB, required this.ingredientDB, required this.calendarDB});
 
@@ -19,10 +20,10 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final emailController = TextEditingController();
-  final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
-  final secondPasswordController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _secondPasswordController = TextEditingController();
 
   bool __isLoading = false;
   bool get _isLoading => __isLoading;
@@ -36,9 +37,10 @@ class _LoginPageState extends State<LoginPage> {
   String get errorText => _errorText;
   set errorText(String value) => setState(() => _errorText = value);
 
-  Future<void> checkPassword() async {
-    final email = emailController.text;
-    final password = passwordController.text;
+  /// Performs login actions and error trapping to ensure that login is valid
+  Future<void> _checkPassword() async {
+    final email = _emailController.text;
+    final password = _passwordController.text;
 
     FocusManager.instance.primaryFocus?.unfocus();
 
@@ -63,6 +65,7 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
+    // Tasks performed in parallel to reduce loading time
     final ingredientTask = widget.ingredientDB.getAllIngredients(userData.$2!.uid!);
     final recipeTask = widget.calendarDB.getAllRecipes(userData.$2!.uid!);
     final mealTask = widget.calendarDB.getAllMeals(userData.$2!.uid!);
@@ -87,28 +90,28 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => CalendarPage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData, meals: mealData, calendarDB: widget.calendarDB,)),
-      //MaterialPageRoute(builder: (context) => IngredientsPage(user: userData.$2!, ingredients: ingredientData,)),
-      //MaterialPageRoute(builder: (context) => RecipePage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData, calendarDB: DatabaseCalendar(),)),
-      //MaterialPageRoute(builder: (context) => AddMealPage(user: userData.$2!, ingredients: ingredientData, recipes: recipeData, day: DateTime(2025, 05, 16), time: TimeOfDay.lunch,)),
     );
   }
 
-  bool suitableEmail(String email) {
+  /// Assures that email has correct structure
+  bool _suitableEmail(String email) {
     final emailReg = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     return emailReg.hasMatch(email);
   }
 
-  Future<bool?> checkEmailExists() async {
-    final data = await widget.userDB.checkEmailExists(emailController.text);
+  /// Database query to check if an email already exists when attempting to register a new one
+  Future<bool?> _checkEmailExists() async {
+    final data = await widget.userDB.checkEmailExists(_emailController.text);
     if (!data.$1) return null;
     return data.$2;
   }
 
-  void registerAccount() async {
-    final email = emailController.text;
-    final username = usernameController.text;
-    final firstPassword = passwordController.text;
-    final secondPassword = secondPasswordController.text;
+  /// Performs all logic and error trapping for logging a new account with the systems
+  void _registerAccount() async {
+    final email = _emailController.text;
+    final username = _usernameController.text;
+    final firstPassword = _passwordController.text;
+    final secondPassword = _secondPasswordController.text;
 
     FocusManager.instance.primaryFocus?.unfocus();
 
@@ -119,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    if (!suitableEmail(email)) {
+    if (!_suitableEmail(email)) {
       errorText = 'Please enter a suitable email';
       return;
     }
@@ -131,14 +134,14 @@ class _LoginPageState extends State<LoginPage> {
 
     _isLoading = true;
     
-    final emailCheck = await checkEmailExists();
+    final emailCheck = await _checkEmailExists();
     if (emailCheck == null) {
       errorText = 'Internal server error, please try again';
-    _isLoading = false;
+      _isLoading = false;
       return;
     } else if (emailCheck) {
       errorText = 'This email has already been registered';
-    _isLoading = false;
+      _isLoading = false;
       return;
     }
 
@@ -172,6 +175,7 @@ class _LoginPageState extends State<LoginPage> {
                         children: <Widget>[
                           Stack(
                             children: <Widget>[
+                              // Static animation is used to offset the logo so part of it is cut off by the screen
                               Container(
                                 transform: Matrix4.translationValues(
                                   MediaQuery.of(context).size.width * .3, -35.0, 0.0,
@@ -215,7 +219,7 @@ class _LoginPageState extends State<LoginPage> {
                                     decoration: AppTextFieldStyles.dropShadow,
                                     child: TextField(
                                       key: const Key('email_textfield'),
-                                      controller: emailController,
+                                      controller: _emailController,
                                       enableSuggestions: false,
                                       autocorrect: false,
                                       decoration: AppTextFieldStyles.primaryStyle('email'),
@@ -230,7 +234,7 @@ class _LoginPageState extends State<LoginPage> {
                                           decoration: AppTextFieldStyles.dropShadow,
                                           child: TextField(
                                             key: const Key('username_textfield'),
-                                            controller: usernameController,
+                                            controller: _usernameController,
                                             enableSuggestions: false,
                                             autocorrect: false,
                                             decoration: AppTextFieldStyles.primaryStyle('username'),
@@ -244,7 +248,7 @@ class _LoginPageState extends State<LoginPage> {
                                     decoration: AppTextFieldStyles.dropShadow,
                                     child: TextField(
                                       key: const Key('password_textfield'),
-                                      controller: passwordController,
+                                      controller: _passwordController,
                                       obscureText: true,
                                       enableSuggestions: false,
                                       autocorrect: false,
@@ -260,7 +264,7 @@ class _LoginPageState extends State<LoginPage> {
                                           decoration: AppTextFieldStyles.dropShadow,
                                           child: TextField(
                                             key: const Key('reenter_password_textfield'),
-                                            controller: secondPasswordController,
+                                            controller: _secondPasswordController,
                                             obscureText: true,
                                             enableSuggestions: false,
                                             autocorrect: false,
@@ -295,7 +299,7 @@ class _LoginPageState extends State<LoginPage> {
                                     child: ElevatedButton(
                                       key: const Key('login_button'),
                                       onPressed:
-                                        isRegister ? registerAccount : checkPassword,
+                                        isRegister ? _registerAccount : _checkPassword,
                                       style: AppButtonStyles.mainBackStyle,
                                       child: Text(
                                         isRegister ? '    Register    ' : '      Login      ',

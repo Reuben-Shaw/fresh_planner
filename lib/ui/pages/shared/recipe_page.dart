@@ -10,6 +10,7 @@ import 'package:fresh_planner/ui/widgets/ingredient_card.dart';
 import 'package:fresh_planner/ui/widgets/loading_screen.dart';
 import 'package:intl/intl.dart';
 
+/// Page used for creating new `Recipe` objects
 class RecipePage extends StatefulWidget {
   const RecipePage({super.key, required this.user, required this.ingredients, required this.recipes, required this.calendarDB, this.ingredientsInRecipe});
 
@@ -38,6 +39,7 @@ class _RecipePageState extends State<RecipePage> {
   final List<IngredientCard> _ingredientCards = [];
   Color? _selectedColour;
   
+  /// Initialises ingredient list if the recipe page is provided with a list of ingredients on construction, used for testing
   @override
   void initState() {
     super.initState();
@@ -57,6 +59,7 @@ class _RecipePageState extends State<RecipePage> {
     });
   }
 
+  /// Handles logic for reading recipes for adding to the database, and also error trapping
   void _addRecipe() async {
     FocusManager.instance.primaryFocus?.unfocus();
 
@@ -161,9 +164,11 @@ class _RecipePageState extends State<RecipePage> {
                         const Divider(height: 5, thickness: 2, color: Colors.black),
                         const SizedBox(height: 10),
                         ..._ingredientCards,
+                        // Holds the `+Select Ingredient` and `Cost of Recipe` labels, which handle navigation to the `ingredients_page`
                         GestureDetector(
                           onTap: () async {
                             _isLoading = true;
+                            // Delay added so that loading screen appears, as without it there's generally too much lag on transition for it to appear
                             await Future.delayed(const Duration(milliseconds: 50));
                             if (context.mounted) {
                               final result = await Navigator.push(
@@ -199,6 +204,7 @@ class _RecipePageState extends State<RecipePage> {
                                   Text('Select Ingredient', style: AppTextStyles.largerBold),
                                 ],
                               ),
+                              // Cost of recipe is included here to increase the tap size, making it easier for users to navigatge
                               Row(
                                 children: <Widget>[
                                   const Text('Cost of Recipe: ', style: AppTextStyles.largerBold),
@@ -284,6 +290,7 @@ class _RecipePageState extends State<RecipePage> {
   }
 }
 
+/// Small subclass used to quickly construct tapable buttons for selecting colour
 class ColourCircle extends StatelessWidget {
   final Color colour;
   final VoidCallback? onTap;

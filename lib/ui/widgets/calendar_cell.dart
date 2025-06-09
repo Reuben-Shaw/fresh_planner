@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/objects/meal.dart';
 
+/// Used to display a single instance of a day on the calendar
 class CalendarCell extends StatelessWidget {
   final DateTime date;
   final Meal? meal;
@@ -8,6 +9,11 @@ class CalendarCell extends StatelessWidget {
   final bool isPassed;
   final bool isFaded;
 
+  /// `isFaded` should be used for days that are before and after the currently displayed month (run off and run on days)
+  /// as well as days that have passed in the CURRENT month, previous months should not be entirely greyed out as it effects
+  /// readability
+  /// 
+  /// Any days that have passed should always be marked as `isPassed`, which prevents them from being interacted with
   const CalendarCell({
     super.key,
     required this.date,

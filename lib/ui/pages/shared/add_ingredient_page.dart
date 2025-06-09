@@ -7,6 +7,7 @@ import 'package:fresh_planner/ui/pages/parent_page.dart';
 import 'package:fresh_planner/ui/styles.dart';
 import 'package:fresh_planner/ui/widgets/loading_screen.dart';
 
+// Page used for creating new ingredients, lowest page in the hierarchy of the app
 class AddIngredientPage extends ParentPage {
   const AddIngredientPage({super.key, required super.user, required super.ingredients, required this.ingredientDB});
   
@@ -21,6 +22,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
   final _costController = TextEditingController();
   final _costAmountController = TextEditingController();
 
+  // Used to update the hint text to have an * when cost is entered, since it is then required
   InputDecoration _costAmountHint = AppTextFieldStyles.primaryStyle('/amount');
   bool __isLoading = false;
   bool get _isLoading => __isLoading;
@@ -77,6 +79,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
     }
   }
 
+  // Handles error trapping and logic for adding new ingredients to the database
   void addIngredient() async {
     FocusManager.instance.primaryFocus?.unfocus();
 
@@ -120,18 +123,16 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
       type: _typeDropdownValue != IngredientType.misc ? _typeDropdownValue : null,
     );
     _isLoading = true;
-    debugPrint('debug 1');
+    
     (bool, String?) response = await widget.ingredientDB.addIngredient(widget.user.uid!, ingredient);
-    debugPrint('debug 2');
+
     if (!response.$1 || !mounted) {
-      debugPrint('debug 3');
       errorText = 'Internal server error, please try again';
       _isLoading = false;
       return;
     }
     ingredient.id = response.$2;
 
-    debugPrint('adding is done with $ingredient');
     Navigator.pop(context, ingredient,); 
   }
 

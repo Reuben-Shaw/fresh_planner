@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Empty page to speed up creation of new ones
 class EmptyPage extends StatefulWidget {
   const EmptyPage({super.key});
 

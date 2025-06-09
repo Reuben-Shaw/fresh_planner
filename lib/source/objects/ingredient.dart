@@ -1,6 +1,9 @@
 import 'package:fresh_planner/source/enums/ingredient_food_type.dart';
 import 'package:fresh_planner/source/enums/ingredient_metric.dart';
 
+/// Class used for storing ingredients
+/// Ingredients stored in the database's ingredient's document don't have an amount
+/// Ingredients stored in the recipe documents have an amount and ID only
 class Ingredient implements Comparable<Ingredient> {
   String? id;
   String name;
@@ -20,6 +23,8 @@ class Ingredient implements Comparable<Ingredient> {
     this.type,
   });
 
+  /// Mapping uses `metricToJson` and `ingredientTypeToJson` contained in this file
+  /// This is necessary since enums don't serialise well to JSON format
   Map<String, Object?> toMap() {
     return {
       'name': name,
@@ -42,6 +47,7 @@ class Ingredient implements Comparable<Ingredient> {
     );
   }
 
+  /// Assess properties other than price and amount to assert equality
   bool isEqual(Ingredient? other) {
     if (other == null) return false;
     if (name != other.name) return false;
@@ -50,6 +56,7 @@ class Ingredient implements Comparable<Ingredient> {
     return true;
   }
 
+  /// Sorts ingredients in lexiographical `IngredientType` order initially, then just regular lexiographical order
   @override
   int compareTo(Ingredient other) {
     int i = type == null ? 0 : other.type == null ? 0 : type!.index.compareTo(other.type!.index);

@@ -44,7 +44,7 @@ class Meal implements Comparable<Meal> {
       'repeatFromOtherWeek': repeatFromOtherWeek?.toIso8601String(),
       'repeatFromDay': repeatFromDay,
       'day': day?.toIso8601String(),
-      'coockedFresh': cookedFresh,
+      'cookedFresh': cookedFresh,
     };
   }
 
@@ -57,7 +57,7 @@ class Meal implements Comparable<Meal> {
       repeatFromOtherWeek: parseIso8601(json['repeatFromOtherWeek']),
       repeatFromDay: json['repeatFromDay'] as int?,
       day: parseIso8601(json['day']),
-      cookedFresh: json['cookedFresh'],
+      cookedFresh: json['cookedFresh'] as bool?,
     );
   }
 
@@ -159,7 +159,7 @@ class Meal implements Comparable<Meal> {
     if (day != null) {
       repetition += 'never, only on the ${day!.day}/${day!.month}/${day!.year}';
     }
-    return ('Cooking ${recipe.name} at ${time.standardName}, repeating $repetition');
+    return ('Cooking ${recipe.name} at ${time.standardName}, repeating $repetition, is fresh $cookedFresh');
   }
 }
 

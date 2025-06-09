@@ -73,7 +73,11 @@ class CalendarCell extends StatelessWidget {
                     height: 15,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: meal == null ? Colors.transparent : (meal?.recipe.colour)!,
+                      color: meal == null || (!(meal!.cookedFresh ?? true)) ? Colors.transparent : meal?.recipe.colour,
+                      border: Border.all(
+                        color: (meal == null || (meal!.cookedFresh ?? true) ? Colors.transparent : meal?.recipe.colour)!,
+                        width: 3,
+                      ),
                     ),
                   ),
                 ],

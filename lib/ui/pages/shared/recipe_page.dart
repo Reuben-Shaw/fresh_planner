@@ -257,13 +257,14 @@ class _RecipePageState extends State<RecipePage> {
                                 children: [
                                   Row(
                                     children: [
-                                      ...[(Colors.red, 'red'), (Colors.orange, 'orange'), (Colors.yellow, 'yellow'), (Colors.lightGreen, 'light_green'), (Colors.green, 'green')]
+                                      ...[(Colors.red, 'red'), (Colors.orange, 'orange'), (Colors.yellow, 'yellow'), (Colors.lightGreen, 'light_green'), (Colors.green[700]!, 'green')]
                                           .map((c) => ColourCircle(colour: c.$1, colourName: c.$2, onTap: () => _updateColour(c.$1))),
                                     ],
                                   ),
+                                  const SizedBox(height: 2,),
                                   Row(
                                     children: [
-                                      ...[(Colors.lightBlue, 'light_blue'), (Colors.blue, 'blue'), (Colors.purple, 'purple'), (Colors.pink[200]!, 'pink'), (Colors.pink, 'hot_pink')]
+                                      ...[(Colors.blue, 'light_blue'), (Colors.blue[900]!, 'blue'), (Colors.purple, 'purple'), (Colors.pink[200]!, 'pink'), (Colors.pink, 'hot_pink')]
                                           .map((c) => ColourCircle(colour: c.$1, colourName: c.$2, onTap: () => _updateColour(c.$1))),
                                     ],
                                   ),
@@ -312,17 +313,22 @@ class ColourCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      key: Key(colourName),
-      onTap: onTap,
-      child: Container(
-        width: 20,
-        height: 20,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: colour,
+    return Row(
+      children: <Widget>[
+        GestureDetector(
+          key: Key(colourName),
+          onTap: onTap,
+          child: Container(
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: colour,
+            ),
+          ),
         ),
-      ),
+        const SizedBox(width: 2,),
+      ],
     );
   }
 }

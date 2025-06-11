@@ -110,7 +110,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
         return;
       }
     }
-    if (widget.ingredients.any((i) => i.name == _nameController.text.toLowerCase())) {
+    if (widget.ingredients.any((i) => i.name.toLowerCase() == _nameController.text.toLowerCase())) {
       errorText = 'Ingredient with the same name already exists';
       return;
     }

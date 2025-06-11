@@ -68,6 +68,10 @@ class _RecipePageState extends State<RecipePage> {
       errorText = 'Ensure all required values are filled';
       return;
     }
+    if (_linkController.text.isNotEmpty && !Uri.parse(_linkController.text).isAbsolute) {
+      errorText = 'Please ensure a valid link is provided';
+      return;
+    }
     for (Recipe r in widget.recipes) {
       if (r.name.toLowerCase() == _nameController.text.toLowerCase()) {
         errorText = 'Recipe with that name already exists';
@@ -144,6 +148,7 @@ class _RecipePageState extends State<RecipePage> {
                         Container(
                           decoration: AppTextFieldStyles.dropShadow,
                           child: TextField(
+                            key: const Key('link_textfield'),
                             controller: _linkController,
                             decoration: AppTextFieldStyles.primaryStyle('link to recipe'),
                           ),
@@ -209,6 +214,7 @@ class _RecipePageState extends State<RecipePage> {
                                 children: <Widget>[
                                   const Text('Cost of Recipe: ', style: AppTextStyles.largerBold),
                                   Text(
+                                    key: const Key('priceRecipe'),
                                     NumberFormat.currency(locale: 'en_UK', symbol: '£').format(
                                       Recipe.calcCost(_ingredientCards.map((card) => card.ingredient).toList())
                                     ),
@@ -238,6 +244,7 @@ class _RecipePageState extends State<RecipePage> {
                           Row(
                             children: <Widget>[
                               Container(
+                                key: const Key('colourDisplay'),
                                 width: 37,
                                 height: 37,
                                 decoration: BoxDecoration(
@@ -250,14 +257,15 @@ class _RecipePageState extends State<RecipePage> {
                                 children: [
                                   Row(
                                     children: [
-                                      ...[Colors.red, Colors.orange, Colors.yellow, Colors.lightGreen, Colors.green]
-                                          .map((c) => ColourCircle(colour: c, onTap: () => _updateColour(c))),
+                                      ...[(Colors.red, 'red'), (Colors.orange, 'orange'), (Colors.yellow, 'yellow'), (Colors.lightGreen, 'light_green'), (Colors.green[700]!, 'green')]
+                                          .map((c) => ColourCircle(colour: c.$1, colourName: c.$2, onTap: () => _updateColour(c.$1))),
                                     ],
                                   ),
+                                  const SizedBox(height: 2,),
                                   Row(
                                     children: [
-                                      ...[Colors.lightBlue, Colors.blue, Colors.purple, Colors.pink[200]!, Colors.pink]
-                                          .map((c) => ColourCircle(colour: c, onTap: () => _updateColour(c))),
+                                      ...[(Colors.blue, 'light_blue'), (Colors.blue[900]!, 'blue'), (Colors.purple, 'purple'), (Colors.pink[200]!, 'pink'), (Colors.pink, 'hot_pink')]
+                                          .map((c) => ColourCircle(colour: c.$1, colourName: c.$2, onTap: () => _updateColour(c.$1))),
                                     ],
                                   ),
                                 ],
@@ -293,26 +301,34 @@ class _RecipePageState extends State<RecipePage> {
 /// Small subclass used to quickly construct tapable buttons for selecting colour
 class ColourCircle extends StatelessWidget {
   final Color colour;
+  final String colourName;
   final VoidCallback? onTap;
 
   const ColourCircle({
     super.key,
     required this.colour,
+    required this.colourName,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 20,
-        height: 20,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: colour,
+    return Row(
+      children: <Widget>[
+        GestureDetector(
+          key: Key(colourName),
+          onTap: onTap,
+          child: Container(
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: colour,
+            ),
+          ),
         ),
-      ),
+        const SizedBox(width: 2,),
+      ],
     );
   }
 }

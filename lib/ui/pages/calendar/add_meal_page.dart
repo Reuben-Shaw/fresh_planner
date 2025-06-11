@@ -44,7 +44,7 @@ class _AddMealPageState extends State<AddMealPage> {
   bool? _isFresh = true;
   MealRepetition? _repetition = MealRepetition.never;
 
-  String errorText = '';
+  String _errorText = '';
 
   Recipe? _selectedRecipe;
   Recipe? _recipeDropdownValue;
@@ -69,7 +69,7 @@ class _AddMealPageState extends State<AddMealPage> {
     super.initState();
     
     _isAddingMeal = widget.currentMeal == null;
-    if (widget.currentMeal == null) return;
+    if (_isAddingMeal) return;
 
     setState(() {
       _selectedRecipe = widget.currentMeal!.recipe;
@@ -96,9 +96,11 @@ class _AddMealPageState extends State<AddMealPage> {
 
   /// Handles logic and error trapping for adding a new meal to the calendar
   void _addNewMeal() async {
-    errorText = '';
+    _errorText = '';
     if (_selectedRecipe == null) {
-      errorText = 'Please ensure a recipe is selected';
+      setState(() {
+        _errorText = 'Please ensure a recipe is selected';
+      });
       return;
     }
 
@@ -115,7 +117,7 @@ class _AddMealPageState extends State<AddMealPage> {
 
     (bool, String?) response = await widget.calendarDB.addMeal(widget.user.uid!, meal);
     if (!response.$1 || !mounted) {
-      errorText = 'Internal server error, please try again';
+      _errorText = 'Internal server error, please try again';
       _isLoading = false;
       return;
     }
@@ -167,6 +169,7 @@ class _AddMealPageState extends State<AddMealPage> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[
                               Icon(
+                                key: const Key('time_icon'),
                                 widget.time == TimeOfDay.breakfast ? Icons.sunny_snowing : widget.time == TimeOfDay.lunch ? Icons.sunny : Icons.nightlight,
                                 color: const Color(0xFF979797),
                               ),
@@ -185,6 +188,7 @@ class _AddMealPageState extends State<AddMealPage> {
                                   child: Container(
                                     decoration: AppTextFieldStyles.dropShadowWithColour,
                                     child: DropdownButton(
+                                      key: const Key('recipe_dropdown'),
                                       items: widget.recipes.map((r) {
                                         return DropdownMenuItem<Recipe>(
                                           value: r,
@@ -270,6 +274,7 @@ class _AddMealPageState extends State<AddMealPage> {
                                         ),
                                       ],
                                     ),
+                                    const SizedBox(height: 10,),
                                     Visibility(
                                       visible: _selectedRecipe?.link != null,
                                       child: Column(
@@ -477,6 +482,14 @@ class _AddMealPageState extends State<AddMealPage> {
                               ],
                             ),
                           ),
+                          Text(
+                            _errorText,
+                            style: const TextStyle(
+                              fontSize: 14, 
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: <Widget>[
@@ -485,6 +498,7 @@ class _AddMealPageState extends State<AddMealPage> {
                                 child: Container(
                                   decoration: AppButtonStyles.circularShadow,
                                   child: ElevatedButton(
+                                    key: const Key('add_button'),
                                     onPressed: _addNewMeal,
                                     style: AppButtonStyles.mainBackStyle,
                                     child: Text(
@@ -498,12 +512,13 @@ class _AddMealPageState extends State<AddMealPage> {
                                 visible: !_isAddingMeal,
                                 /// Logic for deleting a meal from the calendar
                                 child: IconButton(
+                                  key: const Key('delete_button'),
                                   onPressed: () async {
                                     _isLoading = true;
                                     final success = await widget.calendarDB.deleteMeal(widget.user.uid!, widget.currentMeal!);
                                     _isLoading = false;
                                     if (!success || !context.mounted) {
-                                      errorText = 'Internal server error, please try again';
+                                      _errorText = 'Internal server error, please try again';
                                       return;
                                     }
 
@@ -545,10 +560,10 @@ class _AddMealPageState extends State<AddMealPage> {
       ? _buildIngredientList()
       : ConstrainedBox(
         constraints: const BoxConstraints(
-        maxHeight: 120,
-      ),
-      child: _buildIngredientList(),
-    );
+          maxHeight: 120,
+        ),
+        child: _buildIngredientList(),
+      );
   }
 
   /// Widget that contains a bullet list of all the ingredients in the recipe

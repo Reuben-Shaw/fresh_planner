@@ -10,17 +10,18 @@ import '../database/database_ingredients_test.dart';
 void main() {
   late Widget testPage;
 
-  setUp(() {
+  setUp(() async {
+    final db = DatabaseIngredientsTest();
     testPage = MaterialApp(
       home: AddIngredientPage(
         user: User(email: 'correctemail@test.com', username: 'testUser', uid: 'testID'),
-        ingredients: const [],
-        ingredientDB: DatabaseIngredientsTest(),
+        ingredients: (await db.getAllIngredients('testUID'))!,
+        ingredientDB: db,
       ),
     );
   });
 
-  testWidgets('Empty Input', (tester) async {
+  testWidgets('Test Empty Input', (tester) async {
     await tester.pumpWidget(testPage); 
 
     await tester.tap(find.byKey(const Key('add_button')));
@@ -28,7 +29,7 @@ void main() {
     expect(find.text('Ensure all required values are filled'), findsOneWidget);
   });
 
-  testWidgets('Empty Amount Filled Cost', (tester) async {
+  testWidgets('Test Empty Amount Filled Cost', (tester) async {
     await tester.pumpWidget(testPage); 
 
     await tester.enterText(find.byKey(const Key('name_textfield')), 'testIngredient');
@@ -47,7 +48,87 @@ void main() {
     expect(find.text('Please ensure an amount per cost is provided'), findsOneWidget);
   });
 
-  testWidgets('Metric Updates Symbol', (tester) async {
+  testWidgets('Test Non-Numeric Cost', (tester) async {
+    await tester.pumpWidget(testPage); 
+
+    await tester.enterText(find.byKey(const Key('name_textfield')), 'testIngredient');
+
+    final metricDropdown = find.byKey(const ValueKey('metric_dropdown'));
+    await tester.tap(metricDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('   Grams').last);
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byKey(const Key('cost_textfield')), 'bad');
+    await tester.enterText(find.byKey(const Key('amount_textfield')), '3');
+
+    await tester.tap(find.byKey(const Key('add_button')));
+    await tester.pump();
+
+    expect(find.text('Cost is not numeric'), findsOneWidget);
+  });
+
+  testWidgets('Test Non-Numeric Amount', (tester) async {
+    await tester.pumpWidget(testPage); 
+
+    await tester.enterText(find.byKey(const Key('name_textfield')), 'testIngredient');
+
+    final metricDropdown = find.byKey(const ValueKey('metric_dropdown'));
+    await tester.tap(metricDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('   Grams').last);
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byKey(const Key('cost_textfield')), '3');
+    await tester.enterText(find.byKey(const Key('amount_textfield')), 'bad');
+
+    await tester.tap(find.byKey(const Key('add_button')));
+    await tester.pump();
+
+    expect(find.text('Amount per cost is not numeric'), findsOneWidget);
+  });
+
+  testWidgets('Test Non-Integer Amount', (tester) async {
+    await tester.pumpWidget(testPage); 
+
+    await tester.enterText(find.byKey(const Key('name_textfield')), 'testIngredient');
+
+    final metricDropdown = find.byKey(const ValueKey('metric_dropdown'));
+    await tester.tap(metricDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('   Grams').last);
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byKey(const Key('cost_textfield')), '3');
+    await tester.enterText(find.byKey(const Key('amount_textfield')), '5.5');
+
+    await tester.tap(find.byKey(const Key('add_button')));
+    await tester.pump();
+
+    expect(find.text('Amount per cost is not numeric'), findsOneWidget);
+  });
+
+  testWidgets('Test Negative Cost and Amount', (tester) async {
+    await tester.pumpWidget(testPage); 
+
+    await tester.enterText(find.byKey(const Key('name_textfield')), 'testIngredient');
+
+    final metricDropdown = find.byKey(const ValueKey('metric_dropdown'));
+    await tester.tap(metricDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('   Grams').last);
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byKey(const Key('cost_textfield')), '-3');
+    await tester.enterText(find.byKey(const Key('amount_textfield')), '-3');
+
+    await tester.tap(find.byKey(const Key('add_button')));
+    await tester.pump();
+
+    expect(find.text('Pricing cannot use negative numbers'), findsOneWidget);
+  });
+
+  testWidgets('Test Metric Updates Symbol', (tester) async {
     await tester.pumpWidget(testPage); 
 
     final metricDropdown = find.byKey(const ValueKey('metric_dropdown'));
@@ -76,7 +157,23 @@ void main() {
     expect(find.text('%'), findsOneWidget);
   });
 
-  testWidgets('Ensures Ingredient is Correctly Created', (tester) async {
+  testWidgets('Test Duplicate name check shows error', (tester) async {
+    await tester.pumpWidget(testPage);
+    await tester.enterText(find.byKey(const Key('name_textfield')), 'apples');
+
+    final metricDropdown = find.byKey(const ValueKey('metric_dropdown'));
+    await tester.tap(metricDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('   Items').last);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('add_button')));
+    await tester.pump();
+
+    expect(find.text('Ingredient with the same name already exists'), findsOneWidget);
+  });
+
+  testWidgets('Test Ensures Ingredient is Correctly Created', (tester) async {
     Ingredient? ingredient;
 
     await tester.pumpWidget(MaterialApp(

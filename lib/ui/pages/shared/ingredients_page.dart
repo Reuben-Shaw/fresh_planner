@@ -121,7 +121,9 @@ class _IngredientsPageState extends State<IngredientsPage> {
   // TODO: Change this to use some form of voidcallback so the back colour changes in the card itself
   GestureDetector _ingredientCardClick(IngredientCard ingredientCard) {
     Ingredient ingredient = ingredientCard.ingredient;
-    return GestureDetector(onTap: () => _selectIngredient(ingredient),
+    return GestureDetector(
+      key: Key('${ingredientCard.ingredient.name}_tap'),
+      onTap: () => _selectIngredient(ingredient),
       child: Container(
         color: ingredient.isEqual(_selectedIngredient)
             ? Colors.green[100]
@@ -195,6 +197,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                         Container(
                           decoration: AppTextFieldStyles.dropShadow,
                           child: TextField(
+                            key: const Key('search_textfield'),
                             controller: _searchController,
                             enableSuggestions: true,
                             autocorrect: true,
@@ -226,10 +229,19 @@ class _IngredientsPageState extends State<IngredientsPage> {
                                       return ExpansionPanel(
                                         backgroundColor: Colors.white,
                                         headerBuilder: (context, isExpanded) {
-                                          return ListTile(
-                                            title: Text(
-                                              index.standardName,
-                                              style: AppTextStyles.innerTitle,
+                                          return GestureDetector(
+                                            key: Key('${index.standardName}_header_tap'),
+                                            onTap: () {
+                                              final type = index;
+                                              setState(() {
+                                                _isOpen[type] = !(_isOpen[type] ?? false);
+                                              });
+                                            },
+                                            child: ListTile(
+                                              title: Text(
+                                                index.standardName,
+                                                style: AppTextStyles.innerTitle,
+                                              ),
                                             ),
                                           );
                                         },
@@ -251,6 +263,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                               Visibility(
                                 visible: _displaySearchList,
                                 child: ListView(
+                                  key: const Key('single_search_list'),
                                   children: _searchedIngredients.map((ingredientCard) {
                                     return _ingredientCardClick(ingredientCard);
                                   }).toList(),
@@ -263,6 +276,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             GestureDetector(
+                              key: const Key('amount_tap'),
                               onTap: () async {
                                 if (_selectedIngredient == null) return;
                                 // Popup for setting amount
@@ -273,6 +287,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                                     return AlertDialog(
                                       title: const Text('Enter the amount'),
                                       content: TextField(
+                                        key: const Key('amount_textfield'),
                                         keyboardType: TextInputType.number,
                                         onChanged: (val) => value = val,
                                         autofocus: true,
@@ -283,6 +298,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                                           child: const Text('Cancel'),
                                         ),
                                         TextButton(
+                                          key: const Key('amount_button'),
                                           onPressed: () => Navigator.pop(context, value),
                                           child: const Text('Set'),
                                         ),
@@ -303,6 +319,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                                 children: <Widget>[
                                   const Text('Amount: ', style: AppTextStyles.largerBold,),
                                   Text(
+                                    key: const Key('amount_text'),
                                     _selectedIngredient == null ? '0' : _selectedIngredient!.amount.toString(), 
                                     style: const TextStyle(
                                       fontSize: 26,

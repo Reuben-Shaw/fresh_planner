@@ -9,7 +9,7 @@ import 'package:fresh_planner/ui/widgets/loading_screen.dart';
 
 // Page used for creating new ingredients, lowest page in the hierarchy of the app
 class AddIngredientPage extends ParentPage {
-  const AddIngredientPage({super.key, required super.user, required super.ingredients, required this.ingredientDB});
+  const AddIngredientPage({super.key, required super.user, required super.ingredients, required super.recipes, required this.ingredientDB});
   
   final DatabaseIngredients ingredientDB;
 
@@ -80,7 +80,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
   }
 
   // Handles error trapping and logic for adding new ingredients to the database
-  void addIngredient() async {
+  void _addIngredient() async {
     FocusManager.instance.primaryFocus?.unfocus();
 
     if (_nameController.text == '' || _metricDropdownValue == null) {
@@ -287,7 +287,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                                 decoration: AppButtonStyles.circularShadow,
                                 child: ElevatedButton(
                                   key: const Key('add_button'),
-                                  onPressed: addIngredient,
+                                  onPressed: _addIngredient,
                                   style: AppButtonStyles.mainBackStyle,
                                   child: Text(
                                     '    Add    ',

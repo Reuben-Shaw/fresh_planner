@@ -13,6 +13,7 @@ void main() {
       home: IngredientsPage(
         user: User(uid: 'testID', email: 'test@email.com', username: 'testUser'),
         ingredients: (await db.getAllIngredients('testID'))!,
+        recipes: const [],
       ),
     );
   });

@@ -3,10 +3,9 @@ import 'package:fresh_planner/source/database/database_calendar.dart';
 import 'package:fresh_planner/source/enums/ingredient_metric.dart';
 import 'package:fresh_planner/source/enums/meal_repetition.dart';
 import 'package:fresh_planner/source/enums/time_of_day.dart';
-import 'package:fresh_planner/source/objects/ingredient.dart';
 import 'package:fresh_planner/source/objects/meal.dart';
 import 'package:fresh_planner/source/objects/recipe.dart';
-import 'package:fresh_planner/source/objects/user.dart';
+import 'package:fresh_planner/ui/pages/parent_page.dart';
 import 'package:fresh_planner/ui/pages/shared/recipe_page.dart';
 import 'package:fresh_planner/ui/styles.dart';
 import 'package:fresh_planner/ui/widgets/loading_screen.dart';
@@ -14,13 +13,10 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Contains all logic for adding new meals to the `calendar_page`
-class AddMealPage extends StatefulWidget {
+class AddMealPage extends ParentPage {
   /// currentMeal is used for viewing the meal's information, editing meals is not included in this version of the application
-  const AddMealPage({super.key, required this.user, required this.ingredients, required this.recipes, required this.calendarDB, required this.day, required this.time, this.currentMeal});
+  const AddMealPage({super.key, required super.user, required super.ingredients, required super.recipes, required this.calendarDB, required this.day, required this.time, this.currentMeal});
 
-  final User user;
-  final List<Ingredient> ingredients;
-  final List<Recipe> recipes;
   final DatabaseCalendar calendarDB;
   final DateTime day;
   final TimeOfDay time;
@@ -31,8 +27,6 @@ class AddMealPage extends StatefulWidget {
 }
 
 class _AddMealPageState extends State<AddMealPage> {
-  final _calendarDB = DatabaseCalendar();
-  
   bool __isLoading = false;
   bool get _isLoading => __isLoading;
   set _isLoading(bool value) => setState(() => __isLoading = value);
@@ -213,7 +207,7 @@ class _AddMealPageState extends State<AddMealPage> {
                                     _isLoading = true;
                                     final result = await Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => RecipePage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, calendarDB: _calendarDB,)),
+                                      MaterialPageRoute(builder: (context) => RecipePage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, calendarDB: widget.calendarDB,)),
                                     );
                                     _isLoading = false;
                                     if (result is! Recipe) return;

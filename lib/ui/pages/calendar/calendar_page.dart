@@ -11,9 +11,8 @@ import 'package:fresh_planner/ui/styles.dart';
 import 'package:fresh_planner/ui/widgets/calendar_cell.dart';
 
 class CalendarPage extends ParentPage {
-  const CalendarPage({super.key, required super.user, required super.ingredients, required this.recipes, required this.meals, required this.calendarDB});
+  const CalendarPage({super.key, required super.user, required super.ingredients, required super.recipes, required this.meals, required this.calendarDB});
 
-  final List<Recipe> recipes;
   final Map<TimeOfDay, List<Meal>> meals;
   final DatabaseCalendar calendarDB;
 

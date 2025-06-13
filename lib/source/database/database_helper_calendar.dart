@@ -11,6 +11,7 @@ class DatabaseHelperCalendar {
   static const String _addMealUrl = 'addmeal';
   static const String _getAllMealsUrl = 'getallmeals';
   static const String _deleteMealUrl = 'deletemeal';
+  static const String _deleteRecipeUrl= 'deleterecipe';
   
   Future<Map<String, dynamic>> addRecipeAPI(String uid, Recipe recipe) async {
     try {
@@ -115,6 +116,32 @@ class DatabaseHelperCalendar {
         body: jsonEncode({
           'uid': uid,
           'mealID': mealID,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return {
+          'success': true,
+          'message': data['result'],
+        };
+      } else {
+        return {'error': 'Failed with status code ${response.statusCode}'};
+      }
+    } catch (e) {
+      return {'error': 'An error occurred: $e'};
+    }
+  }
+  
+  Future<Map<String, dynamic>> deleteRecipeAPI(String uid, String recipeID) async {
+    try {
+      final Uri url = Uri.parse('https://$_deleteRecipeUrl$_standardUrl');
+      final response = await http.post(
+        url,
+        headers: { 'Content-Type': 'application/json' },
+        body: jsonEncode({
+          'uid': uid,
+          'recipeID': recipeID,
         }),
       );
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/database/database_ingredients.dart';
 import 'package:fresh_planner/source/enums/ingredient_food_type.dart';
 import 'package:fresh_planner/source/objects/ingredient.dart';
+import 'package:fresh_planner/source/objects/recipe.dart';
 import 'package:fresh_planner/ui/pages/parent_page.dart';
 import 'package:fresh_planner/ui/pages/shared/add_ingredient_page.dart';
 import 'package:fresh_planner/ui/styles.dart';
@@ -62,6 +63,15 @@ class _IngredientsPageState extends State<IngredientsPage> {
 
   void _removeIngredient(Ingredient ingredient) async {
     _isLoading = true;
+
+    for(Recipe r in widget.recipes) {
+      if (r.ingredients.contains(ingredient)) {
+        await _showErrorDialog('Error, you attempted to remove an ingredient contained in the recipe ${r.name}. Please delete this recipe before deleting the ingredient');
+        _isLoading = false;
+        return;
+      }
+    }
+
     bool success = await _ingredientDB.removeIngredient(widget.user.uid!, ingredient.id!);
     _isLoading = false;
 
@@ -269,6 +279,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                             ],
                           ),
                         ),
+                        
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
@@ -379,6 +390,32 @@ class _IngredientsPageState extends State<IngredientsPage> {
           ],
         ),
       ),
+    );
+  }
+  
+  Future<void> _showErrorDialog(String error) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(error),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Okay'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

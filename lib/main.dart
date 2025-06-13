@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Fresh Planner',
       theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF26693C)),
         scaffoldBackgroundColor: Colors.white,
         useMaterial3: true,
       ),

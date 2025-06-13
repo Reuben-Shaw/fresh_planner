@@ -110,4 +110,22 @@ class DatabaseCalendar {
       return false;
     }
   }
+
+  Future<bool> deleteRecipe(String uid, Recipe recipe) async {
+    if (recipe.id == null) return false;
+    try {
+      final response = await _database.deleteRecipeAPI(uid, recipe.id!);
+      bool success = response['success'] as bool? ?? false;
+      if (success) {
+        debugPrint('Recipe deleted with id ${recipe.id!}');
+        return true;
+      } else {
+        debugPrint('Deleting recipe failed: ${response['error'] ?? response['message']}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('Crash in deleterecipe: $e');
+      return false;
+    }
+  }
 } 

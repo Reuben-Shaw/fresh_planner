@@ -34,6 +34,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
   };
   List<IngredientCard> _searchedIngredients = [];
 
+  IngredientCard? _selectedIngredientCard;
   Ingredient? _selectedIngredient;
   bool _displaySearchList = false;
 
@@ -46,18 +47,35 @@ class _IngredientsPageState extends State<IngredientsPage> {
   void _setUpIngredientMap() {
     for (Ingredient i in widget.ingredients) {
       final IngredientType t = i.type ?? IngredientType.misc;
-      _ingredientMap[t]!.add(IngredientCard(ingredient: i, onRemove: () async => _removeIngredient(i), showAmount: false,));
+      _ingredientMap[t]!.add(IngredientCard(ingredient: i, onRemove: () async => _removeIngredient(i), showAmount: false, isSelected: false,));
     }
   }
 
-  void _selectIngredient(Ingredient ingredient) {
+  /// Handles logic for when an ingredient card is selected
+  void _selectIngredient(IngredientCard ingredientCard) {
+    Ingredient ingredient = ingredientCard.ingredient;
+    IngredientType type = ingredientCard.ingredient.type ?? IngredientType.misc;
+
+    // When selected, the card is removed and re-added so the colour can change, IngredientCard is stateful and must have all values assigned at initiation
     setState(() {
       if (_selectedIngredient == ingredient) {
         _selectedIngredient = null;
+        _selectedIngredientCard = null;
+        _ingredientMap[type]!.remove(ingredientCard);
+        _ingredientMap[type]!.add(IngredientCard(ingredient: ingredient, onRemove: () async => _removeIngredient(ingredient), showAmount: false, isSelected: false,));
       } else {
+        if (_selectedIngredientCard != null && _selectedIngredient != null) {
+          _ingredientMap[type]!.remove(_selectedIngredientCard);
+          _ingredientMap[type]!.add(IngredientCard(ingredient: _selectedIngredient!, onRemove: () async => _removeIngredient(_selectedIngredient!), showAmount: false, isSelected: false,));
+        }
         _selectedIngredient = ingredient;
+        _ingredientMap[type]!.remove(ingredientCard);
+        final newIngredientCard = IngredientCard(ingredient: ingredient, onRemove: () async => _removeIngredient(ingredient), showAmount: false, isSelected: true,);
+        _ingredientMap[type]!.add(newIngredientCard);
+        _selectedIngredientCard = newIngredientCard;
         if (_selectedIngredient != null) _selectedIngredient!.amount = 0;
       }
+      _ingredientMap[type]!.sort();
     });
   }
 
@@ -125,18 +143,12 @@ class _IngredientsPageState extends State<IngredientsPage> {
     });
   }
 
-  // TODO: Change this to use some form of voidcallback so the back colour changes in the card itself
+  /// Wraps IngredientCards in a GestureDetector, so they can be selected
   GestureDetector _ingredientCardClick(IngredientCard ingredientCard) {
-    Ingredient ingredient = ingredientCard.ingredient;
     return GestureDetector(
       key: Key('${ingredientCard.ingredient.name}_tap'),
-      onTap: () => _selectIngredient(ingredient),
-      child: Container(
-        color: ingredient.isEqual(_selectedIngredient)
-            ? Colors.green[100]
-            : Colors.transparent,
-        child: ingredientCard,
-      ),
+      onTap: () => _selectIngredient(ingredientCard),
+      child: ingredientCard,
     );
   }
 
@@ -184,7 +196,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                                 setState(() {
                                   widget.ingredients.add(result);
                                   widget.ingredients.sort();
-                                  _ingredientMap[result.type ?? IngredientType.misc]!.add(IngredientCard(ingredient: result, onRemove: () async => _removeIngredient(result), showAmount: false,));
+                                  _ingredientMap[result.type ?? IngredientType.misc]!.add(IngredientCard(ingredient: result, onRemove: () async => _removeIngredient(result), showAmount: false, isSelected: false,));
                                   _ingredientMap[result.type ?? IngredientType.misc]!.sort();
                                   _searchController.clear();
                                   _updateSearch('');

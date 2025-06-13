@@ -1,16 +1,34 @@
-# fresh_planner
+# Fresh Planning
 
-A new Flutter project.
+BS3203 - Computing Project
 
-## Getting Started
+Final Year Project by Reuben Shaw
 
-This project is a starting point for a Flutter application.
+## Running the Application
 
-A few resources to get you started if this is your first Flutter project:
+This project has been developed for the Android operating system, therefore to run an Android emulator or a physical Android phone is required.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Android Emulator
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Download Android Studio
+2. Inside Android Studio install at least 1 Android emultaor, I recommend the Pixels 4, 5 & 7 so you can have a variety of sizes of screens
+3. Download the APK from the release tabs on the right of this GitHub repositry
+4. Run the emulator and drag the APK onto the phone's screen
+5. The program will be downloaded and can now be run
+
+### Physical Device
+
+1. Navigate to this GitHub page and download the APK from the release found in the righthand panel
+2. Wait for the APK to download, then open it on your phone
+3. Accept any security checks that Android wants to perform
+4. The program is now downloaded onto your phone and can be run
+
+## Example Account + Registering
+
+There is an example account with pre-populated data that is recommended for use in testing functionality:
+
+* email: tester@test.com
+* password: password
+
+Registering new accounts is possible, and new accounts are automatically populated with some ingredients, but no recipes.
+New accounts can be registered with fake emails, as there is no authentication if the structure is correct, however all data is stored in plaintext, so no sensitive data should be entered into any registration fields.

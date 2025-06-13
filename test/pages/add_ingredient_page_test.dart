@@ -17,6 +17,7 @@ void main() {
         user: User(email: 'correctemail@test.com', username: 'testUser', uid: 'testID'),
         ingredients: (await db.getAllIngredients('testUID'))!,
         ingredientDB: db,
+        recipes: const [],
       ),
     );
   });
@@ -146,7 +147,7 @@ void main() {
 
     await tester.tap(metricDropdown);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('   Milliliters').last);
+    await tester.tap(find.text('   Millilitres').last);
     await tester.pumpAndSettle();
     expect(find.text('ml'), findsOneWidget);
 

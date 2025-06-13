@@ -11,9 +11,8 @@ import 'package:fresh_planner/ui/styles.dart';
 import 'package:fresh_planner/ui/widgets/calendar_cell.dart';
 
 class CalendarPage extends ParentPage {
-  const CalendarPage({super.key, required super.user, required super.ingredients, required this.recipes, required this.meals, required this.calendarDB});
+  const CalendarPage({super.key, required super.user, required super.ingredients, required super.recipes, required this.meals, required this.calendarDB});
 
-  final List<Recipe> recipes;
   final Map<TimeOfDay, List<Meal>> meals;
   final DatabaseCalendar calendarDB;
 
@@ -255,7 +254,7 @@ class _CalendarPageState extends State<CalendarPage> {
     Meal? meal = cell?.meal;
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AddMealPage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, calendarDB: widget.calendarDB, day: day, time: _timeOfDay, currentMeal: meal,)),
+      MaterialPageRoute(builder: (context) => AddMealPage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, calendarDB: widget.calendarDB, day: day, time: _timeOfDay, currentMeal: meal, meals: widget.meals,)),
     );
     _isLoading = false;
     if (result is Meal) {
@@ -270,8 +269,19 @@ class _CalendarPageState extends State<CalendarPage> {
         widget.meals[_timeOfDay]!.sort();
         _calendarCells = _createCalendar();
       });
+    } else if (result is (Map<TimeOfDay, List<Meal>>, Recipe)) {
+      for (TimeOfDay time in [TimeOfDay.breakfast, TimeOfDay.lunch, TimeOfDay.dinner]) {
+        setState(() {
+          widget.meals[time] = result.$1[time]!;
+          widget.meals[time]!.sort();
+        });
+      }
+      setState(() {
+        widget.recipes.remove(result.$2);
+      });
+      _calendarCells = _createCalendar();
     }
-  }
+  } 
 
   /// Gets the first instance of a day of the week from the cellMap
   DateTime _getFirstInstanceOfDay(int dayOfWeek, Map<DateTime, CalendarCell?> cellMap) {

@@ -1,7 +1,7 @@
 enum IngredientMetric {
   grams('Grams', 'g'),
   item('Items', 'Items'),
-  ml('Milliliters', 'ml'),
+  ml('Millilitres', 'ml'),
   percentage('Percentage', '%');
 
   final String standardName;

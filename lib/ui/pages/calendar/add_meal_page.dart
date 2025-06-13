@@ -3,10 +3,9 @@ import 'package:fresh_planner/source/database/database_calendar.dart';
 import 'package:fresh_planner/source/enums/ingredient_metric.dart';
 import 'package:fresh_planner/source/enums/meal_repetition.dart';
 import 'package:fresh_planner/source/enums/time_of_day.dart';
-import 'package:fresh_planner/source/objects/ingredient.dart';
 import 'package:fresh_planner/source/objects/meal.dart';
 import 'package:fresh_planner/source/objects/recipe.dart';
-import 'package:fresh_planner/source/objects/user.dart';
+import 'package:fresh_planner/ui/pages/parent_page.dart';
 import 'package:fresh_planner/ui/pages/shared/recipe_page.dart';
 import 'package:fresh_planner/ui/styles.dart';
 import 'package:fresh_planner/ui/widgets/loading_screen.dart';
@@ -14,25 +13,21 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Contains all logic for adding new meals to the `calendar_page`
-class AddMealPage extends StatefulWidget {
+class AddMealPage extends ParentPage {
   /// currentMeal is used for viewing the meal's information, editing meals is not included in this version of the application
-  const AddMealPage({super.key, required this.user, required this.ingredients, required this.recipes, required this.calendarDB, required this.day, required this.time, this.currentMeal});
+  const AddMealPage({super.key, required super.user, required super.ingredients, required super.recipes, required this.calendarDB, required this.day, required this.time, this.currentMeal, required this.meals});
 
-  final User user;
-  final List<Ingredient> ingredients;
-  final List<Recipe> recipes;
   final DatabaseCalendar calendarDB;
   final DateTime day;
   final TimeOfDay time;
   final Meal? currentMeal;
+  final Map<TimeOfDay, List<Meal>> meals;
 
   @override
   State<AddMealPage> createState() => _AddMealPageState();
 }
 
 class _AddMealPageState extends State<AddMealPage> {
-  final _calendarDB = DatabaseCalendar();
-  
   bool __isLoading = false;
   bool get _isLoading => __isLoading;
   set _isLoading(bool value) => setState(() => __isLoading = value);
@@ -213,7 +208,7 @@ class _AddMealPageState extends State<AddMealPage> {
                                     _isLoading = true;
                                     final result = await Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => RecipePage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, calendarDB: _calendarDB,)),
+                                      MaterialPageRoute(builder: (context) => RecipePage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, calendarDB: widget.calendarDB,)),
                                     );
                                     _isLoading = false;
                                     if (result is! Recipe) return;
@@ -252,7 +247,7 @@ class _AddMealPageState extends State<AddMealPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Visibility(
-                                      visible: _isAddingMeal || (widget.currentMeal?.isSingleDay() ?? false),
+                                      visible: widget.currentMeal?.isSingleDay() ?? false,
                                       child: const SizedBox(height: 16,)
                                     ),
                                     Row(
@@ -268,6 +263,33 @@ class _AddMealPageState extends State<AddMealPage> {
                                             onPressed: _replaceMeal, 
                                             icon: const Icon(
                                               Icons.edit_square,
+                                              color: Color(0xFF26693C),
+                                            ),
+                                          ),
+                                        ),
+                                        Visibility(
+                                          visible: _isAddingMeal,
+                                          // Deleting recipes
+                                          child: IconButton(
+                                            onPressed: () async {
+                                              final updatedMeals = await _showConfirmDeleteRecipe(_selectedRecipe);
+                                              if (updatedMeals != null && context.mounted) {
+                                                final success = await widget.calendarDB.deleteRecipe(widget.user.uid!, _selectedRecipe!);
+                                                if (success && context.mounted) {  
+                                                  Navigator.pop(context, (updatedMeals, _selectedRecipe),); 
+                                                } else {
+                                                  setState(() {
+                                                    _errorText = 'Meals deleted, failed with recipe';
+                                                  });
+                                                }
+                                              } else {
+                                                setState(() {
+                                                  _errorText = 'Failed to delete recipe, please try again';
+                                                });
+                                              }
+                                            },
+                                            icon: const Icon(
+                                              Icons.delete_forever,
                                               color: Color(0xFF26693C),
                                             ),
                                           ),
@@ -579,6 +601,67 @@ class _AddMealPageState extends State<AddMealPage> {
           const SizedBox(height: 10),
         ],
       ),
+    );
+  }
+
+  /// Handles deleting recipes, and all meals using that recipe on the calendar
+  Future<Map<TimeOfDay, List<Meal>>?> _showConfirmDeleteRecipe(Recipe? recipe) async {
+    if (recipe == null) return null;
+
+    return showDialog<Map<TimeOfDay, List<Meal>>>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Recipe'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                    'Are you sure you want to delete the recipe for ${recipe.name}? This will delete all instances of meals containing it.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+              onPressed: () async {
+                final newMeals = <TimeOfDay, List<Meal>>{
+                  TimeOfDay.breakfast: [],
+                  TimeOfDay.lunch: [],
+                  TimeOfDay.dinner: [],
+                };
+
+                List<Future<bool>> deleteMealTasks = [];
+                for (final time in [TimeOfDay.breakfast, TimeOfDay.lunch, TimeOfDay.dinner]) {
+                  for (final meal in widget.meals[time]!) {
+                    if (meal.recipe != recipe) {
+                      newMeals[time]!.add(meal);
+                    } else {
+                      deleteMealTasks.add(widget.calendarDB.deleteMeal(widget.user.uid!, meal));
+                    }
+                  }
+                }
+                // Meals all delted in parallel, to improve program speed
+                final results = await Future.wait(deleteMealTasks);
+                final success = results.every((result) => result == true);
+                if (!success) {
+                  setState(() {
+                    _errorText = 'Internal server error deleting meals, data may be corrupted';
+                  });
+                }
+                
+                if (context.mounted) Navigator.of(context).pop(newMeals);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

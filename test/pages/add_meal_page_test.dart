@@ -30,6 +30,7 @@ void main() {
         day: DateTime(2025, 05, 06),
         time: TimeOfDay.lunch,
         currentMeal: null,
+        meals: const{},
       ),
     );
   });
@@ -73,6 +74,7 @@ void main() {
         day: DateTime(2025, 05, 06),
         time: TimeOfDay.breakfast,
         currentMeal: null,
+        meals: const{},
       ),
     );
     
@@ -90,6 +92,7 @@ void main() {
         day: DateTime(2025, 05, 06),
         time: TimeOfDay.lunch,
         currentMeal: null,
+        meals: const{},
       ),
     );
     
@@ -107,6 +110,7 @@ void main() {
         day: DateTime(2025, 05, 06),
         time: TimeOfDay.dinner,
         currentMeal: null,
+        meals: const{},
       ),
     );
     
@@ -134,6 +138,7 @@ void main() {
         day: DateTime(2025, 05, 06),
         time: TimeOfDay.lunch,
         currentMeal: Meal(recipe: recipe, time: TimeOfDay.lunch, cookedFresh: false),
+        meals: const{},
       ),
     );
     

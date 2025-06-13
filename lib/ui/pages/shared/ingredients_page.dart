@@ -2,18 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/database/database_ingredients.dart';
 import 'package:fresh_planner/source/enums/ingredient_food_type.dart';
 import 'package:fresh_planner/source/objects/ingredient.dart';
-import 'package:fresh_planner/source/objects/user.dart';
+import 'package:fresh_planner/source/objects/recipe.dart';
+import 'package:fresh_planner/ui/pages/parent_page.dart';
 import 'package:fresh_planner/ui/pages/shared/add_ingredient_page.dart';
 import 'package:fresh_planner/ui/styles.dart';
 import 'package:fresh_planner/ui/widgets/ingredient_card.dart';
 import 'package:fresh_planner/ui/widgets/loading_screen.dart';
 
 // Used to display a list of all ingredients that the user currently has
-class IngredientsPage extends StatefulWidget {
-  const IngredientsPage({super.key, required this.user, required this.ingredients});
-
-  final User user;
-  final List<Ingredient> ingredients;
+class IngredientsPage extends ParentPage {
+  const IngredientsPage({super.key, required super.user, required super.ingredients, required super.recipes});
 
   @override
   State<IngredientsPage> createState() => _IngredientsPageState();
@@ -65,6 +63,15 @@ class _IngredientsPageState extends State<IngredientsPage> {
 
   void _removeIngredient(Ingredient ingredient) async {
     _isLoading = true;
+
+    for(Recipe r in widget.recipes) {
+      if (r.ingredients.contains(ingredient)) {
+        await _showErrorDialog('Error, you attempted to remove an ingredient contained in the recipe ${r.name}. Please delete this recipe before deleting the ingredient');
+        _isLoading = false;
+        return;
+      }
+    }
+
     bool success = await _ingredientDB.removeIngredient(widget.user.uid!, ingredient.id!);
     _isLoading = false;
 
@@ -170,7 +177,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                                 _isLoading = true;
                                 final result = await Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => AddIngredientPage(user: widget.user, ingredients: widget.ingredients, ingredientDB: _ingredientDB,)),
+                                  MaterialPageRoute(builder: (context) => AddIngredientPage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes, ingredientDB: _ingredientDB,)),
                                 );
                                 _isLoading = false;
                                 if (result is! Ingredient) return;
@@ -272,6 +279,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
                             ],
                           ),
                         ),
+                        
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
@@ -382,6 +390,32 @@ class _IngredientsPageState extends State<IngredientsPage> {
           ],
         ),
       ),
+    );
+  }
+  
+  Future<void> _showErrorDialog(String error) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(error),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Okay'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:fresh_planner/source/objects/user.dart';
 import 'package:fresh_planner/ui/pages/shared/ingredients_page.dart';
 import 'package:fresh_planner/ui/widgets/ingredient_card.dart';
 import '../database/database_ingredients_test.dart';
+
 void main() {
   late Widget testPage;
 
@@ -13,6 +14,7 @@ void main() {
       home: IngredientsPage(
         user: User(uid: 'testID', email: 'test@email.com', username: 'testUser'),
         ingredients: (await db.getAllIngredients('testID'))!,
+        recipes: const [],
       ),
     );
   });

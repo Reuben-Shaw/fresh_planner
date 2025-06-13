@@ -54,14 +54,14 @@ void main() {
     await tester.pumpWidget(testPage); 
     
     await tester.tap(find.byKey(const Key('register_text')));
-    await tester.pump();
+    await tester.pumpAndSettle();
     await tester.enterText(find.byKey(const Key('email_textfield')), 'existingemail@test.com');
     await tester.enterText(find.byKey(const Key('username_textfield')), 'testUser');
     await tester.enterText(find.byKey(const Key('password_textfield')), 'password');
     await tester.enterText(find.byKey(const Key('reenter_password_textfield')), 'password');
     await tester.pump();
     await tester.tap(find.byKey(const Key('login_button')));
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.text('This email has already been registered'), findsOneWidget);
   });
 
@@ -69,14 +69,14 @@ void main() {
     await tester.pumpWidget(testPage); 
     
     await tester.tap(find.byKey(const Key('register_text')));
-    await tester.pump();
+    await tester.pumpAndSettle();
     await tester.enterText(find.byKey(const Key('email_textfield')), 'validemail@test.com');
     await tester.enterText(find.byKey(const Key('username_textfield')), 'testUser');
     await tester.enterText(find.byKey(const Key('password_textfield')), 'password');
     await tester.enterText(find.byKey(const Key('reenter_password_textfield')), 'wrongPassword');
     await tester.pump();
     await tester.tap(find.byKey(const Key('login_button')));
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.text('Please ensure passwords match'), findsOneWidget);
   });
 

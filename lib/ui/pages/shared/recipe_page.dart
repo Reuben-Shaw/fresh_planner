@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fresh_planner/source/database/database_calendar.dart';
 import 'package:fresh_planner/source/objects/ingredient.dart';
 import 'package:fresh_planner/source/objects/recipe.dart';
-import 'package:fresh_planner/source/objects/user.dart';
+import 'package:fresh_planner/ui/pages/parent_page.dart';
 import 'package:fresh_planner/ui/pages/shared/ingredients_page.dart';
 import 'package:fresh_planner/ui/styles.dart';
 import 'package:fresh_planner/ui/widgets/ingredient_card.dart';
@@ -11,12 +11,9 @@ import 'package:fresh_planner/ui/widgets/loading_screen.dart';
 import 'package:intl/intl.dart';
 
 /// Page used for creating new `Recipe` objects
-class RecipePage extends StatefulWidget {
-  const RecipePage({super.key, required this.user, required this.ingredients, required this.recipes, required this.calendarDB, this.ingredientsInRecipe});
+class RecipePage extends ParentPage {
+  const RecipePage({super.key, required super.user, required super.ingredients, required super.recipes, required this.calendarDB, this.ingredientsInRecipe});
 
-  final User user;
-  final List<Ingredient> ingredients;
-  final List<Recipe> recipes;
   final DatabaseCalendar calendarDB;
   final List<Ingredient>? ingredientsInRecipe;
 
@@ -178,10 +175,21 @@ class _RecipePageState extends State<RecipePage> {
                             if (context.mounted) {
                               final result = await Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => IngredientsPage(user: widget.user, ingredients: widget.ingredients)),
+                                MaterialPageRoute(builder: (context) => IngredientsPage(user: widget.user, ingredients: widget.ingredients, recipes: widget.recipes,)),
                               );
                               _isLoading = false;
                               if (result is! Ingredient) return;
+
+                              // Stacks ingredients if there is replicas
+                              for (IngredientCard card in _ingredientCards) {
+                                if (card.ingredient.isEqual(result)) {
+                                  result.amount += card.ingredient.amount;
+                                  setState(() {
+                                    _ingredientCards.remove(card);
+                                  });
+                                  break;
+                                }
+                              }
                               setState(() {
                                 _ingredientCards.add(IngredientCard(
                                   ingredient: result,

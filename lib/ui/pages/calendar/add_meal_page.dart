@@ -269,10 +269,10 @@ class _AddMealPageState extends State<AddMealPage> {
                                         ),
                                         Visibility(
                                           visible: _isAddingMeal,
+                                          // Deleting recipes
                                           child: IconButton(
                                             onPressed: () async {
                                               final updatedMeals = await _showConfirmDeleteRecipe(_selectedRecipe);
-                                              debugPrint('6');
                                               if (updatedMeals != null && context.mounted) {
                                                 final success = await widget.calendarDB.deleteRecipe(widget.user.uid!, _selectedRecipe!);
                                                 if (success && context.mounted) {  
@@ -283,7 +283,6 @@ class _AddMealPageState extends State<AddMealPage> {
                                                   });
                                                 }
                                               } else {
-                                                debugPrint('Fail!');
                                                 setState(() {
                                                   _errorText = 'Failed to delete recipe, please try again';
                                                 });
@@ -605,6 +604,7 @@ class _AddMealPageState extends State<AddMealPage> {
     );
   }
 
+  /// Handles deleting recipes, and all meals using that recipe on the calendar
   Future<Map<TimeOfDay, List<Meal>>?> _showConfirmDeleteRecipe(Recipe? recipe) async {
     if (recipe == null) return null;
 
@@ -631,7 +631,6 @@ class _AddMealPageState extends State<AddMealPage> {
             TextButton(
               child: const Text('Delete', style: TextStyle(color: Colors.red)),
               onPressed: () async {
-                debugPrint('1');
                 final newMeals = <TimeOfDay, List<Meal>>{
                   TimeOfDay.breakfast: [],
                   TimeOfDay.lunch: [],
@@ -639,11 +638,8 @@ class _AddMealPageState extends State<AddMealPage> {
                 };
 
                 List<Future<bool>> deleteMealTasks = [];
-                debugPrint('2');
                 for (final time in [TimeOfDay.breakfast, TimeOfDay.lunch, TimeOfDay.dinner]) {
-                  debugPrint('3');
                   for (final meal in widget.meals[time]!) {
-                    debugPrint('m');
                     if (meal.recipe != recipe) {
                       newMeals[time]!.add(meal);
                     } else {
@@ -651,7 +647,7 @@ class _AddMealPageState extends State<AddMealPage> {
                     }
                   }
                 }
-                debugPrint('4');
+                // Meals all delted in parallel, to improve program speed
                 final results = await Future.wait(deleteMealTasks);
                 final success = results.every((result) => result == true);
                 if (!success) {
@@ -659,7 +655,6 @@ class _AddMealPageState extends State<AddMealPage> {
                     _errorText = 'Internal server error deleting meals, data may be corrupted';
                   });
                 }
-                debugPrint('5');
                 
                 if (context.mounted) Navigator.of(context).pop(newMeals);
               },

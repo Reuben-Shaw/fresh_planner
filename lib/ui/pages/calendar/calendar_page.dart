@@ -270,7 +270,6 @@ class _CalendarPageState extends State<CalendarPage> {
         _calendarCells = _createCalendar();
       });
     } else if (result is (Map<TimeOfDay, List<Meal>>, Recipe)) {
-      debugPrint('HERE');
       for (TimeOfDay time in [TimeOfDay.breakfast, TimeOfDay.lunch, TimeOfDay.dinner]) {
         setState(() {
           widget.meals[time] = result.$1[time]!;

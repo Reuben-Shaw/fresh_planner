@@ -65,9 +65,10 @@ class _IngredientsPageState extends State<IngredientsPage> {
         _ingredientMap[type]!.add(IngredientCard(ingredient: ingredient, onRemove: () async => _removeIngredient(ingredient), showAmount: false, isSelected: false,));
       } else {
         if (_selectedIngredientCard != null && _selectedIngredient != null) {
-          _ingredientMap[_selectedIngredient!.type]!.remove(_selectedIngredientCard);
-          _ingredientMap[_selectedIngredient!.type]!.add(IngredientCard(ingredient: _selectedIngredient!, onRemove: () async => _removeIngredient(_selectedIngredient!), showAmount: false, isSelected: false,));
-          _ingredientMap[_selectedIngredient!.type]!.sort();
+          IngredientType previousType = _selectedIngredient!.type ?? IngredientType.misc;
+          _ingredientMap[previousType]!.remove(_selectedIngredientCard);
+          _ingredientMap[previousType]!.add(IngredientCard(ingredient: _selectedIngredient!, onRemove: () async => _removeIngredient(_selectedIngredient!), showAmount: false, isSelected: false,));
+          _ingredientMap[previousType]!.sort();
         }
         _selectedIngredient = ingredient;
         _ingredientMap[type]!.remove(ingredientCard);

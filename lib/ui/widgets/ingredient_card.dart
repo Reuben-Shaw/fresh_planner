@@ -8,12 +8,14 @@ class IngredientCard extends StatelessWidget implements Comparable<IngredientCar
   final Ingredient ingredient;
   final VoidCallback? onRemove;
   final bool showAmount;
+  final bool isSelected;
 
   const IngredientCard({
     super.key,
     required this.ingredient,
     this.onRemove,
     required this.showAmount,
+    required this.isSelected,
   });
 
   @override
@@ -28,7 +30,7 @@ class IngredientCard extends StatelessWidget implements Comparable<IngredientCar
       children: <Widget>[
         Expanded(
           child: Container(
-            decoration: AppTextFieldStyles.dropShadowWithColour,
+            decoration: isSelected ? AppTextFieldStyles.altDropShadowWithColour : AppTextFieldStyles.dropShadowWithColour,
             height: 38,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -37,7 +39,7 @@ class IngredientCard extends StatelessWidget implements Comparable<IngredientCar
                 children: <Widget>[
                   Text(
                     ingredient.name,
-                    style: AppTextStyles.standardRegular
+                    style: isSelected ? AppTextStyles.altStandardRegular : AppTextStyles.standardRegular
                   ),
                   Row(
                     children: <Widget>[
@@ -51,7 +53,7 @@ class IngredientCard extends StatelessWidget implements Comparable<IngredientCar
                       Text(
                         (showAmount && (ingredient.metric == IngredientMetric.item || ingredient.amount == 0)) ? '' : 
                         showAmount ? ingredient.metric.metricSymbol : ingredient.metric.standardName, 
-                        style: AppTextStyles.standardBold,
+                        style: isSelected ? AppTextStyles.altStandardBold : AppTextStyles.standardBold,
                       ),
                     ],
                   ),

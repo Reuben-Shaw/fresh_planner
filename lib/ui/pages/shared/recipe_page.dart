@@ -45,7 +45,7 @@ class _RecipePageState extends State<RecipePage> {
     } else if (widget.ingredientsInRecipe!.isNotEmpty) {
       widget.ingredients.sort();
       for (Ingredient i in widget.ingredients) {
-        _ingredientCards.add(IngredientCard(ingredient: i, showAmount: true));
+        _ingredientCards.add(IngredientCard(ingredient: i, showAmount: true, isSelected: false,));
       }
     }
   }
@@ -195,6 +195,7 @@ class _RecipePageState extends State<RecipePage> {
                                   ingredient: result,
                                   showAmount: true,
                                   onRemove: () async => _removeIngredient(result),
+                                  isSelected: false,
                                 ));
                                 _ingredientCards.sort();
                               });

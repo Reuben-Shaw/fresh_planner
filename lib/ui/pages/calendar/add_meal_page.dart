@@ -257,42 +257,48 @@ class _AddMealPageState extends State<AddMealPage> {
                                           _selectedRecipe?.name ?? '',
                                           style: AppTextStyles.innerTitle,
                                         ),
-                                        Visibility(
-                                          visible: !_isAddingMeal && !(widget.currentMeal?.isSingleDay() ?? false),
-                                          child: IconButton(
-                                            onPressed: _replaceMeal, 
-                                            icon: const Icon(
-                                              Icons.edit_square,
-                                              color: Color(0xFF26693C),
+                                        Stack(
+                                          children: <Widget>[
+                                            Visibility(
+                                              visible: !_isAddingMeal && !(widget.currentMeal?.isSingleDay() ?? false),
+                                              child: IconButton(
+                                                onPressed: _replaceMeal, 
+                                                icon: const Icon(
+                                                  Icons.edit_square,
+                                                  color: Color(0xFF26693C),
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        ),
-                                        Visibility(
-                                          visible: _isAddingMeal,
-                                          // Deleting recipes
-                                          child: IconButton(
-                                            onPressed: () async {
-                                              final updatedMeals = await _showConfirmDeleteRecipe(_selectedRecipe);
-                                              if (updatedMeals != null && context.mounted) {
-                                                final success = await widget.calendarDB.deleteRecipe(widget.user.uid!, _selectedRecipe!);
-                                                if (success && context.mounted) {  
-                                                  Navigator.pop(context, (updatedMeals, _selectedRecipe),); 
-                                                } else {
-                                                  setState(() {
-                                                    _errorText = 'Meals deleted, failed with recipe';
-                                                  });
-                                                }
-                                              } else {
-                                                setState(() {
-                                                  _errorText = 'Failed to delete recipe, please try again';
-                                                });
-                                              }
-                                            },
-                                            icon: const Icon(
-                                              Icons.delete_forever,
-                                              color: Color(0xFF26693C),
+                                            Visibility(
+                                              visible: _isAddingMeal,
+                                              // Deleting recipes
+                                              child: IconButton(
+                                                onPressed: () async {
+                                                  _isLoading = true;
+                                                  final updatedMeals = await _showConfirmDeleteRecipe(_selectedRecipe);
+                                                  if (updatedMeals != null && context.mounted) {
+                                                    final success = await widget.calendarDB.deleteRecipe(widget.user.uid!, _selectedRecipe!);
+                                                    if (success && context.mounted) {  
+                                                      Navigator.pop(context, (updatedMeals, _selectedRecipe),); 
+                                                    } else {
+                                                      setState(() {
+                                                        _errorText = 'Meals deleted, failed with recipe';
+                                                      });
+                                                    }
+                                                  } else {
+                                                    setState(() {
+                                                      _errorText = 'Failed to delete recipe, please try again';
+                                                    });
+                                                  }
+                                                  _isLoading = false;
+                                                },
+                                                icon: const Icon(
+                                                  Icons.delete_forever,
+                                                  color: Color(0xFF26693C),
+                                                ),
+                                              ),
                                             ),
-                                          ),
+                                          ],
                                         ),
                                       ],
                                     ),

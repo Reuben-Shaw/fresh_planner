@@ -180,6 +180,7 @@ class _RecipePageState extends State<RecipePage> {
                               _isLoading = false;
                               if (result is! Ingredient) return;
 
+                              // Stacks ingredients if there is replicas
                               for (IngredientCard card in _ingredientCards) {
                                 if (card.ingredient.isEqual(result)) {
                                   result.amount += card.ingredient.amount;

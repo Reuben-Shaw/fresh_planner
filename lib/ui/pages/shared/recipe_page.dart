@@ -179,6 +179,16 @@ class _RecipePageState extends State<RecipePage> {
                               );
                               _isLoading = false;
                               if (result is! Ingredient) return;
+
+                              for (IngredientCard card in _ingredientCards) {
+                                if (card.ingredient.isEqual(result)) {
+                                  result.amount += card.ingredient.amount;
+                                  setState(() {
+                                    _ingredientCards.remove(card);
+                                  });
+                                  break;
+                                }
+                              }
                               setState(() {
                                 _ingredientCards.add(IngredientCard(
                                   ingredient: result,

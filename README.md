@@ -1,8 +1,73 @@
 # Fresh Planning
 
-BS3203 - Computing Project
+![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
+![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node%20js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-ffca28?style=for-the-badge&logo=firebase&logoColor=black)
 
-Final Year Project by Reuben Shaw
+---
+
+**Fresh Planning** is an **accessibly-designed meal planning app** created to help young adults in the UK manage budgeting, shopping, and meal preparation.
+
+Developed as a final year project for a **BSc (Hons) in Software Engineering**, the app, API, research portfolio, and presentation received a final grade of **86/100**.
+
+---
+
+## 🚀 Features
+
+### 🧾 Create Ingredients for Recipes
+
+<div align="center">
+  <img width="300" alt="Create Ingredient" src="https://github.com/user-attachments/assets/50e28ddc-587e-4ff4-8291-c41a386d3bda" />
+  &nbsp;&nbsp;&nbsp;
+  <img width="300" alt="Ingredient Detail" src="https://github.com/user-attachments/assets/d1321e2d-2f4b-48cf-8bf8-3c71166e5294" />
+</div>
+
+---
+
+### 📅 Plan Meals for the Entire Month
+
+Create meal plans for **breakfast, lunch, and dinner** with an intuitive user-mapped interface.
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/3490cbe5-76a7-43e7-94d0-a899196ee66d" alt="Monthly Plan" width="300"/>
+</div>
+
+Customize frequency, set leftovers, and reuse favourite meals.
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/7702584c-0896-4613-a62d-685805754356" alt="Repeating Meals" width="300"/>
+</div>
+
+---
+
+### 🍳 Add Recipes & Link to Your Favourite Sites
+
+Save your own meals and link them to online recipes.
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/fddf5656-bc71-45db-bd66-9a2c1896ecef" alt="Add Recipe" width="300"/>
+</div>
+
+---
+
+## 📚 Tech Stack
+
+- **Flutter & Dart** – Android only Frontend Development and Automated Testing
+- **Firebase** – NoSQL Database and Hosting of API
+- **Node.js** – Backend Services & Integration
+
+---
+
+## 📦 Project Highlights
+
+✅ Accessible UI/UX Design
+
+✅ Modular codebase (Flutter & Firebase)
+
+✅ Full research portfolio with academic backing
+
+---
 
 ## Running the Application
 

@@ -52,33 +52,63 @@ class _IngredientsPageState extends State<IngredientsPage> {
   }
 
   /// Handles logic for when an ingredient card is selected
-  void _selectIngredient(IngredientCard ingredientCard) {
+  void _selectIngredient(IngredientCard ingredientCard, bool performListSelect) {
     Ingredient ingredient = ingredientCard.ingredient;
     IngredientType type = ingredientCard.ingredient.type ?? IngredientType.misc;
 
     // When selected, the card is removed and re-added so the colour can change, IngredientCard is stateful and must have all values assigned at initiation
     setState(() {
-      if (_selectedIngredient == ingredient) {
-        _selectedIngredient = null;
-        _selectedIngredientCard = null;
-        _ingredientMap[type]!.remove(ingredientCard);
-        _ingredientMap[type]!.add(IngredientCard(ingredient: ingredient, onRemove: () async => _removeIngredient(ingredient), showAmount: false, isSelected: false,));
+      if (performListSelect) {
+        _selectFromList(ingredientCard, ingredient, type);
       } else {
-        if (_selectedIngredientCard != null && _selectedIngredient != null) {
-          IngredientType previousType = _selectedIngredient!.type ?? IngredientType.misc;
-          _ingredientMap[previousType]!.remove(_selectedIngredientCard);
-          _ingredientMap[previousType]!.add(IngredientCard(ingredient: _selectedIngredient!, onRemove: () async => _removeIngredient(_selectedIngredient!), showAmount: false, isSelected: false,));
-          _ingredientMap[previousType]!.sort();
-        }
-        _selectedIngredient = ingredient;
-        _ingredientMap[type]!.remove(ingredientCard);
-        final newIngredientCard = IngredientCard(ingredient: ingredient, onRemove: () async => _removeIngredient(ingredient), showAmount: false, isSelected: true,);
-        _ingredientMap[type]!.add(newIngredientCard);
-        _selectedIngredientCard = newIngredientCard;
-        if (_selectedIngredient != null) _selectedIngredient!.amount = 0;
+        _selectFromMap(ingredientCard, ingredient, type);
       }
-      _ingredientMap[type]!.sort();
     });
+  }
+
+  void _selectFromList(IngredientCard ingredientCard, Ingredient ingredient, IngredientType type) {
+    if (_selectedIngredient == ingredient) {
+      _selectedIngredient = null;
+      _selectedIngredientCard = null;
+      _searchedIngredients.remove(ingredientCard);
+      _searchedIngredients.add(IngredientCard(ingredient: ingredient, onRemove: () async => _removeIngredient(ingredient), showAmount: false, isSelected: false,));
+    } else {
+      if (_selectedIngredientCard != null && _selectedIngredient != null) {
+        _searchedIngredients.remove(_selectedIngredientCard);
+        _searchedIngredients.add(IngredientCard(ingredient: _selectedIngredient!, onRemove: () async => _removeIngredient(_selectedIngredient!), showAmount: false, isSelected: false,));
+        _searchedIngredients.sort();
+      }
+      _selectedIngredient = ingredient;
+      _searchedIngredients.remove(ingredientCard);
+      final newIngredientCard = IngredientCard(ingredient: ingredient, onRemove: () async => _removeIngredient(ingredient), showAmount: false, isSelected: true,);
+      _searchedIngredients.add(newIngredientCard);
+      _selectedIngredientCard = newIngredientCard;
+      if (_selectedIngredient != null) _selectedIngredient!.amount = 0;
+    }
+    _searchedIngredients.sort();
+  }
+
+  void _selectFromMap(IngredientCard ingredientCard, Ingredient ingredient, IngredientType type) {
+    if (_selectedIngredient == ingredient) {
+      _selectedIngredient = null;
+      _selectedIngredientCard = null;
+      _ingredientMap[type]!.remove(ingredientCard);
+      _ingredientMap[type]!.add(IngredientCard(ingredient: ingredient, onRemove: () async => _removeIngredient(ingredient), showAmount: false, isSelected: false,));
+    } else {
+      if (_selectedIngredientCard != null && _selectedIngredient != null) {
+        IngredientType previousType = _selectedIngredient!.type ?? IngredientType.misc;
+        _ingredientMap[previousType]!.remove(_selectedIngredientCard);
+        _ingredientMap[previousType]!.add(IngredientCard(ingredient: _selectedIngredient!, onRemove: () async => _removeIngredient(_selectedIngredient!), showAmount: false, isSelected: false,));
+        _ingredientMap[previousType]!.sort();
+      }
+      _selectedIngredient = ingredient;
+      _ingredientMap[type]!.remove(ingredientCard);
+      final newIngredientCard = IngredientCard(ingredient: ingredient, onRemove: () async => _removeIngredient(ingredient), showAmount: false, isSelected: true,);
+      _ingredientMap[type]!.add(newIngredientCard);
+      _selectedIngredientCard = newIngredientCard;
+      if (_selectedIngredient != null) _selectedIngredient!.amount = 0;
+    }
+    _ingredientMap[type]!.sort();
   }
 
   void _removeIngredient(Ingredient ingredient) async {
@@ -113,6 +143,8 @@ class _IngredientsPageState extends State<IngredientsPage> {
 
       // If search text is empty the list headers need to be displayed
       if (searchedText.isEmpty) {
+        _selectedIngredient = null;
+        _selectedIngredientCard = null;
         _searchedIngredients.clear();
         _displaySearchList = false;
         return;
@@ -120,7 +152,12 @@ class _IngredientsPageState extends State<IngredientsPage> {
 
       // If search has text the list headers need to be hidden
       _displaySearchList = true;
-
+      
+      // Clear search by re-assigning selected ingredient
+      if (_selectedIngredientCard != null) {
+        _selectIngredient(_selectedIngredientCard!, true);
+      }
+      
       if (_searchedIngredients.isEmpty) {
         for (var entry in _ingredientMap.entries) {
           final mapEntry = entry.value;
@@ -149,7 +186,7 @@ class _IngredientsPageState extends State<IngredientsPage> {
   GestureDetector _ingredientCardClick(IngredientCard ingredientCard) {
     return GestureDetector(
       key: Key('${ingredientCard.ingredient.name}_tap'),
-      onTap: () => _selectIngredient(ingredientCard),
+      onTap: () => _selectIngredient(ingredientCard, _displaySearchList),
       child: ingredientCard,
     );
   }
